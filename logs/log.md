@@ -57,7 +57,7 @@ numerados em `CLAUDE.md` seção 7.
 - NÃO testado: nada executável existe ainda.
 
 **Commits.**
-- (preencher após o commit inicial)
+- `d1ef0e4` — chore: set up repository with guide, standards and work logs
 
 **Pendências.**
 - Criar o projeto Spring Boot em `backend/`, com a árvore de pacotes da seção 8.
