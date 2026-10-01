@@ -1,0 +1,14 @@
+-- Carga inicial.
+--
+-- Exigencias do enunciado (secao 8.2):
+--   - malha aerea inicial: 4 aeroportos (POA 41, FLN 16, CWB 26, GRU 115) e
+--     8 aerovias (R1..R8);
+--   - pilotos;
+--   - aeronaves das TRES categorias (particular, passageiros, carga);
+--   - planos APROVADOS com suas reservas;
+--   - na DATA DE REFERENCIA, pelo menos 5 das 8 aerovias com alguma ocupacao;
+--   - a ocupacao e consequencia dos planos aprovados, nunca reserva solta;
+--   - os dados permitem tanto sucesso quanto conflito: nao deixar todos os
+--     recursos indisponiveis durante todo o dia.
+--
+-- DATA DE REFERENCIA: [PREENCHER] - e preciso constar tambem no README.md.

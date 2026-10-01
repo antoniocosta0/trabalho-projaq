@@ -1,0 +1,11 @@
+-- Schema do Sistema de Gestao de Planos de Voo.
+--
+-- Precisa rodar do zero, em banco vazio, sem erro.
+--
+-- Checklist de modelagem: CONTEXT_NEW.md / CLAUDE.md, secao 14.3.
+-- Atencao especial as duas restricoes de unicidade que sustentam o controle de
+-- ocupacao, e que sao a ultima linha de defesa contra duas aprovacoes
+-- simultaneas no mesmo recurso:
+--
+--   UNIQUE (aerovia_id, altitude, slot_inicio)
+--   UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)

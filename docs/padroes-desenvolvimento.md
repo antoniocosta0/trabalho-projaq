@@ -66,7 +66,7 @@ Cada papel tem um sufixo, e o sufixo diz em que pasta a classe mora:
 | Papel | Sufixo | Pacote | Exemplo |
 |---|---|---|---|
 | Porta de entrada (caso de uso) | `UseCase` | `domain.ports.in` | `AprovarPlanoUseCase` |
-| Implementação do caso de uso | `Service` | `domain.model` (serviço de aplicação) | `AprovarPlanoService` |
+| Implementação do caso de uso | `Service` | `domain.servicos` | `AprovarPlanoService` |
 | Porta de saída | `Repository` | `domain.ports.out` | `PlanoRepository` |
 | Adaptador de saída | prefixo da tecnologia + `Repository` | `infra.adapters.out.persistence` | `JpaPlanoRepository` |
 | Entidade de persistência | sufixo `Entity` | `infra.adapters.out.persistence` | `PlanoEntity` |

@@ -1,8 +1,8 @@
 # Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.properties
 
 # Java
 *.class
