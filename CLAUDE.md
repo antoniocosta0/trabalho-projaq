@@ -189,6 +189,7 @@ trabalho-1/
 │   └── pull_request_template.md   template de PR (seção 10.4)
 ├── docs/
 │   ├── padroes-desenvolvimento.md branch, commit, PR, nomenclatura Java
+│   ├── arquitetura/README.md      o que cada nível do C4 mostra
 │   ├── dominio/
 │   │   ├── README.md
 │   │   ├── modelo-dominio.puml        (a criar) fonte do diagrama, PlantUML
@@ -207,15 +208,25 @@ trabalho-1/
 ├── logs/
 │   ├── log.md                         o que foi feito (seção 9)
 │   └── decisoes.md                    o que foi decidido e por quê (seção 9)
-└── backend/                           (a criar) projeto Spring Boot (seção 8)
-    ├── pom.xml
-    ├── src/main/java/...
+└── backend/                           projeto Spring Boot (seção 8) — compila
+    ├── pom.xml · mvnw · .mvn/
+    ├── README.md                      o que vai em cada pasta
+    ├── src/main/java/com/pucrs/planosdevoo/
+    │   ├── PlanosDeVooApplication.java
+    │   ├── domain/{model, servicos, ports/in, ports/out}
+    │   └── infra/{adapters/in/rest, adapters/out/persistence, config}
     ├── src/main/resources/
-    │   ├── application.properties
-    │   ├── schema.sql | migrations/
-    │   └── data.sql   | seed
-    └── src/test/java/...
+    │   ├── application.properties     H2 em arquivo, não em memória
+    │   └── db/{schema.sql, data.sql}  (a escrever)
+    └── src/test/java/...              espelha a árvore de main
 ```
+
+**`CLAUDE.md` × `CONTEXT_NEW.md`:** este guia cita o material local da cadeira
+por caminho (seção 2) e serve a quem tem a pasta PROJAQ baixada. O
+`CONTEXT_NEW.md` é autocontido — explica o conteúdo da cadeira em vez de apontar
+para os PDFs — e é o que se compartilha com a equipe e com outras ferramentas de
+IA. **As duas precisam ser atualizadas juntas** quando uma regra do projeto
+mudar.
 
 Regras da pasta:
 
