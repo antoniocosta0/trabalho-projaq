@@ -63,11 +63,3 @@ nbproject/
 ._*
 .Spotlight-V100
 .Trashes
-
-# Arquivos de trabalho deixados fora do versionamento de proposito, para que
-# edicao acidental nao entre em commit. Alteracao deliberada sobe com
-# `git add -f <arquivo>`; depois `git rm --cached <arquivo>` para voltar a
-# proteger (o `add -f` torna o arquivo rastreado de novo).
-/README.md
-/logs/log.md
-/logs/decisoes.md
