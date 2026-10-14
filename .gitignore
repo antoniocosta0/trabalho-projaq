@@ -1,21 +1,50 @@
+# =============================================================================
+# trabalho-1 — Sistema de Gestao de Planos de Voo
+# Java 25 + Maven + Spring Boot + H2. Equipe em macOS, Windows e Linux.
+#
+# Regra usada aqui: entra o que e GERADO (build), LOCAL (banco, IDE) ou
+# SECRETO (credencial). Nao entra o que e ENTREGA — README, docs/ e logs/
+# sao avaliados e ficam versionados.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
 # Maven
+# -----------------------------------------------------------------------------
 target/
 .mvn/timing.properties
 dependency-reduced-pom.xml
+.flattened-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+buildNumber.properties
 
+# -----------------------------------------------------------------------------
 # Java
+# -----------------------------------------------------------------------------
 *.class
 *.jar
 *.war
+*.ear
+*.nar
 *.ctxt
+*.hprof
 hs_err_pid*
 replay_pid*
+.attach_pid*
+
 # Wrapper do Maven: versionado de proposito, para `./mvnw` rodar em clone novo
-# sem depender de download. Precisa vir DEPOIS de `*.jar` para a negacao valer.
+# sem depender de download. Precisa vir DEPOIS de `*.jar` para a negacao valer —
+# no git, o ultimo padrao que casa e o que decide.
 !**/.mvn/wrapper/maven-wrapper.jar
 
-# Saida de build de IDE. Ancorado na raiz de proposito: `out/` solto casaria
-# com domain/ports/out e infra/adapters/out, que sao pastas da arquitetura.
+# -----------------------------------------------------------------------------
+# Saida de build de IDE
+# Ancorado na raiz de proposito: `out/` solto casaria com domain/ports/out e
+# infra/adapters/out, que sao pastas da arquitetura hexagonal.
+# -----------------------------------------------------------------------------
 /out/
 /build/
 /bin/
@@ -23,43 +52,126 @@ replay_pid*
 /backend/build/
 /backend/bin/
 
-# Log de execucao da aplicacao.
-# Os logs de trabalho (logs/*.md) sao entrega e ficam versionados.
+# -----------------------------------------------------------------------------
+# Log de execucao da aplicacao
+# Os logs de trabalho (logs/*.md) sao entrega e ficam versionados — este padrao
+# casa por extensao e nao os atinge.
+# -----------------------------------------------------------------------------
 *.log
+logs/*.log
+spring.log
 
-# Banco de dados local
+# -----------------------------------------------------------------------------
+# Banco de dados local (H2 em arquivo)
+# O enunciado exige persistencia entre reinicializacoes, entao o banco existe
+# no disco de cada um — mas o estado e local, nunca versionado. A carga inicial
+# reproduzivel mora em backend/src/main/resources/db/.
+# -----------------------------------------------------------------------------
 *.db
 *.mv.db
 *.trace.db
 *.lock.db
 data/
 
-# Ambiente
+# -----------------------------------------------------------------------------
+# Ambiente e credenciais
+# -----------------------------------------------------------------------------
 .env
-.env.local
+.env.*
+!.env.example
 application-local.properties
+application-local.yml
+*.pem
+*.key
+*.p12
+*.jks
 
-# IDE
+# -----------------------------------------------------------------------------
+# IntelliJ IDEA
+# -----------------------------------------------------------------------------
 .idea/
+.idea_modules/
 *.iml
 *.ipr
 *.iws
-.vscode/
+atlassian-ide-plugin.xml
+
+# -----------------------------------------------------------------------------
+# Eclipse / Spring Tool Suite
+# -----------------------------------------------------------------------------
 .classpath
 .project
 .settings/
-nbproject/
+.apt_generated/
+.apt_generated_test/
+.factorypath
+.springBeans
+.sts4-cache/
+.recommenders/
+.loadpath
+.buildpath
+.target
 
-# Editores
+# -----------------------------------------------------------------------------
+# VS Code
+# -----------------------------------------------------------------------------
+.vscode/
+!.vscode/extensions.json
+
+# -----------------------------------------------------------------------------
+# NetBeans
+# -----------------------------------------------------------------------------
+nbproject/
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# -----------------------------------------------------------------------------
+# Editores de texto
+# -----------------------------------------------------------------------------
 *~
 *.swp
 *.swo
+*.bak
+*.orig
+*.rej
+.\#*
+\#*\#
 
+# -----------------------------------------------------------------------------
 # Ferramentas locais
+# -----------------------------------------------------------------------------
 .claude/settings.local.json
 
+# -----------------------------------------------------------------------------
 # macOS
+# -----------------------------------------------------------------------------
 .DS_Store
+.AppleDouble
+.LSOverride
 ._*
 .Spotlight-V100
+.DocumentRevisions-V100
+.TemporaryItems
 .Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# -----------------------------------------------------------------------------
+# Windows
+# -----------------------------------------------------------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# -----------------------------------------------------------------------------
+# Linux
+# -----------------------------------------------------------------------------
+.directory
+.Trash-*
+.nfs*
