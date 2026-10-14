@@ -7,44 +7,41 @@ interagir com o mundo exterior.
 
 ```
 src/main/java/com/pucrs/planosdevoo/
-├── PlanosDeVooApplication.java      ponto de entrada do Spring Boot
-├── domain/                          NÃO conhece Spring, JPA nem infra
-│   ├── model/                       entidades, value objects, enums, serviços de domínio
-│   ├── servicos/                    implementações dos casos de uso (...Service)
+├── PlanosDeVooApplication.java          ponto de entrada do Spring Boot
+├── domain/                              NÃO conhece Spring, JPA nem infra
+│   ├── model/                           entidades, value objects, enums, serviços de domínio
 │   └── ports/
-│       ├── in/                      interfaces dos casos de uso (...UseCase)
-│       └── out/                     interfaces dos repositórios (...Repository)
-└── infra/                           conhece domain; a seta é sempre para dentro
+│       ├── in/usecases/                 casos de uso (...UC) e commands (...Command)
+│       └── out/repositories/            interfaces dos repositórios (Repositorio...)
+└── infra/                               conhece domain; a seta é sempre para dentro
     ├── adapters/
-    │   ├── in/rest/                 controllers (...Controller)
-    │   │   ├── dto/                 ...Request e ...Response
-    │   │   └── exception/           tradução de erro de domínio para status HTTP
-    │   └── out/persistence/
-    │       ├── entity/              entidades de banco (...Entity)
-    │       ├── repository/          implementação das portas de saída (Jpa...Repository)
-    │       └── mapper/              conversão domínio ↔ persistência (...Mapper)
-    └── config/                      beans de configuração (...Config)
+    │   ├── in/rest/                     controllers, DTOs e tradução de erro para HTTP
+    │   └── out/persistence/             entidades JPA, Spring Data, Repositorio...JPA, mappers
+    └── config/                          UseCaseConfig: cria os casos de uso como beans
 
 src/main/resources/
 ├── application.properties
 └── db/
-    ├── schema.sql                   schema, versionado
-    └── data.sql                     carga inicial e data de referência
+    ├── schema.sql                       schema, versionado
+    └── data.sql                         carga inicial e data de referência
 
-src/test/java/com/pucrs/planosdevoo/   espelha a árvore de main
+src/test/java/com/pucrs/planosdevoo/     espelha a árvore de main
 ```
+
+É a mesma organização do estudo de caso da cadeira (`P7a`) e do exemplo
+`ex3-sist-vendas-hexagonal`: **Domain** (Model, Ports In UseCases, Ports Out
+Repositories) e **Infra** (Adapters In Rest, Adapters Out Persistence, Config).
 
 ## O que vai em cada pasta
 
 | Pasta | O que mora aqui | O que NÃO mora aqui |
 |---|---|---|
-| `domain/model` | `PlanoDeVoo`, `Trecho`, `Pouso`, `Aerovia`, `Aeroporto`, `Aeronave` e subclasses, `Piloto`, `ReservaAerovia`, `ReservaVaga`, `Slot`, `SituacaoPlano`, `AcaoNoDestino` | qualquer `import` de Spring ou JPA |
-| `domain/servicos` | orquestração do caso de uso: `AprovarPlanoService`, `ValidarPlanoService` | regra de negócio que pertence à entidade |
-| `domain/ports/in` | `CriarPlanoUseCase`, `AdicionarTrechoUseCase`, `ValidarPlanoUseCase`, `AprovarPlanoUseCase`, `CancelarPlanoUseCase`… | implementação |
-| `domain/ports/out` | `PlanoRepository`, `AerovíaRepository`, `ReservaRepository`… (interfaces) | JPA, SQL, `JpaRepository` |
-| `infra/adapters/in/rest` | `PlanoController`, `MalhaController`, `AeronaveController` | regra de negócio, consulta ao banco |
-| `infra/adapters/out/persistence` | `PlanoEntity`, `JpaPlanoRepository`, `PlanoMapper` | regra de negócio |
-| `infra/config` | beans, `@Bean` de ligação entre porta e adaptador | lógica |
+| `domain/model` | `PlanoDeVoo`, `Aerovia`, `Aeroporto`, `Aeronave` e subclasses, `Piloto`, `SituacaoPlano` (e depois `Trecho`, `Pouso`, reservas) | qualquer `import` de Spring ou JPA |
+| `domain/ports/in/usecases` | `ConsultarAeroportosUC`, `CriarPlanoUC` + `CriarPlanoCommand`, `ListarPlanosUC`… | regra que pertence à entidade |
+| `domain/ports/out/repositories` | `RepositorioAeroportos`, `RepositorioPlanosDeVoo`… (interfaces) | JPA, SQL, `JpaRepository` |
+| `infra/adapters/in/rest` | `PlanoDeVooController`, `MalhaAereaController`, `FrotaController`, `...RequestDTO`, `...ResponseDTO`, `RestExceptionHandler` | regra de negócio, consulta ao banco |
+| `infra/adapters/out/persistence` | `...JpaEntity`, `...SpringDataRepository`, `Repositorio...JPA`, `...Mapper` | regra de negócio |
+| `infra/config` | `UseCaseConfig` | lógica |
 
 ## A regra que o PR cobra
 
@@ -58,13 +55,12 @@ grep -rn "org.springframework\|jakarta.persistence\|infra\." src/main/java/com/p
 
 Esse comando tem que devolver **nada**.
 
-## Pequeno desvio do material da cadeira
+## Diferença em relação ao exemplo da cadeira
 
-O estudo de caso coloca entidades **e** serviços juntos em `Domain/Model`.
-Aqui os serviços que implementam casos de uso foram separados em
-`domain/servicos/`, para que `model/` fique só com o modelo. É um refinamento,
-não uma mudança de estilo — mas, por ser desvio da referência, está registrado
-em `logs/decisoes.md` e deve ser citado na apresentação.
+No exemplo do professor, os casos de uso têm `@Component`. Aqui eles não têm
+nenhuma anotação: viram beans em `infra/config/UseCaseConfig`. O `P7a` pede "a
+maior independência possível" do modelo em relação ao Spring, e assim
+`domain/` fica sem nenhum import de framework. Registrado em `logs/decisoes.md`.
 
 ## Comandos
 
