@@ -1,26 +1,43 @@
 # Maven
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!.mvn/wrapper/maven-wrapper.properties
 .mvn/timing.properties
+dependency-reduced-pom.xml
 
 # Java
 *.class
 *.jar
 *.war
-*.log
+*.ctxt
 hs_err_pid*
 replay_pid*
+# Wrapper do Maven: versionado de proposito, para `./mvnw` rodar em clone novo
+# sem depender de download. Precisa vir DEPOIS de `*.jar` para a negacao valer.
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# Saida de build de IDE. Ancorado na raiz de proposito: `out/` solto casaria
+# com domain/ports/out e infra/adapters/out, que sao pastas da arquitetura.
+/out/
+/build/
+/bin/
+/backend/out/
+/backend/build/
+/backend/bin/
+
+# Log de execucao da aplicacao.
+# Os logs de trabalho (logs/*.md) sao entrega e ficam versionados.
+*.log
 
 # Banco de dados local
 *.db
 *.mv.db
 *.trace.db
+*.lock.db
 data/
 
 # Ambiente
 .env
 .env.local
+application-local.properties
 
 # IDE
 .idea/
@@ -31,7 +48,26 @@ data/
 .classpath
 .project
 .settings/
-bin/
+nbproject/
+
+# Editores
+*~
+*.swp
+*.swo
+
+# Ferramentas locais
+.claude/settings.local.json
 
 # macOS
 .DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Arquivos de trabalho deixados fora do versionamento de proposito, para que
+# edicao acidental nao entre em commit. Alteracao deliberada sobe com
+# `git add -f <arquivo>`; depois `git rm --cached <arquivo>` para voltar a
+# proteger (o `add -f` torna o arquivo rastreado de novo).
+/README.md
+/logs/log.md
+/logs/decisoes.md
