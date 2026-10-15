@@ -140,6 +140,14 @@ nbdist/
 \#*\#
 
 # -----------------------------------------------------------------------------
+# Logs de trabalho
+# Cada pessoa mantem os seus na propria maquina e a equipe compara no fim.
+# O formato das entradas fica em logs/README.md, esse sim versionado.
+# -----------------------------------------------------------------------------
+logs/log.md
+logs/decisoes.md
+
+# -----------------------------------------------------------------------------
 # Ferramentas locais
 # -----------------------------------------------------------------------------
 .claude/settings.local.json
