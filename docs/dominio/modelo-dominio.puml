@@ -1,0 +1,162 @@
+@startuml
+' Modelo de domínio - Sistema de Gestão de Planos de Voo
+' PUCRS - Projeto e Arquitetura de Software - 2026/2 - turma 340
+' Entrega de 05/10. Fonte versionada; o .png é exportado deste arquivo.
+
+title
+  Modelo de Domínio - Planos de Voo
+  <size:11>Exportado em 2026-10-15</size>
+end title
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam nodesep 70
+skinparam ranksep 70
+
+class Aeroporto {
+  codigo
+  nome
+  quantidadeVagas
+  --
+  possuiVaga(numero) : boolean
+}
+
+class Aerovia {
+  id
+  distanciaKm
+  --
+  duracao(velocidadeCruzeiro) : Duration
+}
+
+note right of Aerovia
+  Imutável após o cadastro: não há
+  alteração nem exclusão.
+  Orientada: POA->FLN (R1) e
+  FLN->POA (R8) são aerovias distintas.
+end note
+
+class Piloto {
+  id
+  nome
+}
+
+abstract class Aeronave {
+  prefixo
+  velocidadeCruzeiro
+  autonomia
+  --
+  distanciaMaxSemAbastecer() : double
+  {abstract} podeOperar(altitude, entrada, saida) : boolean
+}
+
+note left of Aeronave
+  podeOperar() é polimórfico: cada
+  categoria traz a sua regra de altitude
+  e de janela de horário. Categoria nova
+  entra como subclasse nova, sem alterar
+  a validação do plano.
+end note
+
+class AeronaveParticular {
+  empresaManutencao
+}
+
+class AeronavePassageiros {
+  companhiaAerea
+  capacidadePassageiros
+}
+
+class AeronaveCarga {
+  companhiaAerea
+  capacidadeToneladas
+}
+
+class PlanoDeVoo <<raiz de agregado>> {
+  id
+  partida
+  situacao
+  --
+  adicionarTrecho(trecho)
+  removerTrecho(ordem)
+  validar() : List<String>
+  aprovar()
+  abandonar()
+  cancelar(agora)
+}
+
+note top of PlanoDeVoo
+  Raiz do agregado: Trecho e Pouso só
+  existem dentro do plano e toda alteração
+  passa por ele. validar() devolve a lista
+  de problemas (não boolean, não exceção)
+  e não altera estado nem reserva nada.
+end note
+
+class Trecho {
+  ordem
+  altitude
+  horarioEntrada
+  --
+  horarioChegada() : LocalDateTime
+  slotsOcupados() : List<Slot>
+}
+
+class Pouso <<value object>> {
+  numeroVaga
+  permanenciaMinutos
+  --
+  saida(chegada) : LocalDateTime
+}
+
+class Slot <<value object>> {
+  inicio
+  --
+  {static} entre(inicio, fim) : List<Slot>
+}
+
+note bottom of Slot
+  Slot de 1 hora alinhado à hora cheia.
+  Qualquer uso parcial ocupa o slot inteiro:
+  15:52 -> 17:07 são 3 slots.
+end note
+
+class ReservaAerovia {
+  altitude
+}
+
+class ReservaVaga {
+  numeroVaga
+}
+
+enum SituacaoPlano {
+  EM_EDICAO
+  APROVADO
+  CANCELADO
+  ABANDONADO
+}
+
+Aerovia "*" --> "1" Aeroporto : origem >
+Aerovia "*" --> "1" Aeroporto : destino >
+
+Aeronave <|-- AeronaveParticular
+Aeronave <|-- AeronavePassageiros
+Aeronave <|-- AeronaveCarga
+
+PlanoDeVoo "*" --> "1" Piloto
+PlanoDeVoo "*" --> "1" Aeronave
+PlanoDeVoo "*" --> "1" Aeroporto : origem >
+PlanoDeVoo "*" --> "1" Aeroporto : destino >
+PlanoDeVoo --> SituacaoPlano
+PlanoDeVoo "1" *-- "0..*" Trecho : percurso
+Trecho "*" --> "1" Aerovia
+Trecho "1" *-- "0..1" Pouso
+
+PlanoDeVoo "1" -- "0..*" ReservaAerovia
+PlanoDeVoo "1" -- "0..*" ReservaVaga
+ReservaAerovia "*" --> "1" Aerovia
+ReservaAerovia "*" --> "1" Slot
+ReservaVaga "*" --> "1" Aeroporto
+ReservaVaga "*" --> "1" Slot
+
+@enduml

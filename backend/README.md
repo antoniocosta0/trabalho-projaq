@@ -73,7 +73,14 @@ maior independência possível" do modelo em relação ao Spring, e assim
 
 ## Pendências desta pasta
 
-- [ ] `schema.sql` e `data.sql` escritos (hoje são só comentários).
+- [x] `schema.sql` com as tabelas de aeroporto, aerovia, piloto, aeronave e
+      plano de voo.
+- [ ] `schema.sql`: faltam as tabelas `trecho`, `reserva_aerovia` e
+      `reserva_vaga`, com `UNIQUE (aerovia_id, altitude, slot_inicio)` e
+      `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)`.
+- [x] `data.sql` com a malha inicial, pilotos e aeronaves das três categorias.
+- [ ] `data.sql`: faltam os planos aprovados com suas reservas, cobrindo pelo
+      menos 5 das 8 aerovias na data de referência.
 - [ ] Data de referência definida, no `data.sql` e no `README.md` da raiz.
 - [ ] Dependência do springdoc (OpenAPI) descomentada no `pom.xml`, com a
       versão compatível conferida.

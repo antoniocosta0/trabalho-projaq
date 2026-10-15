@@ -756,21 +756,19 @@ Estado atual do modelo. Muda com justificativa registrada.
 | Elemento | Tipo | Papel |
 |---|---|---|
 | `PlanoDeVoo` | entidade / **raiz de agregado** | id, partida, situação; `adicionarTrecho`, `removerTrecho`, `validar() : List<String>`, `aprovar`, `abandonar`, `cancelar(agora)` |
-| `Trecho` | entidade | ordem, altitude, entrada, ação; `chegada()`, `slotsOcupados()` |
+| `Trecho` | entidade | ordem, altitude, entrada; `chegada()`, `slotsOcupados()` |
 | `Pouso` | **value object** (0..1 por trecho) | numeroVaga, permanenciaMin; `saida(chegada)` |
 | `Aerovia` | entidade | id, distanciaKm, origem, destino; `duracao(velocidadeKmh) : Duration`; **imutável após o cadastro** |
 | `Aeroporto` | entidade | codigo, nome, quantidadeVagas; `possuiVaga(numero)` |
 | `Aeronave` | **abstrata** | prefixo, velocidadeCruzeiroKmh, autonomiaKm; `distanciaMaxSemAbastecer()`, `podeOperar(altitude, entrada, saida) : boolean` |
 | `AeronaveParticular` | concreta | empresaManutencao |
-| `AeronaveComercial` | abstrata | companhiaAerea |
-| `AeronaveCarga` | concreta | capacidadeToneladas |
-| `AeronavePassageiros` | concreta | capacidadePassageiros |
+| `AeronaveCarga` | concreta | companhiaAerea, capacidadeToneladas |
+| `AeronavePassageiros` | concreta | companhiaAerea, capacidadePassageiros |
 | `Piloto` | entidade | id, nome |
 | `ReservaAerovia` | entidade | altitude, slot |
 | `ReservaVaga` | entidade | numeroVaga, slot |
 | `Slot` | **value object** | inicio; `entre(inicio, fim) : List<Slot>` |
 | `SituacaoPlano` | enum | `EM_EDICAO`, `APROVADO`, `CANCELADO`, `ABANDONADO` |
-| `AcaoNoDestino` | enum | `SOBREVOO`, `POUSO` |
 
 **Decisões que o modelo embute** — todas precisam estar escritas, porque serão
 questionadas:
@@ -785,6 +783,16 @@ questionadas:
 4. `validar()` devolve **lista de problemas**, não `boolean` nem exceção.
 5. Reserva é **entidade separada** do trecho, não um campo dentro dele — é o
    que permite reservar tudo de uma vez e liberar tudo de uma vez.
+6. **Não há enum `AcaoNoDestino`.** O `Pouso` `0..1` no `Trecho` já diz tudo:
+   trecho com pouso é pouso, trecho sem pouso é sobrevoo. O enum seria estado
+   redundante — poderia dizer `POUSO` com o pouso ausente, criando duas fontes
+   de verdade para a mesma coisa.
+7. A hierarquia de `Aeronave` é **plana**: `AeronaveParticular`,
+   `AeronaveCarga` e `AeronavePassageiros` direto sob `Aeronave`, com
+   `companhiaAerea` repetido nas duas comerciais. Uma `AeronaveComercial`
+   abstrata no meio pouparia o atributo repetido, mas acrescentaria um nível à
+   hierarquia sem comportamento próprio para justificar. É o que o código
+   implementa.
 
 **Ainda em aberto:**
 
