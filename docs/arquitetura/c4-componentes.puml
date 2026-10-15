@@ -1,0 +1,46 @@
+@startuml
+' C4 nível 3 - Componentes do backend
+' PUCRS - Projeto e Arquitetura de Software - 2026/2 - turma 340
+' A decomposição segue a arquitetura hexagonal (ports & adapters), que é a
+' efetivamente implementada em backend/src/main/java/com/pucrs/planosdevoo/.
+!include <C4/C4_Component>
+
+title
+  Nível 3 - Componentes do Backend (arquitetura hexagonal)
+  <size:11>Exportado em 2026-10-15</size>
+end title
+
+System_Ext(cliente, "Cliente HTTP", "Postman, arquivo .http ou Swagger UI")
+ContainerDb(banco, "Banco de dados", "H2 em arquivo", "Rede aérea, pilotos, aeronaves, planos, trechos e reservas")
+
+Container_Boundary(api, "Backend (Spring Boot)") {
+
+  Component(adaptadores_entrada, "Adaptadores de entrada (REST)", "Spring Web MVC", "Controllers e DTOs de requisição e resposta, agrupados por assunto: Malha Aérea, Frota e Planos de Voo. Traduzem HTTP/JSON e códigos de status; nenhuma regra de negócio mora aqui")
+
+  Component(portas_entrada, "Portas de entrada (casos de uso)", "Java puro, publicados como beans", "Um caso de uso por operação: consultar malha e frota, criar plano, definir percurso, consultar disponibilidade, validar, aprovar, abandonar, cancelar e consultar planos. Orquestram o modelo e as portas de saída")
+
+  Component(modelo, "Modelo de domínio", "Java puro, sem framework", "PlanoDeVoo (raiz de agregado), Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e suas categorias, ReservaAerovia e ReservaVaga. Concentra as regras: percurso, horários, autonomia, altitudes e ocupação")
+
+  Component(portas_saida, "Portas de saída (repositórios)", "Interfaces Java", "RepositorioPlanosDeVoo, RepositorioAerovias, RepositorioAeroportos, RepositorioAeronaves, RepositorioPilotos e os repositórios de reserva. Abstraem o acesso à persistência")
+
+  Component(adaptadores_saida, "Adaptadores de persistência", "Spring Data JPA", "Implementam as portas de saída. Entidades de banco separadas das entidades de domínio, com mapeadores entre as duas")
+
+  Component(config, "Configuração", "Spring @Configuration", "Monta os casos de uso injetando os adaptadores por construtor (UseCaseConfig)")
+}
+
+Rel(cliente, adaptadores_entrada, "Requisições", "HTTP/JSON")
+Rel(adaptadores_entrada, portas_entrada, "Aciona")
+Rel(portas_entrada, modelo, "Usa")
+Rel(portas_entrada, portas_saida, "Usa")
+Rel(modelo, portas_saida, "Usa")
+Rel_U(adaptadores_saida, portas_saida, "Implementa")
+Rel(config, portas_entrada, "Instancia e injeta")
+Rel(adaptadores_saida, banco, "Lê e grava", "JDBC/SQL")
+
+note as regra_dependencia
+  **Regra de dependência:** todas as setas internas apontam
+  para dentro. O modelo e as portas não conhecem Spring,
+  JPA nem HTTP; quem depende é sempre a infraestrutura.
+end note
+
+@enduml

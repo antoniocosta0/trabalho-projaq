@@ -1,0 +1,18 @@
+@startuml
+' C4 nível 1 - Contexto
+' PUCRS - Projeto e Arquitetura de Software - 2026/2 - turma 340
+!include <C4/C4_Context>
+
+title
+  Nível 1 - Contexto
+  <size:11>Exportado em 2026-10-15</size>
+end title
+
+Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
+System_Ext(cliente, "Cliente HTTP", "Postman, arquivo .http ou Swagger UI. Não faz parte do escopo de implementação")
+System(sistema, "Sistema de Gestão de Planos de Voo", "Controla rede aérea, pilotos, aeronaves, planos de voo e reservas de altitudes e vagas")
+
+Rel(usuario, cliente, "Usa")
+Rel(cliente, sistema, "Envia requisições", "HTTP/JSON (API REST)")
+
+@enduml
