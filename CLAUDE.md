@@ -192,13 +192,13 @@ trabalho-1/
 │   ├── arquitetura/README.md      o que cada nível do C4 mostra
 │   ├── dominio/
 │   │   ├── README.md
-│   │   ├── modelo-dominio.puml        (a criar) fonte do diagrama, PlantUML
-│   │   ├── modelo-dominio.png         (a criar) imagem exportada, datada
-│   │   └── casos-de-uso.md            (a criar) UC01–UC19 detalhados (seção 7)
+│   │   ├── modelo-dominio.puml        fonte do diagrama, PlantUML
+│   │   ├── modelo-dominio.png         imagem exportada
+│   │   └── casos-de-uso.md            UC01–UC19 detalhados (seção 7)
 │   ├── arquitetura/
-│   │   ├── c4-contexto.puml / .png    (a criar)
-│   │   ├── c4-containers.puml / .png  (a criar)
-│   │   ├── c4-componentes.puml / .png (a criar)
+│   │   ├── c4-contexto.puml / .png    nível 1
+│   │   ├── c4-containers.puml / .png  nível 2
+│   │   ├── c4-componentes.puml / .png nível 3, a hexagonal
 │   │   └── decisoes/                  um ADR por decisão (seção 15)
 │   │       ├── README.md              índice das 8 decisões exigidas
 │   │       └── 0000-template.md       formato do ADR
@@ -389,21 +389,19 @@ justificativa registrada em `logs/decisoes.md`.
 | Elemento | Tipo | Papel |
 |---|---|---|
 | `PlanoDeVoo` | entidade / **raiz de agregado** | id, partida, situação; `adicionarTrecho`, `removerTrecho`, `validar() : List<String>`, `aprovar`, `abandonar`, `cancelar(agora)` |
-| `Trecho` | entidade | ordem, altitude, entrada, ação; `chegada()`, `slotsOcupados()` |
+| `Trecho` | entidade | ordem, altitude, entrada; `chegada()`, `slotsOcupados()` |
 | `Pouso` | **value object** (0..1 no trecho) | numeroVaga, permanenciaMin; `saida(chegada)` |
 | `Aerovia` | entidade | id, distanciaKm, origem, destino; `duracao(velocidade) : Duration`; **imutável após cadastro** |
 | `Aeroporto` | entidade | codigo, nome, quantidadeVagas; `possuiVaga(numero)` |
 | `Aeronave` | **abstrata** | prefixo, velocidadeCruzeiroKmh, autonomiaKm; `distanciaMaxSemAbastecer()`, `podeOperar(altitude, entrada, saida) : boolean` |
 | `AeronaveParticular` | concreta | empresaManutencao |
-| `AeronaveComercial` | abstrata | companhiaAerea |
-| `AeronaveCarga` | concreta | capacidadeToneladas |
-| `AeronavePassageiros` | concreta | capacidadePassageiros |
+| `AeronaveCarga` | concreta | companhiaAerea, capacidadeToneladas |
+| `AeronavePassageiros` | concreta | companhiaAerea, capacidadePassageiros |
 | `Piloto` | entidade | id, nome |
 | `ReservaAerovia` | entidade | altitude, slot |
 | `ReservaVaga` | entidade | numeroVaga, slot |
 | `Slot` | **value object** | inicio; `entre(inicio, fim) : List<Slot>` |
 | `SituacaoPlano` | enum | EM_EDICAO, APROVADO, CANCELADO, ABANDONADO |
-| `AcaoNoDestino` | enum | SOBREVOO, POUSO |
 
 **Decisões que esse desenho já embute** — e que precisam estar escritas como
 ADR, porque o professor vai perguntar:
@@ -420,6 +418,16 @@ ADR, porque o professor vai perguntar:
    tipos de falha.
 5. Reserva é **entidade separada** do trecho, e não um campo dentro dele. É o
    que permite aprovar tudo de uma vez e liberar tudo de uma vez.
+6. **Não há enum `AcaoNoDestino`.** O `Pouso` `0..1` no `Trecho` já diz tudo:
+   trecho com pouso é pouso, trecho sem pouso é sobrevoo. O enum seria estado
+   redundante — daria para ele dizer `POUSO` com o pouso ausente, e aí haveria
+   duas fontes de verdade para a mesma coisa.
+7. A hierarquia de `Aeronave` é **plana**: `AeronaveParticular`,
+   `AeronaveCarga` e `AeronavePassageiros` direto sob `Aeronave`, com
+   `companhiaAerea` repetido nas duas comerciais. Uma `AeronaveComercial`
+   abstrata no meio pouparia o atributo repetido, mas acrescentaria um nível à
+   hierarquia sem nenhum comportamento próprio para justificar. É o que o
+   código implementa.
 
 Pontos ainda em aberto para decidir e registrar:
 
@@ -1060,7 +1068,7 @@ As que custam nota e são fáceis de deixar passar:
 - [x] Material da PROJAQ localizado (seção 2), em especial o `P7a` hexagonal.
 - [x] Padrões de branch, commit e PR definidos (`docs/padroes-desenvolvimento.md`).
 - [x] Template de PR em `.github/pull_request_template.md`.
-- [ ] Projeto Spring Boot criado em `backend/`, a partir das versões do `pom.xml` de exemplo.
+- [x] Projeto Spring Boot criado em `backend/`, a partir das versões do `pom.xml` de exemplo.
 
 **Antes de abrir o PR**
 
@@ -1071,20 +1079,20 @@ As que custam nota e são fáceis de deixar passar:
 - [ ] Diagrama e ADR atualizados, se a mudança pediu.
 - [ ] Entradas nos dois logs feitas.
 
-**Entrega de 05/10 — domínio**
+**Entrega de 05/10 — domínio** — feito em 2026-10-15
 
-- [ ] Modelo de domínio em UML, com atributos, operações e cardinalidades.
-- [ ] Value objects e raiz de agregado identificados.
-- [ ] Regras do enunciado mapeadas para onde moram no modelo.
-- [ ] Casos de uso numerados, com ator, pré-condição e resultado.
-- [ ] `.puml` e `.png` versionados em `docs/dominio/`.
-- [ ] Decisões de modelagem registradas em `decisoes.md`.
+- [x] Modelo de domínio em UML, com atributos, operações e cardinalidades.
+- [x] Value objects e raiz de agregado identificados.
+- [x] Regras do enunciado mapeadas para onde moram no modelo.
+- [x] Casos de uso numerados, com ator, pré-condição e resultado.
+- [x] `.puml` e `.png` versionados em `docs/dominio/`.
+- [x] Decisões de modelagem registradas em `decisoes.md`.
 
 **Entrega de 07/10 — arquitetura**
 
-- [ ] C4 nível 1, 2 e 3, com tecnologias nas setas.
-- [ ] Estrutura de pastas criada no repositório, não só desenhada.
-- [ ] Regra de dependência escrita e respeitada.
+- [x] C4 nível 1, 2 e 3, com tecnologias nas setas.
+- [x] Estrutura de pastas criada no repositório, não só desenhada.
+- [x] Regra de dependência escrita e respeitada.
 - [ ] ADR 0001 (estilo arquitetural) escrito, com alternativas.
 
 **Entrega de 14/10 — 40% dos casos de uso**
