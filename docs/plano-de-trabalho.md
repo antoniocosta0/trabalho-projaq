@@ -1,6 +1,8 @@
 # Plano de trabalho — entrega de domingo
 
-**Prazo de entrega: domingo, 18/10/2026, 23:00.** Apresentação na segunda, 19/10.
+**Prazo de entrega: domingo, 18/10/2026, 23:55**, por envio no Moodle
+(`Trabalho final (parte 1)`, grupo `GrupoTF_P1 6`). Apresentação na segunda,
+19/10.
 Isto é: **3 dias**, contando a noite de hoje (quinta, 15/10).
 
 Este arquivo é a fonte de verdade da divisão. O WhatsApp serve para avisar que
@@ -10,109 +12,123 @@ algo mudou aqui — não para combinar o que cada um faz.
 
 ## 1. Quem pega o quê
 
-| Frente | O que é | Responsável |
+| Pessoa | Frente | Esforço |
 |---|---|---|
-| **A** | Núcleo do domínio: `Slot`, `Trecho`, `Pouso` + testes | `[A DEFINIR]` |
-| **B** | `PlanoDeVoo` como agregado: percurso, validação, abandono | `[A DEFINIR]` |
-| **C** | Reservas, aprovação e cancelamento | `[A DEFINIR]` |
-| **D** | Cadastros e carga inicial | `[A DEFINIR]` |
-| **E** | ADRs, README, OpenAPI e roteiro da apresentação | `[A DEFINIR]` |
+| **Vicenzo Masera** | **A** — núcleo do domínio, depois entra em B | 4h + B |
+| **João Pedro Bianchi (Dejota)** | **B** — agregado e validação, com o Vicenzo | 10h a dois |
+| **Pedro Redivo** | **C** — reservas, aprovação e cancelamento | 8h a dois |
+| **Gustavo Both** | **C** com o Redivo, depois o `data.sql` | 8h a dois + 3h |
+| **Antônio Costa** | **E** — documentação — mais os **cadastros** (UC02, 04, 06, 08), a integração de domingo e o **envio no Moodle** | 6h + 3h |
 
-Equipe: Antônio Costa, João Pedro Bianchi (Dejota), Vicenzo Masera,
-Pedro Redivo (Redivo), Gustavo Both (Both).
-
-**Sugestão de formato, se o grupo preferir dobrar o caminho crítico:** duas
-pessoas em **A+B** (é a parte mais difícil e a que bloqueia todas as outras) e
-as três restantes em C, D e E. Nesse caso a frente E ganha ajuda no sábado,
-quando A já estiver fechada.
+**Por que assim:** B e C são as duas frentes pesadas e cada uma leva uma dupla.
+A é curta e o Vicenzo rola dela direto para B, sem repasse. Os cadastros são o
+código mais leve do projeto — quatro `POST` copiando o padrão dos `GET` que já
+existem — e combinam com quem está tocando a documentação.
 
 ---
 
 ## 2. A restrição que manda em tudo
 
-O trabalho é **sequencial**, não paralelo:
+A cadeia **não** é linear. `A` é o único gargalo de verdade:
 
 ```
 A (Slot, Trecho, Pouso)
-   └─► B (agregado, validar)
-          └─► C (reservar, aprovar, cancelar)
-                 └─► D (carga inicial com planos aprovados)
+  ├──► B (agregado, validar, abandonar) ──┐
+  │                                       ├──► aprovar e cancelar
+  └──► C (reservas, tabelas, UC12, UC13) ─┘
+                                           └──► data.sql com planos aprovados
 ```
 
-Quem pegar B não consegue começar de verdade antes de A entregar. Quem pegar D
-não consegue escrever o `data.sql` final antes de C existir. **Por isso A é a
-primeira coisa a ser feita e não pode atrasar** — se A escorregar para sábado,
-a entrega não fecha.
+As entidades de reserva, as três tabelas, os dois `UNIQUE` e as consultas de
+disponibilidade dependem só do `Slot`. **C não espera B** — só o `aprovar`,
+que é o último passo de C, precisa do `validar` que vem de B.
 
-A frente **E é a única 100% paralela**: começa agora e não depende de ninguém.
+Rodando em paralelo desde o começo, sem depender de ninguém: os **cadastros** e
+a maior parte da **documentação**.
+
+**Se A atrasar, a entrega não fecha.** É a única frente com essa propriedade.
 
 ---
 
 ## 3. As frentes
 
-### Frente A — Núcleo do domínio (bloqueia todo o resto)
+### A — Núcleo do domínio · Vicenzo
 
-Branch: `feat/route-domain-core`
+Branch: `feat/route-domain-core` · **entregar sexta de manhã**
 
 - [ ] `Slot` (value object): `inicio`, `Slot.entre(inicio, fim) : List<Slot>`
-- [ ] `SlotTest`: 15:52→17:07 = **3 slots**. Decidir, documentar e testar a
-      borda exata 15:00→16:00 (1 slot ou 2?) — escolhe, registra em
-      `logs/decisoes.md` e testa
 - [ ] `Trecho`: `ordem`, `altitude`, `horarioEntrada`, `horarioChegada()`,
       `slotsOcupados()`
 - [ ] `Pouso` (value object): `numeroVaga`, `permanenciaMinutos`,
       `saida(chegada)`
-- [ ] `TrechoTest`: duração e chegada; `PousoTest`: saída após permanência
+- [ ] `SlotTest`, `TrechoTest`, `PousoTest`
 
-**Pronto quando:** `./mvnw clean test` verde, e nenhum desses testes sobe o
-Spring nem toca no banco. Se um teste de regra precisa subir a aplicação, a
-arquitetura não está isolando nada.
+**Combinar com o Antônio antes de escrever a primeira linha** — B, C e o seed
+dependem destas três respostas:
 
-### Frente B — Agregado e validação (UC10, UC11, UC14, UC18)
+1. A borda exata: entrada 15:00, saída 16:00 — **1 slot ou 2?** Decidir,
+   registrar em `logs/decisoes.md` e testar.
+2. `slotsOcupados()` devolve `List<Slot>` ou `Set<Slot>`?
+3. `saida(chegada)` já inclui a permanência?
 
-Branch: `feat/flight-plan-validation` · **depende de A**
+**Pronto quando:** `./mvnw clean test` verde e nenhum desses testes sobe o
+Spring nem toca no banco.
 
-- [ ] `PlanoDeVoo.adicionarTrecho`, `.removerTrecho` — só em `EM_EDICAO`
-- [ ] `PlanoDeVoo.validar() : List<String>` com as seis verificações, nesta
-      ordem: continuidade do percurso e pouso obrigatório no destino;
-      horários batendo com a chegada calculada; mesmo dia; aeronave
-      (`podeOperar`); autonomia (85%, sobrevoo acumula e pouso zera);
-      disponibilidade
+### B — Agregado e validação · Vicenzo + Dejota
+
+Branch: `feat/flight-plan-validation` · **depende de A** · começa sexta à tarde
+
+- [ ] `PlanoDeVoo.adicionarTrecho`, `.removerTrecho` — só em `EM_EDICAO` (UC10, UC11)
+- [ ] `PlanoDeVoo.validar() : List<String>` (UC14), com as seis verificações
 - [ ] `PlanoDeVoo.abandonar()` (UC18)
-- [ ] Testes de cada tipo de falha, um por um
+- [ ] Persistência de `Trecho` e `Pouso`
 - [ ] API: `POST /planos/{id}/trechos`, `DELETE /planos/{id}/trechos/{ordem}`,
       `POST /planos/{id}/validacao`, `POST /planos/{id}/abandono`
-- [ ] Persistência de `Trecho` e `Pouso`
+
+Divisão sugerida dentro da dupla: um pega continuidade do percurso, horários e
+mesmo dia; o outro pega aeronave, autonomia e disponibilidade.
 
 **Pronto quando:** validar devolve a lista de problemas, **não muda estado** e
 **não cria reserva nenhuma**.
 
-### Frente C — Reservas, aprovação e cancelamento (UC12, UC13, UC15, UC19)
+### C — Reservas, aprovação e cancelamento · Redivo + Both
 
-Branch: `feat/reservations-and-approval` · **depende de A e B**
+Branch: `feat/reservations-and-approval` · **depende de A** · começa sexta à tarde
 
 - [ ] `ReservaAerovia` e `ReservaVaga` no domínio, com portas de saída
 - [ ] `schema.sql`: tabelas `trecho`, `reserva_aerovia`, `reserva_vaga`, com
       `UNIQUE (aerovia_id, altitude, slot_inicio)` e
       `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)`
-- [ ] `AprovarPlanoUC` em **uma** `@Transactional`: revalida, reserva tudo ou
-      não reserva nada
-- [ ] `CancelarPlanoUC`: só `APROVADO` com partida futura; libera as reservas
 - [ ] UC12 e UC13: consultar altitudes e vagas livres por período
+- [ ] `AprovarPlanoUC` (UC15) em **uma** `@Transactional` — **só depois de B**
+- [ ] `CancelarPlanoUC` (UC19): só `APROVADO` com partida futura
 - [ ] **Teste que o enunciado cobra por escrito:** aprovação malsucedida não
       deixa reserva parcial
 
-**Pronto quando:** aprovar duas vezes a mesma altitude no mesmo slot falha na
+**Pronto quando:** aprovar a mesma altitude no mesmo slot duas vezes falha na
 segunda, e a primeira continua íntegra.
 
-### Frente D — Cadastros e carga inicial (UC02, UC04, UC06, UC08)
+### D1 — Cadastros · Antônio
 
-Branch: `feat/registration-endpoints` e `db/initial-seed`
-**Cadastros são independentes — começam já.** A carga depende de C.
+Branch: `feat/registration-endpoints` · **não depende de nada, começa já**
 
-- [ ] `POST /aeroportos`, `POST /aerovias` (sem `PUT`, sem `DELETE` — aerovia é
-      imutável), `POST /pilotos`, `POST /aeronaves` (Factory por categoria,
-      para o controller não conhecer as subclasses)
+- [ ] `POST /aeroportos` (UC02)
+- [ ] `POST /aerovias` (UC04) — sem `PUT` e sem `DELETE`: aerovia é imutável
+- [ ] `POST /pilotos` (UC06)
+- [ ] `POST /aeronaves` (UC08) — Factory por categoria, para o controller não
+      conhecer as subclasses
+
+É o código mais leve do projeto: cada endpoint é o espelho de um `GET` que já
+existe. `MalhaAereaController` + `ConsultarAeroviasUC` + `RepositorioAeroviasJPA`
+é o modelo a copiar.
+
+**Pronto quando:** dá para cadastrar um aeroporto novo e usar num plano, sem
+recompilar — é o teste de extensibilidade que o professor vai fazer.
+
+### D2 — Carga inicial · Both
+
+Branch: `db/initial-seed` · **depende de C** · sábado
+
 - [ ] `data.sql`: planos **aprovados** com suas reservas, gerando ocupação em
       **5 ou mais das 8 aerovias** na data de referência
 - [ ] As ocupações são consequência dos planos aprovados — nada de linha solta
@@ -120,26 +136,33 @@ Branch: `feat/registration-endpoints` e `db/initial-seed`
 - [ ] Deixar folga: não pode ficar tudo indisponível o dia inteiro, senão não
       dá para demonstrar aprovação bem-sucedida
 - [ ] Rodar o roteiro do `CLAUDE.md` §14.4: apaga o banco, sobe, confere as
-      contagens, cria/valida/aprova um plano, **reinicia** e confirma que o
-      plano continua lá
+      contagens, cria/valida/aprova um plano, **reinicia** e confirma que
+      continua lá
 
-**Pronto quando:** o banco apagado e recriado do zero dá 5+ aerovias ocupadas
-na data de referência, sem nenhuma inserção manual.
+Fica com quem fez C porque é quem sabe exatamente como a reserva é gravada.
 
-### Frente E — Documentação e apresentação (começa agora, não depende de ninguém)
+### E — Documentação e apresentação · Antônio
 
-Branch: `docs/adrs-and-readme`
+Branch: `docs/adrs-and-readme` · **a maior parte começa já**
 
-- [ ] Os **8 ADRs** de `docs/arquitetura/decisoes/`. O rascunho de todos já
-      está pronto em `logs/decisoes.md`, com a alternativa descartada de cada
-      um — é transcrever para o formato do `0000-template.md`
-- [ ] `README.md`: os sete `[PREENCHER]` (equipe, data de referência,
-      ambiente, execução, banco, URL da API, Swagger)
-- [ ] Descomentar o `springdoc-openapi-starter-webmvc-ui` no `pom.xml` com a
-      versão compatível com Spring Boot 4.x, e conferir o Swagger UI abrindo
-- [ ] `docs/api/requests.http` com as **17 demonstrações** do `CLAUDE.md`
-      §16.3, numeradas e comentadas — incluindo as falhas, não só o caminho
-      feliz
+Pode escrever agora — os rascunhos das 8 decisões já estão em `logs/decisoes.md`:
+
+- [ ] ADR 0001 — estilo arquitetural (hexagonal × camadas)
+- [ ] ADR 0002 — entidade de domínio separada da de persistência
+- [ ] ADR 0003 — banco escolhido, e por que não em memória
+- [ ] ADR 0005 — cálculo de slots como value object
+- [ ] ADR 0006 — categoria nova de aeronave sem alterar a validação
+- [ ] ADR 0007 — herança da hierarquia de aeronaves no banco
+- [ ] ADR 0008 — idioma do código
+- [ ] springdoc descomentado no `pom.xml`, com a versão compatível conferida, e
+      Swagger UI abrindo
+
+Depende das outras frentes:
+
+- [ ] ADR 0004 — atomicidade da aprovação · **depois de C**
+- [ ] `README.md`, os sete `[PREENCHER]` · a data de referência depende de D2
+- [ ] `docs/api/requests.http` com as **17 demonstrações** do `CLAUDE.md` §16.3
+      · cresce junto com os endpoints, fecha no domingo
 - [ ] Ensaiar o roteiro na ordem, cronometrado
 
 **Pronto quando:** alguém de fora clona o repositório, segue o README e faz a
@@ -149,16 +172,35 @@ primeira requisição sem perguntar nada.
 
 ## 4. Calendário
 
-| Quando | A | B | C | D | E |
+| Quando | Vicenzo | Dejota | Redivo | Both | Antônio |
 |---|---|---|---|---|---|
-| **Qui 15, noite** | começa | — | — | cadastros | ADRs 0001–0003 |
-| **Sex 16** | **entrega até meio-dia** | começa à tarde | tabelas e portas | cadastros | ADRs + springdoc |
-| **Sáb 17** | apoia B | fecha validação | aprovar e cancelar | `data.sql` | README + `requests.http` |
-| **Dom 18, até 18:00** | — | — | fecha | roteiro §14.4 | ensaio |
-| **Dom 18, 18:00–23:00** | todos: integração, último PR, conferência final | | | | |
+| **Qui 15, noite** | A | — | — | — | assinaturas de A com o Vicenzo, depois ADRs |
+| **Sex 16, manhã** | **fecha A** | — | prepara C | prepara C | cadastros |
+| **Sex 16, tarde** | B | B | C | C | ADRs + springdoc |
+| **Sáb 17** | B | **fecha B** | aprovar e cancelar | `data.sql` | README + `requests.http` |
+| **Dom 18, até 18:00** | apoio | apoio | **fecha C** | roteiro §14.4 | ADR 0004, ensaio |
+| **Dom 18, 18:00–23:55** | todos: integração, último PR, conferência final; Antônio envia no Moodle | | | | |
 
 Deixar as cinco horas finais de domingo para integração não é folga: é onde
 aparecem os conflitos de merge e os bugs de borda.
+
+---
+
+## 4.1. O envio no Moodle — responsável: Antônio
+
+Até agora **nada foi enviado**. A tarefa está aberta em
+`Trabalho final (parte 1)`, grupo `GrupoTF_P1 6`, com vencimento em
+**domingo, 18/10/2026, 23:55**.
+
+O enunciado (§8.5) diz que a entrega é **por repositório Git**, então o envio é
+o link do repositório — não um `.zip` de código. Confirmar no Moodle o formato
+aceito (link ou arquivo) **antes de domingo**, não às 23:40.
+
+- [ ] Conferir o formato de envio aceito pela tarefa
+- [ ] Enviar até **domingo 22:00**, com margem — e não às 23:55
+- [ ] Confirmar que o status saiu de "Nada foi enviado para esta tarefa"
+
+Esta é a única tarefa da lista que, se for esquecida, anula todo o resto.
 
 ---
 
