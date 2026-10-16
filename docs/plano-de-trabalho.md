@@ -1,6 +1,8 @@
 # Plano de trabalho — entrega de domingo
 
-**Prazo de entrega: domingo, 18/10/2026, 23:00.** Apresentação na segunda, 19/10.
+**Prazo de entrega: domingo, 18/10/2026, 23:55**, por envio no Moodle
+(`Trabalho final (parte 1)`, grupo `GrupoTF_P1 6`). Apresentação na segunda,
+19/10.
 Isto é: **3 dias**, contando a noite de hoje (quinta, 15/10).
 
 Este arquivo é a fonte de verdade da divisão. O WhatsApp serve para avisar que
@@ -16,7 +18,7 @@ algo mudou aqui — não para combinar o que cada um faz.
 | **João Pedro Bianchi (Dejota)** | **B** — agregado e validação, com o Vicenzo | 10h a dois |
 | **Pedro Redivo** | **C** — reservas, aprovação e cancelamento | 8h a dois |
 | **Gustavo Both** | **C** com o Redivo, depois o `data.sql` | 8h a dois + 3h |
-| **Antônio Costa** | **E** — documentação — mais os **cadastros** (UC02, 04, 06, 08) e a integração de domingo | 6h + 3h |
+| **Antônio Costa** | **E** — documentação — mais os **cadastros** (UC02, 04, 06, 08), a integração de domingo e o **envio no Moodle** | 6h + 3h |
 
 **Por que assim:** B e C são as duas frentes pesadas e cada uma leva uma dupla.
 A é curta e o Vicenzo rola dela direto para B, sem repasse. Os cadastros são o
@@ -177,10 +179,28 @@ primeira requisição sem perguntar nada.
 | **Sex 16, tarde** | B | B | C | C | ADRs + springdoc |
 | **Sáb 17** | B | **fecha B** | aprovar e cancelar | `data.sql` | README + `requests.http` |
 | **Dom 18, até 18:00** | apoio | apoio | **fecha C** | roteiro §14.4 | ADR 0004, ensaio |
-| **Dom 18, 18:00–23:00** | todos: integração, último PR, conferência final, entrega | | | | |
+| **Dom 18, 18:00–23:55** | todos: integração, último PR, conferência final; Antônio envia no Moodle | | | | |
 
 Deixar as cinco horas finais de domingo para integração não é folga: é onde
 aparecem os conflitos de merge e os bugs de borda.
+
+---
+
+## 4.1. O envio no Moodle — responsável: Antônio
+
+Até agora **nada foi enviado**. A tarefa está aberta em
+`Trabalho final (parte 1)`, grupo `GrupoTF_P1 6`, com vencimento em
+**domingo, 18/10/2026, 23:55**.
+
+O enunciado (§8.5) diz que a entrega é **por repositório Git**, então o envio é
+o link do repositório — não um `.zip` de código. Confirmar no Moodle o formato
+aceito (link ou arquivo) **antes de domingo**, não às 23:40.
+
+- [ ] Conferir o formato de envio aceito pela tarefa
+- [ ] Enviar até **domingo 22:00**, com margem — e não às 23:55
+- [ ] Confirmar que o status saiu de "Nada foi enviado para esta tarefa"
+
+Esta é a única tarefa da lista que, se for esquecida, anula todo o resto.
 
 ---
 
