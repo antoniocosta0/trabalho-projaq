@@ -5,7 +5,7 @@
 
 title
   Modelo de Domínio - Planos de Voo
-  <size:11>Exportado em 2026-10-15</size>
+  <size:11>Exportado em 2026-10-16</size>
 end title
 hide circle
 hide empty members
@@ -119,6 +119,8 @@ note bottom of Slot
   Slot de 1 hora alinhado à hora cheia.
   Qualquer uso parcial ocupa o slot inteiro:
   15:52 -> 17:07 são 3 slots.
+  Intervalo [inicio, fim): 15:00 -> 16:00
+  ocupa 1 slot.
 end note
 
 class ReservaAerovia {
