@@ -12,18 +12,17 @@ algo mudou aqui — não para combinar o que cada um faz.
 
 ## 1. Quem pega o quê
 
-| Pessoa | Frente | Esforço |
-|---|---|---|
-| **Vicenzo Masera** | **A** — núcleo do domínio, depois entra em B | 4h + B |
-| **João Pedro Bianchi (Dejota)** | **B** — agregado e validação, com o Vicenzo | 10h a dois |
-| **Pedro Redivo** | **C** — reservas, aprovação e cancelamento | 8h a dois |
-| **Gustavo Both** | **C** com o Redivo, depois o `data.sql` | 8h a dois + 3h |
-| **Antônio Costa** | **E** — documentação — mais os **cadastros** (UC02, 04, 06, 08), a integração de domingo e o **envio no Moodle** | 6h + 3h |
+| Pessoa | Frente |
+|---|---|
+| **Vicenzo Masera** | **A** — núcleo do domínio · **concluída em 16/10**. Depois: revisa os PRs e ajuda quem travar |
+| **Gustavo Both** | **B** — agregado, percurso, validação e abandono |
+| **Pedro Redivo** | **C** — reservas, disponibilidade, aprovação e cancelamento |
+| **João Pedro Bianchi (Dejota)** | **D** — cadastros e carga inicial (`data.sql`) |
+| **Antônio Costa** | **E** — documentação e apresentação, mais a integração de domingo e o **envio no Moodle** |
 
-**Por que assim:** B e C são as duas frentes pesadas e cada uma leva uma dupla.
-A é curta e o Vicenzo rola dela direto para B, sem repasse. Os cadastros são o
-código mais leve do projeto — quatro `POST` copiando o padrão dos `GET` que já
-existem — e combinam com quem está tocando a documentação.
+**Por que assim:** uma pessoa por frente, cada uma com dono claro, para não haver
+duas pessoas escrevendo o mesmo código e conflito na hora de juntar. Quem
+precisar de algo de outra frente combina direto com o dono dela.
 
 ---
 
@@ -35,7 +34,7 @@ A cadeia **não** é linear. `A` é o único gargalo de verdade:
 A (Slot, Trecho, Pouso)
   ├──► B (agregado, validar, abandonar) ──┐
   │                                       ├──► aprovar e cancelar
-  └──► C (reservas, tabelas, UC12, UC13) ─┘
+  └──► C (reservas, tabelas, UC07, UC08) ─┘
                                            └──► data.sql com planos aprovados
 ```
 
@@ -52,16 +51,16 @@ a maior parte da **documentação**.
 
 ## 3. As frentes
 
-### A — Núcleo do domínio · Vicenzo
+### A — Núcleo do domínio · Vicenzo · ✅ concluída
 
-Branch: `feat/route-domain-core` · **entregar sexta de manhã**
+Branch: `feat/route-domain-core` · **entregue em 16/10**
 
-- [ ] `Slot` (value object): `inicio`, `Slot.entre(inicio, fim) : List<Slot>`
-- [ ] `Trecho`: `ordem`, `altitude`, `horarioEntrada`, `horarioChegada()`,
+- [x] `Slot` (value object): `inicio`, `Slot.entre(inicio, fim) : List<Slot>`
+- [x] `Trecho`: `ordem`, `altitude`, `horarioEntrada`, `horarioChegada()`,
       `slotsOcupados()`
-- [ ] `Pouso` (value object): `numeroVaga`, `permanenciaMinutos`,
+- [x] `Pouso` (value object): `numeroVaga`, `permanenciaMinutos`,
       `saida(chegada)`
-- [ ] `SlotTest`, `TrechoTest`, `PousoTest`
+- [x] `SlotTest`, `TrechoTest`, `PousoTest`
 
 **Combinar com o Antônio antes de escrever a primeira linha** — B, C e o seed
 dependem destas três respostas:
@@ -74,24 +73,21 @@ dependem destas três respostas:
 **Pronto quando:** `./mvnw clean test` verde e nenhum desses testes sobe o
 Spring nem toca no banco.
 
-### B — Agregado e validação · Vicenzo + Dejota
+### B — Agregado e validação · Gustavo
 
 Branch: `feat/flight-plan-validation` · **depende de A** · começa sexta à tarde
 
-- [ ] `PlanoDeVoo.adicionarTrecho`, `.removerTrecho` — só em `EM_EDICAO` (UC10, UC11)
-- [ ] `PlanoDeVoo.validar() : List<String>` (UC14), com as seis verificações
-- [ ] `PlanoDeVoo.abandonar()` (UC18)
+- [ ] `PlanoDeVoo.adicionarTrecho`, `.removerTrecho` — só em `EM_EDICAO` (UC06)
+- [ ] `PlanoDeVoo.validar() : List<String>` (UC09), com as seis verificações
+- [ ] `PlanoDeVoo.abandonar()` (UC11)
 - [ ] Persistência de `Trecho` e `Pouso`
 - [ ] API: `POST /planos/{id}/trechos`, `DELETE /planos/{id}/trechos/{ordem}`,
       `POST /planos/{id}/validacao`, `POST /planos/{id}/abandono`
 
-Divisão sugerida dentro da dupla: um pega continuidade do percurso, horários e
-mesmo dia; o outro pega aeronave, autonomia e disponibilidade.
-
 **Pronto quando:** validar devolve a lista de problemas, **não muda estado** e
 **não cria reserva nenhuma**.
 
-### C — Reservas, aprovação e cancelamento · Redivo + Both
+### C — Reservas, aprovação e cancelamento · Redivo
 
 Branch: `feat/reservations-and-approval` · **depende de A** · começa sexta à tarde
 
@@ -99,23 +95,28 @@ Branch: `feat/reservations-and-approval` · **depende de A** · começa sexta à
 - [ ] `schema.sql`: tabelas `trecho`, `reserva_aerovia`, `reserva_vaga`, com
       `UNIQUE (aerovia_id, altitude, slot_inicio)` e
       `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)`
-- [ ] UC12 e UC13: consultar altitudes e vagas livres por período
-- [ ] `AprovarPlanoUC` (UC15) em **uma** `@Transactional` — **só depois de B**
-- [ ] `CancelarPlanoUC` (UC19): só `APROVADO` com partida futura
+- [ ] UC07 e UC08: consultar altitudes e vagas livres por período
+- [ ] `AprovarPlanoUC` (UC10) em **uma** `@Transactional` — **só depois de B**
+- [ ] `CancelarPlanoUC` (UC12): só `APROVADO` com partida futura
 - [ ] **Teste que o enunciado cobra por escrito:** aprovação malsucedida não
       deixa reserva parcial
 
 **Pronto quando:** aprovar a mesma altitude no mesmo slot duas vezes falha na
 segunda, e a primeira continua íntegra.
 
-### D1 — Cadastros · Antônio
+### D1 — Cadastros · Dejota
+
+**Não são casos de uso** (orientação do professor: a malha, os pilotos e as
+aeronaves vêm da carga inicial). Ficam na API porque o enunciado (§2 e §8.1)
+pede que dê para cadastrar novos aeroportos e aerovias. Prioridade baixa: se o
+tempo apertar, `POST /aeroportos` e `POST /aerovias` primeiro.
 
 Branch: `feat/registration-endpoints` · **não depende de nada, começa já**
 
-- [ ] `POST /aeroportos` (UC02)
-- [ ] `POST /aerovias` (UC04) — sem `PUT` e sem `DELETE`: aerovia é imutável
-- [ ] `POST /pilotos` (UC06)
-- [ ] `POST /aeronaves` (UC08) — Factory por categoria, para o controller não
+- [ ] `POST /aeroportos`
+- [ ] `POST /aerovias` — sem `PUT` e sem `DELETE`: aerovia é imutável
+- [ ] `POST /pilotos`
+- [ ] `POST /aeronaves` — Factory por categoria, para o controller não
       conhecer as subclasses
 
 É o código mais leve do projeto: cada endpoint é o espelho de um `GET` que já
@@ -125,7 +126,7 @@ existe. `MalhaAereaController` + `ConsultarAeroviasUC` + `RepositorioAeroviasJPA
 **Pronto quando:** dá para cadastrar um aeroporto novo e usar num plano, sem
 recompilar — é o teste de extensibilidade que o professor vai fazer.
 
-### D2 — Carga inicial · Both
+### D2 — Carga inicial · Dejota
 
 Branch: `db/initial-seed` · **depende de C** · sábado
 
@@ -139,7 +140,7 @@ Branch: `db/initial-seed` · **depende de C** · sábado
       contagens, cria/valida/aprova um plano, **reinicia** e confirma que
       continua lá
 
-Fica com quem fez C porque é quem sabe exatamente como a reserva é gravada.
+Depende de C: combinar com o Redivo como cada reserva é gravada no banco.
 
 ### E — Documentação e apresentação · Antônio
 
@@ -154,6 +155,8 @@ Pode escrever agora — os rascunhos das 8 decisões já estão em `logs/decisoe
 - [ ] ADR 0006 — categoria nova de aeronave sem alterar a validação
 - [ ] ADR 0007 — herança da hierarquia de aeronaves no banco
 - [ ] ADR 0008 — idioma do código
+- [ ] ADR 0009 — cadastros fora da lista de casos de uso (orientação do
+      professor), mas mantidos na API por causa do enunciado §2 e §8.1
 - [ ] springdoc descomentado no `pom.xml`, com a versão compatível conferida, e
       Swagger UI abrindo
 
@@ -172,13 +175,11 @@ primeira requisição sem perguntar nada.
 
 ## 4. Calendário
 
-| Quando | Vicenzo | Dejota | Redivo | Both | Antônio |
+| Quando | Vicenzo | Gustavo | Redivo | Dejota | Antônio |
 |---|---|---|---|---|---|
-| **Qui 15, noite** | A | — | — | — | assinaturas de A com o Vicenzo, depois ADRs |
-| **Sex 16, manhã** | **fecha A** | — | prepara C | prepara C | cadastros |
-| **Sex 16, tarde** | B | B | C | C | ADRs + springdoc |
-| **Sáb 17** | B | **fecha B** | aprovar e cancelar | `data.sql` | README + `requests.http` |
-| **Dom 18, até 18:00** | apoio | apoio | **fecha C** | roteiro §14.4 | ADR 0004, ensaio |
+| **Sex 16** | **fecha A** | — | — | — | ADRs |
+| **Sáb 17** | revisão de PRs, apoio | B: percurso e trechos | C: reservas, tabelas, UC07 e UC08 | D1: cadastros | ADRs + springdoc |
+| **Dom 18, até 18:00** | apoio | **fecha B**: validar e abandonar | aprovar e cancelar (precisa de B), **fecha C** | D2: `data.sql` e roteiro §14.4 | README, `requests.http`, ensaio |
 | **Dom 18, 18:00–23:55** | todos: integração, último PR, conferência final; Antônio envia no Moodle | | | | |
 
 Deixar as cinco horas finais de domingo para integração não é folga: é onde
@@ -245,7 +246,9 @@ no mais tardar.
 ## 7. O que já está pronto
 
 - Estrutura hexagonal em `backend/`, com a regra de dependência respeitada
-- 7 dos 19 casos de uso: UC01, UC03, UC05, UC07, UC09, UC16, UC17
+- 7 dos 14 casos de uso: UC01 a UC05, UC13 e UC14
+- **Frente A concluída** (Vicenzo, 16/10): `Slot`, `Trecho` e `Pouso`, com testes.
+  Borda decidida: intervalo `[início, fim)`, então 15:00 → 16:00 ocupa **1 slot**
 - H2 em arquivo, `schema.sql` e `data.sql` com malha, pilotos e aeronaves
 - Modelo de domínio e os três C4, em `docs/` (PR #3)
 - As 8 decisões arquiteturais registradas em `logs/decisoes.md`, prontas para

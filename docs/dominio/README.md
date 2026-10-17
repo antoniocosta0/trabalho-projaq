@@ -6,7 +6,7 @@ Entrega de **05/10**: diagrama de domínio e casos de uso identificados.
 |---|---|
 | `modelo-dominio.puml` | fonte do diagrama, versionado |
 | `modelo-dominio.png` | imagem exportada, com a data |
-| `casos-de-uso.md` | UC01 a UC19, com ator, pré-condição e resultado |
+| `casos-de-uso.md` | UC01 a UC14, com ator, pré-condição e resultado; cadastros fora da lista |
 
 O estado atual do modelo está descrito em `CLAUDE.md`, seção 6, com as decisões
 de modelagem que ele já embute e os pontos ainda em aberto.
