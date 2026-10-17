@@ -5,7 +5,7 @@
 
 title
   Modelo de Domínio - Planos de Voo
-  <size:11>Exportado em 2026-10-16</size>
+  <size:11>Exportado em 2026-10-17</size>
 end title
 hide circle
 hide empty members
@@ -77,7 +77,8 @@ class PlanoDeVoo <<raiz de agregado>> {
   partida
   situacao
   --
-  adicionarTrecho(trecho)
+  adicionarTrecho(aerovia, altitude, entrada, pouso)
+  alterarTrecho(ordem, aerovia, altitude, entrada, pouso)
   removerTrecho(ordem)
   validar() : List<String>
   aprovar()

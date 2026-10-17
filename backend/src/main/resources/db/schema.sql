@@ -50,3 +50,16 @@ CREATE TABLE IF NOT EXISTS plano_de_voo (
     partida           TIMESTAMP   NOT NULL,
     situacao          VARCHAR(20) NOT NULL
 );
+
+-- Percurso do plano. Pertence ao plano: sem identidade propria, a chave e
+-- (plano, ordem). numero_vaga e permanencia_minutos nulos = sobrevoo.
+CREATE TABLE IF NOT EXISTS trecho (
+    plano_id             BIGINT      NOT NULL REFERENCES plano_de_voo (id),
+    ordem                INT         NOT NULL,
+    aerovia_id           VARCHAR(20) NOT NULL REFERENCES aerovia (id),
+    altitude             INT         NOT NULL,
+    horario_entrada      TIMESTAMP   NOT NULL,
+    numero_vaga          INT,
+    permanencia_minutos  INT,
+    PRIMARY KEY (plano_id, ordem)
+);

@@ -1,7 +1,10 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence;
 
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,8 +13,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "plano_de_voo")
@@ -44,10 +50,18 @@ public class PlanoDeVooJpaEntity {
     @Column(nullable = false)
     private SituacaoPlano situacao;
 
+    // Os trechos ficam na tabela "trecho" e são salvos e carregados junto com o
+    // plano (ao salvar, o Hibernate apaga os antigos e grava a lista atual).
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "trecho", joinColumns = @JoinColumn(name = "plano_id"))
+    @OrderBy("ordem")
+    private List<TrechoJpaEmbeddable> trechos = new ArrayList<>();
+
     protected PlanoDeVooJpaEntity() { }
 
     public PlanoDeVooJpaEntity(Long id, PilotoJpaEntity piloto, AeronaveJpaEntity aeronave, AeroportoJpaEntity origem,
-                            AeroportoJpaEntity destino, LocalDateTime partida, SituacaoPlano situacao) {
+                            AeroportoJpaEntity destino, LocalDateTime partida, SituacaoPlano situacao,
+                            List<TrechoJpaEmbeddable> trechos) {
         this.id = id;
         this.piloto = piloto;
         this.aeronave = aeronave;
@@ -55,6 +69,7 @@ public class PlanoDeVooJpaEntity {
         this.destino = destino;
         this.partida = partida;
         this.situacao = situacao;
+        this.trechos = new ArrayList<>(trechos);
     }
 
     public Long getId() { return id; }
@@ -64,4 +79,5 @@ public class PlanoDeVooJpaEntity {
     public AeroportoJpaEntity getDestino() { return destino; }
     public LocalDateTime getPartida() { return partida; }
     public SituacaoPlano getSituacao() { return situacao; }
+    public List<TrechoJpaEmbeddable> getTrechos() { return trechos; }
 }
