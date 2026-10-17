@@ -7,6 +7,9 @@ import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarPilotosUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ListarPlanosUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.AbandonarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.ValidarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
@@ -54,5 +57,20 @@ public class UseCaseConfig {
     @Bean
     public ListarPlanosUC listarPlanosUC(RepositorioPlanosDeVoo planos) {
         return new ListarPlanosUC(planos);
+    }
+
+    @Bean
+    public DefinirPercursoUC definirPercursoUC(RepositorioPlanosDeVoo planos, RepositorioAerovias aerovias) {
+        return new DefinirPercursoUC(planos, aerovias);
+    }
+
+    @Bean
+    public ValidarPlanoUC validarPlanoUC(RepositorioPlanosDeVoo planos) {
+        return new ValidarPlanoUC(planos);
+    }
+
+    @Bean
+    public AbandonarPlanoUC abandonarPlanoUC(RepositorioPlanosDeVoo planos) {
+        return new AbandonarPlanoUC(planos);
     }
 }

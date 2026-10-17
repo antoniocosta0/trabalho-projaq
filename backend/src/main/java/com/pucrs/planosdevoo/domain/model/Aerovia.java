@@ -26,10 +26,12 @@ public class Aerovia {
         this.distanciaKm = distanciaKm;
     }
 
-    // duração = distância / velocidade de cruzeiro
+    // duração = distância / velocidade de cruzeiro, arredondada ao minuto.
+    // Os horários do plano são informados em minutos; com segundos, o usuário
+    // nunca conseguiria digitar uma entrada que batesse com a chegada calculada.
     public Duration duracao(double velocidadeKmh) {
-        long segundos = Math.round(distanciaKm / velocidadeKmh * 3600);
-        return Duration.ofSeconds(segundos);
+        long minutos = Math.round(distanciaKm / velocidadeKmh * 60);
+        return Duration.ofMinutes(minutos);
     }
 
     public String getId() { return id; }

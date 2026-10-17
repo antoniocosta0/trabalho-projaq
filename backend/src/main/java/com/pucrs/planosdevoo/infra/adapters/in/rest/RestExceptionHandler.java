@@ -1,5 +1,6 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
+import com.pucrs.planosdevoo.domain.model.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -18,5 +19,11 @@ public class RestExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail regraViolada(IllegalArgumentException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
+    }
+
+    // Ex.: alterar o percurso de um plano que não está mais em edição.
+    @ExceptionHandler(OperacaoNaoPermitidaException.class)
+    public ProblemDetail operacaoNaoPermitida(OperacaoNaoPermitidaException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
     }
 }
