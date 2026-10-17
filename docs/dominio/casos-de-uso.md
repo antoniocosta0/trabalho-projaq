@@ -7,6 +7,13 @@ Entrega de **05/10**.
 voo. O enunciado não distingue perfis (não há piloto-usuário, operador ou
 administrador separados), então um ator só é o modelo fiel ao problema.
 
+**Cadastros fora da lista.** Por orientação do professor, cadastrar aeroporto,
+aerovia, piloto e aeronave **não conta como caso de uso**: são operações de
+manutenção de dados, sem regra de negócio. A malha, os pilotos e as aeronaves
+já vêm na carga inicial (`data.sql`). Mesmo assim, como o enunciado (§2 e §8.1)
+pede que seja possível cadastrar novos aeroportos e aerovias, a API mantém os
+endpoints de cadastro — ver o fim deste arquivo.
+
 Cada caso de uso traz **pré-condição** e **resultado**, como pede a entrega, e
 as **classes envolvidas**, para amarrar com o modelo de domínio.
 
@@ -20,14 +27,7 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
 - **Resultado:** lista com código, nome e quantidade de vagas de cada aeroporto.
 - **Classes:** `Aeroporto`.
 
-### UC02 — Cadastrar aeroporto
-- **Pré-condição:** o código informado ainda não existe.
-- **Fluxo:** o usuário informa código, nome e quantidade de vagas.
-- **Resultado:** aeroporto disponível para uso em aerovias e planos, **sem
-  recompilar nem alterar código** — a malha vem do banco.
-- **Classes:** `Aeroporto`.
-
-### UC03 — Consultar aerovias
+### UC02 — Consultar aerovias
 - **Pré-condição:** nenhuma.
 - **Fluxo:** o sistema lista as aerovias cadastradas.
 - **Resultado:** lista com identificador, origem, destino e distância em km.
@@ -35,51 +35,26 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
   registros distintos.
 - **Classes:** `Aerovia`, `Aeroporto`.
 
-### UC04 — Cadastrar aerovia
-- **Pré-condição:** origem e destino já cadastrados; identificador inédito.
-- **Fluxo:** o usuário informa identificador, aeroporto de origem, aeroporto de
-  destino e distância.
-- **Resultado:** aerovia disponível para uso em trechos. **Não há alteração nem
-  exclusão de aerovia** — o que preserva os dados já referenciados por planos e
-  reservas. Correção se faz criando uma aerovia nova, com identificador novo.
-- **Classes:** `Aerovia`, `Aeroporto`.
-
 ---
 
 ## Pilotos e aeronaves
 
-### UC05 — Consultar pilotos
+### UC03 — Consultar pilotos
 - **Pré-condição:** nenhuma.
 - **Resultado:** lista de pilotos disponíveis para uso em um plano.
 - **Classes:** `Piloto`.
 
-### UC06 — Cadastrar piloto
-- **Pré-condição:** nenhuma.
-- **Fluxo:** o usuário informa o nome do piloto.
-- **Resultado:** piloto disponível para uso em planos.
-- **Classes:** `Piloto`.
-
-### UC07 — Consultar aeronaves
+### UC04 — Consultar aeronaves
 - **Pré-condição:** nenhuma.
 - **Resultado:** lista com prefixo, categoria, velocidade de cruzeiro, autonomia
   e os dados próprios de cada categoria.
-- **Classes:** `Aeronave` e subclasses.
-
-### UC08 — Cadastrar aeronave
-- **Pré-condição:** prefixo inédito; categoria conhecida.
-- **Fluxo:** o usuário informa prefixo, categoria, velocidade de cruzeiro,
-  autonomia e os dados próprios da categoria — empresa de manutenção
-  (particular), companhia aérea e capacidade de passageiros (passageiros),
-  companhia aérea e capacidade em toneladas (carga).
-- **Resultado:** aeronave disponível para uso em planos, já com a regra de
-  operação da sua categoria.
 - **Classes:** `Aeronave` e subclasses.
 
 ---
 
 ## Planos de voo
 
-### UC09 — Criar plano de voo
+### UC05 — Criar plano de voo
 - **Pré-condição:** piloto, aeronave, aeroporto de origem e aeroporto de destino
   já cadastrados.
 - **Fluxo:** o usuário informa piloto, aeronave, origem, destino e data e hora
@@ -88,26 +63,19 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
   sem percurso e **sem nenhuma reserva**.
 - **Classes:** `PlanoDeVoo`, `Piloto`, `Aeronave`, `Aeroporto`, `SituacaoPlano`.
 
-### UC10 — Adicionar trecho ao percurso
+### UC06 — Definir ou alterar o percurso
 - **Pré-condição:** o plano existe e está **EM_EDICAO**.
-- **Fluxo:** o usuário informa a aerovia, a altitude e o horário de entrada. Se
-  a aeronave for pousar no aeroporto de destino daquele trecho, informa também a
-  vaga pretendida e o tempo de permanência; caso contrário, é sobrevoo. O
-  **horário de chegada é calculado pelo sistema** (distância ÷ velocidade de
-  cruzeiro), nunca informado.
-- **Resultado:** trecho acrescentado ao fim do percurso. Indicar vaga **não
-  reserva** nada.
+- **Fluxo:** o usuário acrescenta, altera ou remove trechos. Em cada trecho
+  informa a aerovia, a altitude e o horário de entrada. Se a aeronave for pousar
+  no aeroporto de destino daquele trecho, informa também a vaga pretendida e o
+  tempo de permanência; caso contrário, é sobrevoo. O **horário de chegada é
+  calculado pelo sistema** (distância ÷ velocidade de cruzeiro), nunca
+  informado.
+- **Resultado:** percurso atualizado e reordenado. Indicar vaga **não reserva**
+  nada, e nenhuma reserva é afetada, porque um plano em edição não tem reservas.
 - **Classes:** `PlanoDeVoo`, `Trecho`, `Pouso`, `Aerovia`.
 
-### UC11 — Remover ou alterar trecho
-- **Pré-condição:** o plano existe e está **EM_EDICAO**.
-- **Fluxo:** o usuário remove um trecho pela ordem, ou altera aerovia, altitude,
-  horário de entrada ou dados do pouso.
-- **Resultado:** percurso atualizado e reordenado. Nenhuma reserva é afetada,
-  porque um plano em edição não tem reservas.
-- **Classes:** `PlanoDeVoo`, `Trecho`, `Pouso`.
-
-### UC12 — Consultar altitudes disponíveis em uma aerovia
+### UC07 — Consultar altitudes disponíveis em uma aerovia
 - **Pré-condição:** a aerovia existe.
 - **Fluxo:** o usuário informa a aerovia e um período.
 - **Resultado:** quais das 11 altitudes (25.000 a 35.000 pés, de 1.000 em 1.000)
@@ -115,14 +83,14 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
   reserva nada e não altera estado.
 - **Classes:** `Aerovia`, `ReservaAerovia`, `Slot`.
 
-### UC13 — Consultar vagas disponíveis em um aeroporto
+### UC08 — Consultar vagas disponíveis em um aeroporto
 - **Pré-condição:** o aeroporto existe.
 - **Fluxo:** o usuário informa o aeroporto e um período.
 - **Resultado:** quais vagas estão livres em todos os slots do período. Também
   é só consulta.
 - **Classes:** `Aeroporto`, `ReservaVaga`, `Slot`.
 
-### UC14 — Validar plano
+### UC09 — Validar plano
 - **Pré-condição:** o plano existe e está **EM_EDICAO**.
 - **Fluxo:** o sistema confere, nesta ordem:
   1. **continuidade do percurso** — origem da 1ª aerovia = origem do plano,
@@ -140,9 +108,9 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
 - **Classes:** `PlanoDeVoo`, `Trecho`, `Pouso`, `Slot`, `Aeronave`, `Aerovia`,
   `ReservaAerovia`, `ReservaVaga`.
 
-### UC15 — Aprovar plano
+### UC10 — Aprovar plano
 - **Pré-condição:** o plano existe e está **EM_EDICAO**.
-- **Fluxo:** o sistema revalida (UC14) — porque a disponibilidade consultada
+- **Fluxo:** o sistema revalida (UC09) — porque a disponibilidade consultada
   antes pode ter mudado — e então cria as reservas: uma `ReservaAerovia` por
   slot de cada aerovia percorrida, na altitude do trecho, e uma `ReservaVaga`
   por slot de cada permanência em vaga.
@@ -152,21 +120,7 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
 - **Classes:** `PlanoDeVoo`, `Trecho`, `Pouso`, `Slot`, `ReservaAerovia`,
   `ReservaVaga`.
 
-### UC16 — Consultar plano por identificador
-- **Pré-condição:** nenhuma.
-- **Resultado:** todos os dados do plano — percurso, horários calculados,
-  reservas e situação — **em qualquer situação**, inclusive cancelado e
-  abandonado.
-- **Classes:** `PlanoDeVoo`, `Trecho`, `Pouso`, `ReservaAerovia`, `ReservaVaga`.
-
-### UC17 — Consultar planos por situação
-- **Pré-condição:** nenhuma.
-- **Fluxo:** o usuário filtra por EM_EDICAO, APROVADO, CANCELADO ou ABANDONADO;
-  sem filtro, lista todos.
-- **Resultado:** lista de planos da situação pedida.
-- **Classes:** `PlanoDeVoo`, `SituacaoPlano`.
-
-### UC18 — Abandonar plano
+### UC11 — Abandonar plano
 - **Pré-condição:** o plano está **EM_EDICAO**.
 - **Fluxo:** o usuário abandona o plano.
 - **Resultado:** plano passa a **ABANDONADO**. Não pode mais ser alterado,
@@ -174,7 +128,7 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
   porque plano em edição nunca reservou nada.
 - **Classes:** `PlanoDeVoo`, `SituacaoPlano`.
 
-### UC19 — Cancelar plano aprovado
+### UC12 — Cancelar plano aprovado
 - **Pré-condição:** o plano está **APROVADO** e a **partida ainda não ocorreu**.
 - **Fluxo:** o usuário cancela o plano.
 - **Resultado:** plano passa a **CANCELADO** e **todas as suas reservas são
@@ -182,20 +136,48 @@ as **classes envolvidas**, para amarrar com o modelo de domínio.
   cuja partida já ocorreu é voo executado: consultável, **não cancelável**.
 - **Classes:** `PlanoDeVoo`, `ReservaAerovia`, `ReservaVaga`, `SituacaoPlano`.
 
+### UC13 — Consultar plano por identificador
+- **Pré-condição:** nenhuma.
+- **Resultado:** todos os dados do plano — percurso, horários calculados,
+  reservas e situação — **em qualquer situação**, inclusive cancelado e
+  abandonado.
+- **Classes:** `PlanoDeVoo`, `Trecho`, `Pouso`, `ReservaAerovia`, `ReservaVaga`.
+
+### UC14 — Consultar planos por situação
+- **Pré-condição:** nenhuma.
+- **Fluxo:** o usuário filtra por EM_EDICAO, APROVADO, CANCELADO ou ABANDONADO;
+  sem filtro, lista todos.
+- **Resultado:** lista de planos da situação pedida.
+- **Classes:** `PlanoDeVoo`, `SituacaoPlano`.
+
 ---
 
 ## Mapa de estados
 
 ```
-                 UC15 aprovar (validado + tudo reservado)
+                 UC10 aprovar (validado + tudo reservado)
     EM_EDICAO ──────────────────────────────────────────► APROVADO
         │                                                     │
-        │ UC18 abandonar          UC19 cancelar (só se a partida ainda não
+        │ UC11 abandonar          UC12 cancelar (só se a partida ainda não
         ▼                          ocorreu; libera todas as reservas)
     ABANDONADO                                                ▼
                                                           CANCELADO
 ```
 
-Só **EM_EDICAO** é modificável (UC10, UC11, UC14, UC15, UC18). Planos
+Só **EM_EDICAO** é modificável (UC06, UC09, UC10, UC11). Planos
 aprovados, cancelados e abandonados preservam o que tinham e continuam
-consultáveis (UC16, UC17).
+consultáveis (UC13, UC14).
+
+---
+
+## Cadastros (fora da lista de casos de uso)
+
+Não são casos de uso, mas existem na API para atender o enunciado (§2 e §8.1) e
+para que um aeroporto ou aerovia nova possa ser incluída **sem alterar código**:
+
+- **Cadastrar aeroporto:** código inédito, nome e quantidade de vagas.
+- **Cadastrar aerovia:** identificador inédito, origem e destino já cadastrados
+  e distância. **Sem alteração e sem exclusão** depois de criada.
+- **Cadastrar piloto:** nome.
+- **Cadastrar aeronave:** prefixo inédito, categoria, velocidade de cruzeiro,
+  autonomia e os dados próprios da categoria.

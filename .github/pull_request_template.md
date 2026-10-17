@@ -3,7 +3,7 @@
 > Adicione um resumo detalhado do que esta alteração engloba. Comece pelo
 > problema que existia, não pela solução.
 
-**Caso(s) de uso:** <!-- ex.: UC14 (validar plano), UC15 (aprovar plano) — ver CLAUDE.md seção 7 -->
+**Caso(s) de uso:** <!-- ex.: UC09 (validar plano), UC10 (aprovar plano) — ver CLAUDE.md seção 7 -->
 
 **Entrega do cronograma:** <!-- ex.: 14/10 — implementação de 40% dos casos de uso -->
 

@@ -35,7 +35,7 @@ commits.
 ### 1.2 Regras
 
 - **Sem ID de task no nome da branch.** Este trabalho não usa ferramenta de
-  tasks; o rastro é o caso de uso (UC01–UC19, `CLAUDE.md` seção 7) e a entrega
+  tasks; o rastro é o caso de uso (UC01–UC14, `CLAUDE.md` seção 7) e a entrega
   do cronograma, citados no corpo do PR.
 - Branch sai sempre de `main` atualizada.
 - PR é aberto contra `main`, sem conflito.

@@ -194,7 +194,7 @@ trabalho-1/
 │   │   ├── README.md
 │   │   ├── modelo-dominio.puml        fonte do diagrama, PlantUML
 │   │   ├── modelo-dominio.png         imagem exportada
-│   │   └── casos-de-uso.md            UC01–UC19 detalhados (seção 7)
+│   │   └── casos-de-uso.md            UC01–UC14 detalhados (seção 7)
 │   ├── arquitetura/
 │   │   ├── c4-contexto.puml / .png    nível 1
 │   │   ├── c4-containers.puml / .png  nível 2
@@ -447,27 +447,27 @@ para escolher os 40% de 14/10.
 | # | Caso de uso | Observação |
 |---|---|---|
 | UC01 | Consultar aeroportos | |
-| UC02 | Cadastrar aeroporto | |
-| UC03 | Consultar aerovias | |
-| UC04 | Cadastrar aerovia | sem alteração e sem exclusão |
-| UC05 | Consultar pilotos | |
-| UC06 | Cadastrar piloto | |
-| UC07 | Consultar aeronaves | |
-| UC08 | Cadastrar aeronave | por categoria |
-| UC09 | Criar plano de voo | nasce EM_EDICAO |
-| UC10 | Adicionar trecho ao percurso | só EM_EDICAO |
-| UC11 | Remover / alterar trecho | só EM_EDICAO |
-| UC12 | Consultar altitudes disponíveis em uma aerovia por período | não reserva |
-| UC13 | Consultar vagas disponíveis em um aeroporto por período | não reserva |
-| UC14 | **Validar plano** | não muda estado, não reserva; devolve lista de problemas |
-| UC15 | **Aprovar plano** | integral: tudo ou nada |
-| UC16 | Consultar plano por id | |
-| UC17 | Consultar planos por situação | |
-| UC18 | Abandonar plano | só EM_EDICAO |
-| UC19 | **Cancelar plano** | só APROVADO com partida futura; libera reservas |
+| UC02 | Consultar aerovias | |
+| UC03 | Consultar pilotos | |
+| UC04 | Consultar aeronaves | |
+| UC05 | Criar plano de voo | nasce EM_EDICAO |
+| UC06 | Definir ou alterar o percurso (trechos) | só EM_EDICAO |
+| UC07 | Consultar altitudes disponíveis em uma aerovia por período | não reserva |
+| UC08 | Consultar vagas disponíveis em um aeroporto por período | não reserva |
+| UC09 | **Validar plano** | não muda estado, não reserva; devolve lista de problemas |
+| UC10 | **Aprovar plano** | integral: tudo ou nada |
+| UC11 | Abandonar plano | só EM_EDICAO |
+| UC12 | **Cancelar plano** | só APROVADO com partida futura; libera reservas |
+| UC13 | Consultar plano por id | |
+| UC14 | Consultar planos por situação | |
 
-Os 40% de 14/10 devem cobrir o fio condutor: **UC09, UC10, UC14, UC15**, mais o
-mínimo de consulta de malha (UC01, UC03) que eles exigem. Com isso dá para
+Cadastrar aeroporto, aerovia, piloto e aeronave **não são casos de uso**, por
+orientação do professor: os dados vêm da carga inicial. A API mantém os
+endpoints de cadastro porque o enunciado (§2 e §8.1) pede que seja possível
+cadastrar novos aeroportos e aerovias.
+
+Os 40% de 14/10 devem cobrir o fio condutor: **UC05, UC06, UC09, UC10**, mais o
+mínimo de consulta de malha (UC01, UC02) que eles exigem. Com isso dá para
 demonstrar o ciclo inteiro; sem isso, dez CRUDs não demonstram nada.
 
 ---
@@ -559,7 +559,7 @@ toda sessão de trabalho**, escreve nos dois arquivos de `logs/`:
 
 **Resumo.** O que foi feito, em 2 a 5 linhas.
 
-**Casos de uso tocados.** UC14 (validação de percurso) — implementado e testado.
+**Casos de uso tocados.** UC09 (validação de percurso) — implementado e testado.
 
 **Arquivos tocados.**
 - `backend/src/.../PlanoDeVoo.java` — o que mudou
