@@ -7,7 +7,7 @@
 
 title
   Nível 3 - Componentes do Backend (arquitetura hexagonal)
-  <size:11>Exportado em 2026-10-15</size>
+  <size:11>Exportado em 2026-10-18</size>
 end title
 
 System_Ext(cliente, "Cliente HTTP", "Postman, arquivo .http ou Swagger UI")
