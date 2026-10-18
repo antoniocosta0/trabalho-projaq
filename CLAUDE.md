@@ -173,20 +173,21 @@ O que isso impõe na ordem de trabalho:
 
 ## 4. Estrutura do repositório
 
-O repositório já está inicializado (`git init`, branch `main`), com a
-documentação, os logs e os padrões no lugar. O que falta é `backend/`.
+O repositório está inicializado (`git init`, branch `main`), com a
+documentação, os logs, os padrões e o `backend/` completo no lugar.
 
-Estado atual e alvo — `(a criar)` marca o que ainda não existe:
+Estado atual (18/10). O backend está completo; o que falta está anotado na própria árvore:
 
 ```
 trabalho-1/
 ├── CLAUDE.md                      este guia
-├── README.md                      esqueleto, com [PREENCHER] nas seções exigidas
+├── README.md                      preenchido: ambiente, execução, banco, API, data de referência
 ├── .gitignore                     Java, Maven, banco local, IDE, macOS
 ├── PAS_TF_2026_2_PlanosDeVoo (1).md
 ├── PAS_TF_2026_2_CronogramaPlanosDeVoo_P1.pdf
 ├── .github/
-│   └── pull_request_template.md   template de PR (seção 10.4)
+│   ├── pull_request_template.md   template de PR (seção 10.4)
+│   └── workflows/ci.yml           CI: testes e regra de dependência a cada push e PR
 ├── docs/
 │   ├── padroes-desenvolvimento.md branch, commit, PR, nomenclatura Java
 │   ├── arquitetura/README.md      o que cada nível do C4 mostra
@@ -200,11 +201,11 @@ trabalho-1/
 │   │   ├── c4-containers.puml / .png  nível 2
 │   │   ├── c4-componentes.puml / .png nível 3, a hexagonal
 │   │   └── decisoes/                  um ADR por decisão (seção 15)
-│   │       ├── README.md              índice das 8 decisões exigidas
+│   │       ├── README.md              índice das nove decisões registradas
 │   │       └── 0000-template.md       formato do ADR
 │   └── api/
 │       ├── README.md
-│       └── requests.http              (a criar) roteiro da apresentação
+│       └── requests.http              roteiro da apresentação (8 das 17 demonstrações)
 ├── logs/
 │   ├── log.md                         o que foi feito (seção 9)
 │   └── decisoes.md                    o que foi decidido e por quê (seção 9)
@@ -217,7 +218,7 @@ trabalho-1/
     │   └── infra/{adapters/in/rest, adapters/out/persistence, config}
     ├── src/main/resources/
     │   ├── application.properties     H2 em arquivo, não em memória
-    │   └── db/{schema.sql, data.sql}  (a escrever)
+    │   └── db/{schema.sql, data.sql}  schema completo; data.sql sem os planos aprovados
     └── src/test/java/...              espelha a árvore de main
 ```
 
@@ -1095,13 +1096,16 @@ As que custam nota e são fáceis de deixar passar:
 - [x] Regra de dependência escrita e respeitada.
 - [x] ADR 0001 (estilo arquitetural) escrito, com alternativas.
 
-**Entrega de 14/10 — 40% dos casos de uso**
+**Entrega de 14/10 — 40% dos casos de uso** — superada: 14 de 14 em 18/10
 
-- [ ] Ciclo completo de um plano funcionando pela API.
-- [ ] Banco persistindo entre reinicializações.
-- [ ] Carga inicial rodando do zero.
-- [ ] Testes das regras de cálculo passando.
-- [ ] Quais UCs estão prontos, listados no `log.md`.
+- [x] Ciclo completo de um plano funcionando pela API: criar, montar percurso,
+      validar, aprovar, cancelar e abandonar.
+- [x] Banco persistindo entre reinicializações (H2 em arquivo).
+- [x] Carga inicial rodando do zero — malha, pilotos e aeronaves; os planos
+      aprovados ainda não entraram.
+- [x] Testes das regras de cálculo passando: 88 testes, verdes também no CI.
+- [ ] Quais UCs estão prontos, listados no `log.md` — o log local desta máquina
+      está sendo posto em dia.
 
 **Antes de cada commit**
 
@@ -1121,10 +1125,11 @@ As que custam nota e são fáceis de deixar passar:
 **Antes da apresentação de 19/10**
 
 - [ ] Banco apagado e recriado do zero, com sucesso.
-- [ ] As 17 demonstrações da seção 16.3 testadas, em ordem.
-- [ ] Data de referência conferida: 5+ aerovias com ocupação.
+- [ ] As 17 demonstrações da seção 16.3 testadas, em ordem — **8 no roteiro**.
+- [ ] Data de referência conferida: 5+ aerovias com ocupação — **0 hoje**,
+      depende dos planos aprovados no `data.sql`.
 - [ ] `requests.http` (ou coleção equivalente) completo e numerado.
-- [ ] Swagger UI abrindo.
+- [x] Swagger UI abrindo (conferido no PR #9).
 - [ ] README seguido por alguém de fora, do clone até a primeira requisição.
-- [ ] Diagramas conferidos contra o código, um por um.
-- [ ] ADRs escritos, cobrindo as 8 decisões da seção 15.2.
+- [x] Diagramas conferidos contra o código, um por um (PR #13).
+- [x] ADRs escritos: as 8 decisões da seção 15.2, mais a 0009 — nove no total.

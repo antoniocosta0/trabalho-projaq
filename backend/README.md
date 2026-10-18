@@ -75,13 +75,15 @@ maior independência possível" do modelo em relação ao Spring, e assim
 
 - [x] `schema.sql` com as tabelas de aeroporto, aerovia, piloto, aeronave e
       plano de voo.
-- [ ] `schema.sql`: faltam as tabelas `trecho`, `reserva_aerovia` e
-      `reserva_vaga`, com `UNIQUE (aerovia_id, altitude, slot_inicio)` e
-      `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)`.
+- [x] `schema.sql` com as tabelas `trecho`, `reserva_aerovia` e `reserva_vaga`,
+      incluindo `UNIQUE (aerovia_id, altitude, slot_inicio)` e
+      `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)` (PRs #8 e #10).
 - [x] `data.sql` com a malha inicial, pilotos e aeronaves das três categorias.
 - [ ] `data.sql`: faltam os planos aprovados com suas reservas, cobrindo pelo
-      menos 5 das 8 aerovias na data de referência.
-- [ ] Data de referência definida, no `data.sql` e no `README.md` da raiz.
-- [ ] Dependência do springdoc (OpenAPI) descomentada no `pom.xml`, com a
-      versão compatível conferida.
+      menos 5 das 8 aerovias na data de referência. **É a última pendência de
+      dado do projeto** — sem ela não há ocupação prévia para demonstrar
+      conflito de altitude, vaga ocupada e cancelamento recusado.
+- [x] Data de referência definida: **19/10/2026**, declarada no `README.md` da raiz.
+- [x] Dependência do springdoc (OpenAPI) ativa no `pom.xml`, versão `2.8.6`,
+      compatibilidade com o Spring Boot 4.1.1 conferida na prática (PR #9).
 - [ ] `groupId` / pacote `com.pucrs` trocado, se a equipe preferir outro.
