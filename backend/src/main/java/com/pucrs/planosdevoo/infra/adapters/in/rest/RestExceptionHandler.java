@@ -1,6 +1,8 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
+import com.pucrs.planosdevoo.domain.model.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.OperacaoNaoPermitidaException;
+import com.pucrs.planosdevoo.domain.model.PlanoInvalidoException;
 import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -24,6 +26,20 @@ public class RestExceptionHandler {
     // Ex.: alterar o percurso de um plano que não está mais em edição.
     @ExceptionHandler(OperacaoNaoPermitidaException.class)
     public ProblemDetail operacaoNaoPermitida(OperacaoNaoPermitidaException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    // Aprovação recusada: devolve a lista completa de problemas, não só o primeiro.
+    @ExceptionHandler(PlanoInvalidoException.class)
+    public ProblemDetail planoInvalido(PlanoInvalidoException e) {
+        ProblemDetail detalhe = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
+        detalhe.setProperty("problemas", e.getProblemas());
+        return detalhe;
+    }
+
+    // Duas aprovações disputaram a mesma altitude ou vaga e esta perdeu.
+    @ExceptionHandler(ConflitoDeReservaException.class)
+    public ProblemDetail conflitoDeReserva(ConflitoDeReservaException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
     }
 }

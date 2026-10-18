@@ -19,9 +19,9 @@ Container_Boundary(api, "Backend (Spring Boot)") {
 
   Component(portas_entrada, "Portas de entrada (casos de uso)", "Java puro, publicados como beans", "Um caso de uso por operação: consultar malha e frota, criar plano, definir percurso, consultar disponibilidade, validar, aprovar, abandonar, cancelar e consultar planos. Orquestram o modelo e as portas de saída")
 
-  Component(modelo, "Modelo de domínio", "Java puro, sem framework", "PlanoDeVoo (raiz de agregado), Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e suas categorias, ReservaAerovia e ReservaVaga. Concentra as regras: percurso, horários, autonomia, altitudes e ocupação")
+  Component(modelo, "Modelo de domínio", "Java puro, sem framework", "PlanoDeVoo (raiz de agregado), Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e suas categorias, ReservaAerovia, ReservaVaga e o serviço VerificadorDeConflitos. Concentra as regras: percurso, horários, autonomia, altitudes e ocupação")
 
-  Component(portas_saida, "Portas de saída (repositórios)", "Interfaces Java", "RepositorioPlanosDeVoo, RepositorioAerovias, RepositorioAeroportos, RepositorioAeronaves, RepositorioPilotos e os repositórios de reserva. Abstraem o acesso à persistência")
+  Component(portas_saida, "Portas de saída (repositórios)", "Interfaces Java", "RepositorioPlanosDeVoo, RepositorioAerovias, RepositorioAeroportos, RepositorioAeronaves, RepositorioPilotos, RepositorioReservas e Transacao (o bloco que grava tudo ou nada). Abstraem o acesso à persistência")
 
   Component(adaptadores_saida, "Adaptadores de persistência", "Spring Data JPA", "Implementam as portas de saída. Entidades de banco separadas das entidades de domínio, com mapeadores entre as duas")
 

@@ -2,6 +2,7 @@ package com.pucrs.planosdevoo.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Trecho {
 
@@ -46,8 +47,26 @@ public class Trecho {
         return horarioEntrada.plus(aerovia.duracao(velocidadeCruzeiroKmh));
     }
 
+    // As 11 altitudes em que se pode voar: de 25.000 a 35.000 pés, de 1.000 em 1.000.
+    public static List<Integer> altitudesPermitidas() {
+        return IntStream.rangeClosed(ALTITUDE_MINIMA / INCREMENTO_ALTITUDE, ALTITUDE_MAXIMA / INCREMENTO_ALTITUDE)
+                .map(milhares -> milhares * INCREMENTO_ALTITUDE)
+                .boxed()
+                .toList();
+    }
+
     public List<Slot> slotsOcupados() {
         return Slot.entre(horarioEntrada, horarioChegada());
+    }
+
+    // Slots da vaga no aeroporto de destino, da chegada até o fim da permanência.
+    // Sobrevoo não ocupa vaga nenhuma.
+    public List<Slot> slotsDaVaga() {
+        if (pouso == null) {
+            return List.of();
+        }
+        LocalDateTime chegada = horarioChegada();
+        return Slot.entre(chegada, pouso.saida(chegada));
     }
 
     public int getOrdem() { return ordem; }
