@@ -24,4 +24,9 @@ public class RepositorioPilotosJPA implements RepositorioPilotos {
     public Optional<Piloto> buscarPorId(Long id) {
         return jpa.findById(id).map(FrotaMapper::paraDominio);
     }
+
+    @Override
+    public Piloto salvar(Piloto piloto) {
+        return FrotaMapper.paraDominio(jpa.save(FrotaMapper.paraEntidade(piloto)));
+    }
 }

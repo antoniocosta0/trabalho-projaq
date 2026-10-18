@@ -27,6 +27,14 @@ public class AeroviaJpaEntity {
 
     protected AeroviaJpaEntity() { }
 
+    // Só construtor, sem setter: aerovia não muda depois de cadastrada.
+    public AeroviaJpaEntity(String id, AeroportoJpaEntity origem, AeroportoJpaEntity destino, double distanciaKm) {
+        this.id = id;
+        this.origem = origem;
+        this.destino = destino;
+        this.distanciaKm = distanciaKm;
+    }
+
     public String getId() { return id; }
     public AeroportoJpaEntity getOrigem() { return origem; }
     public AeroportoJpaEntity getDestino() { return destino; }

@@ -11,6 +11,10 @@ public final class MalhaAereaMapper {
         return new Aeroporto(e.getCodigo(), e.getNome(), e.getQuantidadeVagas());
     }
 
+    public static AeroportoJpaEntity paraEntidade(Aeroporto a) {
+        return new AeroportoJpaEntity(a.getCodigo(), a.getNome(), a.getQuantidadeVagas());
+    }
+
     public static Aerovia paraDominio(AeroviaJpaEntity e) {
         return new Aerovia(e.getId(), paraDominio(e.getOrigem()), paraDominio(e.getDestino()), e.getDistanciaKm());
     }

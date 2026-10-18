@@ -24,4 +24,9 @@ public class RepositorioAeroportosJPA implements RepositorioAeroportos {
     public Optional<Aeroporto> buscarPorCodigo(String codigo) {
         return jpa.findById(codigo).map(MalhaAereaMapper::paraDominio);
     }
+
+    @Override
+    public Aeroporto salvar(Aeroporto aeroporto) {
+        return MalhaAereaMapper.paraDominio(jpa.save(MalhaAereaMapper.paraEntidade(aeroporto)));
+    }
 }

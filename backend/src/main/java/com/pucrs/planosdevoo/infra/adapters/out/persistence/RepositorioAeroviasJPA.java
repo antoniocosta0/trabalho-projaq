@@ -10,9 +10,11 @@ import org.springframework.stereotype.Repository;
 public class RepositorioAeroviasJPA implements RepositorioAerovias {
 
     private final AeroviaSpringDataRepository jpa;
+    private final AeroportoSpringDataRepository aeroportos;
 
-    public RepositorioAeroviasJPA(AeroviaSpringDataRepository jpa) {
+    public RepositorioAeroviasJPA(AeroviaSpringDataRepository jpa, AeroportoSpringDataRepository aeroportos) {
         this.jpa = jpa;
+        this.aeroportos = aeroportos;
     }
 
     @Override
@@ -23,5 +25,15 @@ public class RepositorioAeroviasJPA implements RepositorioAerovias {
     @Override
     public Optional<Aerovia> buscarPorId(String id) {
         return jpa.findById(id).map(MalhaAereaMapper::paraDominio);
+    }
+
+    // Origem e destino já existem (o caso de uso conferiu): basta a referência.
+    @Override
+    public Aerovia salvar(Aerovia aerovia) {
+        AeroviaJpaEntity entidade = new AeroviaJpaEntity(aerovia.getId(),
+                aeroportos.getReferenceById(aerovia.getOrigem().getCodigo()),
+                aeroportos.getReferenceById(aerovia.getDestino().getCodigo()), aerovia.getDistanciaKm());
+        jpa.save(entidade);
+        return aerovia;
     }
 }
