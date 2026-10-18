@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface RepositorioAeroportos {
     List<Aeroporto> listarTodos();
     Optional<Aeroporto> buscarPorCodigo(String codigo);
+    Aeroporto salvar(Aeroporto aeroporto);
 }

@@ -1,9 +1,8 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence;
 
 import com.pucrs.planosdevoo.domain.model.Aeronave;
-import com.pucrs.planosdevoo.domain.model.AeronaveCarga;
-import com.pucrs.planosdevoo.domain.model.AeronaveParticular;
-import com.pucrs.planosdevoo.domain.model.AeronavePassageiros;
+import com.pucrs.planosdevoo.domain.model.DadosAeronave;
+import com.pucrs.planosdevoo.domain.model.FabricaDeAeronaves;
 import com.pucrs.planosdevoo.domain.model.Piloto;
 
 public final class FrotaMapper {
@@ -14,17 +13,20 @@ public final class FrotaMapper {
         return new Piloto(e.getId(), e.getNome());
     }
 
-    // A coluna "categoria" decide qual subclasse do domínio é criada.
-    // Categoria nova = um case novo aqui + a subclasse nova no domínio.
+    public static PilotoJpaEntity paraEntidade(Piloto p) {
+        return new PilotoJpaEntity(p.getId(), p.getNome());
+    }
+
+    // Quem escolhe a subclasse pela coluna "categoria" é a FabricaDeAeronaves,
+    // a mesma do cadastro: o switch por categoria existe num lugar só.
     public static Aeronave paraDominio(AeronaveJpaEntity e) {
-        return switch (e.getCategoria()) {
-            case "PARTICULAR" -> new AeronaveParticular(e.getPrefixo(), e.getVelocidadeCruzeiroKmh(),
-                    e.getAutonomiaKm(), e.getEmpresaManutencao());
-            case "PASSAGEIROS" -> new AeronavePassageiros(e.getPrefixo(), e.getVelocidadeCruzeiroKmh(),
-                    e.getAutonomiaKm(), e.getCompanhiaAerea(), e.getCapacidadePassageiros());
-            case "CARGA" -> new AeronaveCarga(e.getPrefixo(), e.getVelocidadeCruzeiroKmh(),
-                    e.getAutonomiaKm(), e.getCompanhiaAerea(), e.getCapacidadeToneladas());
-            default -> throw new IllegalStateException("Categoria de aeronave desconhecida: " + e.getCategoria());
-        };
+        return FabricaDeAeronaves.criar(new DadosAeronave(e.getPrefixo(), e.getCategoria(),
+                e.getVelocidadeCruzeiroKmh(), e.getAutonomiaKm(), e.getEmpresaManutencao(), e.getCompanhiaAerea(),
+                e.getCapacidadePassageiros(), e.getCapacidadeToneladas()));
+    }
+
+    public static AeronaveJpaEntity paraEntidade(DadosAeronave d) {
+        return new AeronaveJpaEntity(d.prefixo(), d.categoria(), d.velocidadeCruzeiroKmh(), d.autonomiaKm(),
+                d.empresaManutencao(), d.companhiaAerea(), d.capacidadePassageiros(), d.capacidadeToneladas());
     }
 }

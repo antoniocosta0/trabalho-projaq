@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface RepositorioAerovias {
     List<Aerovia> listarTodas();
     Optional<Aerovia> buscarPorId(String id);
+    Aerovia salvar(Aerovia aerovia);
 }

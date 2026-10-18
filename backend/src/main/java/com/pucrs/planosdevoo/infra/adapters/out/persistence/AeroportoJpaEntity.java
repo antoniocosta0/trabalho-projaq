@@ -20,6 +20,12 @@ public class AeroportoJpaEntity {
 
     protected AeroportoJpaEntity() { }
 
+    public AeroportoJpaEntity(String codigo, String nome, int quantidadeVagas) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.quantidadeVagas = quantidadeVagas;
+    }
+
     public String getCodigo() { return codigo; }
     public String getNome() { return nome; }
     public int getQuantidadeVagas() { return quantidadeVagas; }

@@ -1,6 +1,10 @@
 package com.pucrs.planosdevoo.infra.config;
 
 import com.pucrs.planosdevoo.domain.model.VerificadorDeConflitos;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarAeronaveUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarAeroportoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarAeroviaUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarPilotoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.AprovarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CancelarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAltitudesDisponiveisUC;
@@ -49,6 +53,26 @@ public class UseCaseConfig {
     @Bean
     public ConsultarAeronavesUC consultarAeronavesUC(RepositorioAeronaves aeronaves) {
         return new ConsultarAeronavesUC(aeronaves);
+    }
+
+    @Bean
+    public CadastrarAeroportoUC cadastrarAeroportoUC(RepositorioAeroportos aeroportos) {
+        return new CadastrarAeroportoUC(aeroportos);
+    }
+
+    @Bean
+    public CadastrarAeroviaUC cadastrarAeroviaUC(RepositorioAerovias aerovias, RepositorioAeroportos aeroportos) {
+        return new CadastrarAeroviaUC(aerovias, aeroportos);
+    }
+
+    @Bean
+    public CadastrarPilotoUC cadastrarPilotoUC(RepositorioPilotos pilotos) {
+        return new CadastrarPilotoUC(pilotos);
+    }
+
+    @Bean
+    public CadastrarAeronaveUC cadastrarAeronaveUC(RepositorioAeronaves aeronaves) {
+        return new CadastrarAeronaveUC(aeronaves);
     }
 
     @Bean

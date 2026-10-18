@@ -37,6 +37,19 @@ public class AeronaveJpaEntity {
 
     protected AeronaveJpaEntity() { }
 
+    public AeronaveJpaEntity(String prefixo, String categoria, double velocidadeCruzeiroKmh, double autonomiaKm,
+                             String empresaManutencao, String companhiaAerea, Integer capacidadePassageiros,
+                             Double capacidadeToneladas) {
+        this.prefixo = prefixo;
+        this.categoria = categoria;
+        this.velocidadeCruzeiroKmh = velocidadeCruzeiroKmh;
+        this.autonomiaKm = autonomiaKm;
+        this.empresaManutencao = empresaManutencao;
+        this.companhiaAerea = companhiaAerea;
+        this.capacidadePassageiros = capacidadePassageiros;
+        this.capacidadeToneladas = capacidadeToneladas;
+    }
+
     public String getPrefixo() { return prefixo; }
     public String getCategoria() { return categoria; }
     public double getVelocidadeCruzeiroKmh() { return velocidadeCruzeiroKmh; }

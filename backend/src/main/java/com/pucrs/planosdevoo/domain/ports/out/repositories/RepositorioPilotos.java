@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface RepositorioPilotos {
     List<Piloto> listarTodos();
     Optional<Piloto> buscarPorId(Long id);
+    Piloto salvar(Piloto piloto);
 }
