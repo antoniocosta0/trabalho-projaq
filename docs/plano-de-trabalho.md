@@ -107,20 +107,21 @@ Branch: `feat/reservations-and-approval` · **concluída em 18/10** (PR #10)
 **Pronto quando:** aprovar a mesma altitude no mesmo slot duas vezes falha na
 segunda, e a primeira continua íntegra.
 
-### D1 — Cadastros · Dejota
+### D1 — Cadastros · Dejota · ✅ concluída
 
 **Não são casos de uso** (orientação do professor: a malha, os pilotos e as
 aeronaves vêm da carga inicial). Ficam na API porque o enunciado (§2 e §8.1)
 pede que dê para cadastrar novos aeroportos e aerovias. Prioridade baixa: se o
 tempo apertar, `POST /aeroportos` e `POST /aerovias` primeiro.
 
-Branch: `feat/registration-endpoints` · **não depende de nada, começa já**
+Branch: `feat/registration-endpoints` · **concluída em 18/10** (PR #17)
 
-- [ ] `POST /aeroportos`
-- [ ] `POST /aerovias` — sem `PUT` e sem `DELETE`: aerovia é imutável
-- [ ] `POST /pilotos`
-- [ ] `POST /aeronaves` — Factory por categoria, para o controller não
-      conhecer as subclasses
+- [x] `POST /aeroportos`
+- [x] `POST /aerovias` — sem `PUT` e sem `DELETE`: aerovia é imutável, e id
+      repetido é recusado com 409
+- [x] `POST /pilotos` — id gerado pelo banco a partir de 101
+- [x] `POST /aeronaves` — `FabricaDeAeronaves` no domínio, único ponto que
+      conhece as subclasses
 
 É o código mais leve do projeto: cada endpoint é o espelho de um `GET` que já
 existe. `MalhaAereaController` + `ConsultarAeroviasUC` + `RepositorioAeroviasJPA`
@@ -129,21 +130,20 @@ existe. `MalhaAereaController` + `ConsultarAeroviasUC` + `RepositorioAeroviasJPA
 **Pronto quando:** dá para cadastrar um aeroporto novo e usar num plano, sem
 recompilar — é o teste de extensibilidade que o professor vai fazer.
 
-### D2 — Carga inicial · Dejota
+### D2 — Carga inicial · Dejota · ✅ concluída
 
-Branch: `db/initial-seed` · **depende de C** · sábado
+Branch: `db/initial-seed` · **concluída em 18/10** (PR #18)
 
-- [ ] `data.sql`: planos **aprovados** com suas reservas, gerando ocupação em
-      **5 ou mais das 8 aerovias** na data de referência
-- [ ] As ocupações são consequência dos planos aprovados — nada de linha solta
-      na tabela de reservas
-- [ ] Deixar folga: não pode ficar tudo indisponível o dia inteiro, senão não
-      dá para demonstrar aprovação bem-sucedida
-- [~] Rodar o roteiro do `CLAUDE.md` §14.4 — **rodado em 18/10 pelo Antônio**,
-      com o banco apagado: criou, validou, aprovou, reiniciou a aplicação e
-      confirmou que os planos e as reservas sobreviveram. Falta refazer **depois**
-      que a carga inicial tiver os planos aprovados, para conferir a contagem de
-      5 ou mais aerovias ocupadas
+- [x] `data.sql`: quatro planos **aprovados** com suas reservas, ocupando
+      **6 das 8 aerovias** na data de referência
+- [x] As ocupações são consequência dos planos aprovados — conferido a cada
+      build pelo `SeedConsistenciaTest`, que compara o seed com o que o domínio
+      geraria
+- [x] Folga preservada: R1 e R3 ficam livres o dia inteiro
+- [x] Rodar o roteiro do `CLAUDE.md` §14.4 — rodado em 18/10 com o banco
+      apagado, antes e depois da carga inicial entrar: criou, validou, aprovou,
+      reiniciou a aplicação, confirmou que planos e reservas sobreviveram, e
+      conferiu as **6 de 8** aerovias ocupadas na data de referência
 
 Depende de C: combinar com o Redivo como cada reserva é gravada no banco.
 
@@ -254,7 +254,10 @@ no mais tardar.
   agora conferida automaticamente a cada push e PR, pelo CI (PR #12)
 - **Os 14 casos de uso**: UC01 a UC14, todos com endpoint. UC01–UC05, UC13 e
   UC14 no PR #2; UC06, UC09 e UC11 no PR #8; UC07, UC08, UC10 e UC12 no PR #10
-- 88 testes automatizados, verdes, rodando também no CI com JDK 25
+- **Todas as cinco frentes concluídas**, A a E
+- 104 testes automatizados, verdes, rodando também no CI com JDK 25
+- Carga inicial com planos aprovados, ocupando 6 das 8 aerovias na data de
+  referência, e os quatro cadastros atendendo o §8.1
 - As nove decisões arquiteturais escritas como ADR, de 0001 a 0009
 - **Frente A concluída** (Vicenzo, 16/10): `Slot`, `Trecho` e `Pouso`, com testes.
   Borda decidida: intervalo `[início, fim)`, então 15:00 → 16:00 ocupa **1 slot**

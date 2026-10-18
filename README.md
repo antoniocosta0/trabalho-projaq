@@ -24,18 +24,17 @@ de uma vez e aprovar.
 **19/10/2026.**
 
 É a data usada nos testes de disponibilidade, conflito e reserva durante a
-apresentação, e é a data dos planos que a carga inicial precisa trazer já
-aprovados — com partidas de manhã e de noite, para demonstrar tanto o
-cancelamento de um plano ainda futuro quanto a recusa de cancelar um plano cuja
-partida já ocorreu.
+apresentação. A carga inicial traz **quatro planos já aprovados** voando nesse
+dia, e as reservas deles ocupam altitudes de aerovias e vagas de aeroportos:
+**6 das 8 aerovias** têm ocupação, acima do mínimo de 60% que o enunciado pede.
 
-> **Estado em 18/10:** a carga inicial ainda **não** traz esses planos
-> aprovados. O `data.sql` carrega a malha aérea, os pilotos e as aeronaves; as
-> tabelas `plano_de_voo`, `trecho`, `reserva_aerovia` e `reserva_vaga` começam
-> vazias. Até que isso entre, não há ocupação prévia na data de referência: dá
-> para criar, validar, aprovar e cancelar planos pela API, mas os conflitos
-> precisam ser produzidos na hora, aprovando dois planos que disputem o mesmo
-> recurso.
+Dois desses planos partem de madrugada e de manhã (01:00 e 06:30) e dois à
+noite (20:00 e 21:00). No dia da apresentação, os primeiros já partiram e
+demonstram que um plano cuja partida ocorreu **não** é cancelável; os últimos
+ainda são futuros e demonstram o cancelamento com liberação das reservas.
+
+A R1 e a R3 ficam livres o dia inteiro de propósito, para que sempre haja
+recurso disponível para demonstrar uma aprovação bem-sucedida.
 
 ## Preparação do ambiente
 
@@ -86,7 +85,7 @@ Na inicialização, o Spring executa dois scripts versionados, nesta ordem:
 | Script | O que faz |
 |---|---|
 | `backend/src/main/resources/db/schema.sql` | cria as tabelas, com chaves, índices e restrições |
-| `backend/src/main/resources/db/data.sql` | carrega a malha aérea, os pilotos e as aeronaves (os planos aprovados ainda não entraram — ver *Data de referência*) |
+| `backend/src/main/resources/db/data.sql` | carrega a malha aérea, os pilotos, as aeronaves e os planos aprovados com suas reservas |
 
 O schema **não** é gerado pelo Hibernate (`spring.jpa.hibernate.ddl-auto=none`),
 para que seja versionável e reproduzível. O `data.sql` usa `MERGE`, então rodar
@@ -101,8 +100,9 @@ rm -rf ./data
 ```
 
 A carga inicial é reproduzível a partir deste repositório: não há nenhuma
-inserção manual necessária antes da apresentação. O que o `data.sql` ainda não
-cobre está listado no cabeçalho do próprio arquivo, marcado como `[PENDENTE]`.
+inserção manual necessária antes da apresentação. O `data.sql` é conferido
+contra o próprio domínio a cada build, pelo `SeedConsistenciaTest`: se uma linha
+de reserva deixar de bater com o que a aprovação geraria, o build quebra.
 
 ### Inspecionar o banco
 

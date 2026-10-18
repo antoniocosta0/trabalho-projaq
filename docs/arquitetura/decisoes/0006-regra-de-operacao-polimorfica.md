@@ -64,11 +64,20 @@ num; comparar categorias exige abrir as três subclasses.
 
 - Nenhum `instanceof` nem `switch` por categoria fora do ponto de construção.
   O PR cobra isso como item de checklist.
-- Existe **um** lugar que conhece os nomes das categorias: o `FrotaMapper`, que
-  traduz a coluna `categoria` do banco para a subclasse correta. É a fronteira
-  de criação, e é inevitável — algum ponto do sistema precisa decidir qual
-  objeto instanciar a partir de um dado. Categoria nova, portanto, custa: uma
-  subclasse nova no domínio, um `case` novo no mapeador, e nada mais.
+- Existe **um** lugar que conhece os nomes das categorias: a
+  `FabricaDeAeronaves`, em `domain/model`. É a fronteira de criação, e é
+  inevitável — algum ponto do sistema precisa decidir qual objeto instanciar a
+  partir de um dado. Categoria nova, portanto, custa: uma subclasse nova no
+  domínio, um `case` novo na fábrica, e nada mais.
+
+  Essa fronteira **começou no `FrotaMapper`**, em `infra`, quando a única forma
+  de uma aeronave entrar no sistema era vindo do banco. Com o `POST /aeronaves`
+  (PR #17) passaram a existir dois caminhos de criação, e manter a escolha no
+  mapeador significaria ou duplicar o `switch`, ou fazer o cadastro depender da
+  persistência para construir uma entidade de domínio. A fábrica foi movida para
+  o domínio e o mapeador passou a consumi-la: o conhecimento sobre as subclasses
+  volta para onde elas moram, e a regra de dependência da ADR 0001 fica
+  respeitada nos dois caminhos.
 - A hierarquia é plana, sem `AeronaveComercial` intermediária: `companhiaAerea`
   aparece repetido em `AeronaveCarga` e `AeronavePassageiros`. Um nível a mais
   sem comportamento próprio não se pagaria.

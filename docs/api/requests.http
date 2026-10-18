@@ -7,8 +7,13 @@
 ### com o banco apagado antes — não são respostas presumidas.
 ###
 ### IMPORTANTE: o roteiro supõe o banco LIMPO e os blocos executados NA ORDEM.
-### Os planos recebem id 1, 2, 3... conforme vão sendo criados. Para recomeçar:
+### Os planos criados aqui recebem id 1, 2, 3... Para recomeçar:
 ###   cd backend && rm -rf ./data && ./mvnw spring-boot:run
+###
+### A carga inicial já traz QUATRO planos aprovados, com ids 1001 a 1004, que
+### ocupam 6 das 8 aerovias em 19/10. Eles não atrapalham este roteiro: o seed
+### deixa a R1 livre o dia inteiro e não usa nenhuma vaga em FLN, que são os
+### recursos usados no caminho feliz abaixo.
 ###
 ### Pré-requisito: aplicação no ar em http://localhost:8080
 ### Swagger UI: http://localhost:8080/swagger-ui.html
@@ -44,7 +49,9 @@ GET {{host}}/aeronaves
 ### ═══════════════════════════════════════════════════════════════
 
 ### 2.1 Disponibilidade ANTES de tudo (UC07) · demonstração 3
-# 200 — as 11 altitudes livres: 25000..35000, de 1000 em 1000.
+# 200 — as 11 altitudes livres: 25000..35000, de 1000 em 1000. A R1 está livre
+# porque a carga inicial a deixou de fora de propósito; as outras sete aerovias
+# têm ocupação neste dia (ver 4.4).
 # Guarde este número: ele vai mudar depois da aprovação, e só depois dela.
 GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
 
@@ -293,6 +300,34 @@ Content-Type: application/json
 # atravessa a hora cheia.
 POST {{host}}/planos/8/validacao
 
+### 4.4 CONFLITO CONTRA UM PLANO DA CARGA INICIAL · demonstração 10
+# Até aqui a disputa foi com um plano criado na hora. Esta é contra um plano que
+# o sistema já trazia aprovado: o 1003 ocupa a R2 a 31.000 pés a partir das
+# 21:00, e a permanência dele leva a reserva até o slot das 22:00.
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "GRU",
+  "partida": "2026-10-19T21:00:00" }
+
+### 4.4.a Trecho disputando exatamente o recurso do plano 1003
+POST {{host}}/planos/9/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R2", "altitude": 31000, "horarioEntrada": "2026-10-19T21:00:00",
+  "numeroVaga": 30, "permanenciaMinutos": 60 }
+
+### 4.4.b Validar
+# 200 — valido false:
+#   "Trecho 1: a altitude 31000 pés da aerovia R2 já está reservada
+#    no(s) slot(s) das 19/10 21:00, 19/10 22:00"
+POST {{host}}/planos/9/validacao
+
+### 4.4.c De onde vem essa ocupação — o plano que a criou
+# 200 — plano 1003, APROVADO, POA -> GRU partindo 21:00. A ocupação da carga
+# inicial é consequência de um plano aprovado, nunca uma reserva solta.
+GET {{host}}/planos/1003
+
 ### ═══════════════════════════════════════════════════════════════
 ### 5. CANCELAMENTO                      · demonstrações 13 e 14
 ### ═══════════════════════════════════════════════════════════════
@@ -309,7 +344,7 @@ GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=20
 # 200 — voltaram as 16 vagas.
 GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
 
-### 5.2 Plano com partida JÁ OCORRIDA — preparação (plano 9) · demonstração 14
+### 5.2 Plano com partida JÁ OCORRIDA — preparação (plano 10) · demonstração 14
 # Parte em 17/10, que já passou. Voo executado: consultável, não cancelável.
 POST {{host}}/planos
 Content-Type: application/json
@@ -318,7 +353,7 @@ Content-Type: application/json
   "partida": "2026-10-17T08:00:00" }
 
 ### 5.2.a Trecho
-POST {{host}}/planos/9/trechos
+POST {{host}}/planos/10/trechos
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-17T08:00:00",
@@ -326,17 +361,35 @@ Content-Type: application/json
 
 ### 5.2.b Aprovar — funciona: a data passada não impede aprovar
 # 200 — situacao APROVADO.
-POST {{host}}/planos/9/aprovacao
+POST {{host}}/planos/10/aprovacao
 
 ### 5.2.c Cancelar — RECUSADO · demonstração 14
 # 409 — "Não é possível cancelar o plano: a partida (17/10 08:00) já ocorreu"
-POST {{host}}/planos/9/cancelamento
+POST {{host}}/planos/10/cancelamento
+
+### 5.3 A MESMA RECUSA, com um plano da carga inicial · demonstração 14
+###
+### ATENÇÃO: este bloco só devolve 409 **no dia 19/10**, porque o plano 1001
+### parte às 01:00 daquele dia. Ensaiando antes, ele ainda é futuro e o
+### cancelamento é ACEITO (200) — o que não é defeito, é o relógio. Para
+### ensaiar a recusa em qualquer dia, use o 5.2 acima, cujo plano parte em
+### 17/10. Na apresentação, este é o bloco mais realista: um voo que o sistema
+### já trazia aprovado e que decolou de madrugada.
+###
+# 409 em 19/10 — "Não é possível cancelar o plano: a partida (19/10 01:00) já ocorreu"
+POST {{host}}/planos/1001/cancelamento
+
+### 5.3.a E o plano da noite, que ainda não partiu, É cancelável · demonstração 13
+# 200 em 19/10 antes das 20:00 — situacao CANCELADO, e as reservas da R4 e da
+# R6 são liberadas. É o contraste que fecha a dupla 13 e 14: mesma carga
+# inicial, mesmo dia, decisões opostas por causa do horário de partida.
+POST {{host}}/planos/1004/cancelamento
 
 ### ═══════════════════════════════════════════════════════════════
 ### 6. ABANDONO, ESTADOS E CONSULTAS   · demonstrações 15, 16 e 17
 ### ═══════════════════════════════════════════════════════════════
 
-### 6.1 Plano para abandonar — preparação (plano 10)
+### 6.1 Plano para abandonar — preparação (plano 11)
 POST {{host}}/planos
 Content-Type: application/json
 
@@ -344,7 +397,7 @@ Content-Type: application/json
   "partida": "2026-10-19T20:00:00" }
 
 ### 6.1.a Trecho (PP-PAR a 26.000 pés: altitude permitida para particular)
-POST {{host}}/planos/10/trechos
+POST {{host}}/planos/11/trechos
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 26000, "horarioEntrada": "2026-10-19T20:00:00",
@@ -353,22 +406,27 @@ Content-Type: application/json
 ### 6.2 Abandonar plano em edição (UC11) · demonstração 15
 # 200 — situacao ABANDONADO. Não havia reserva a liberar: plano em edição
 # nunca reserva nada.
-POST {{host}}/planos/10/abandono
+POST {{host}}/planos/11/abandono
 
 ### 6.3 Tentar MODIFICAR plano fora de edição · demonstração 17
 # 409 — "Não é possível alterar o percurso: o plano está ABANDONADO,
 #        e só planos EM_EDICAO podem ser modificados"
-POST {{host}}/planos/10/trechos
+POST {{host}}/planos/11/trechos
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 26000, "horarioEntrada": "2026-10-19T20:00:00" }
 
 ### 6.4 Consultar planos APROVADOS (UC14) · demonstração 16
-# 200 — o plano 9 (o de partida passada).
+# 200 — o plano 10, criado aqui, mais os planos da carga inicial que ainda não
+# foram cancelados. Em 19/10, depois de rodar o 5.3: planos 10, 1001, 1002 e
+# 1003 — o 1004 foi cancelado no bloco 5.3.a. Ensaiando ANTES de 19/10, o 1001
+# também sai desta lista, porque naquele momento ele ainda é futuro e o
+# cancelamento do bloco 5.3 é aceito.
 GET {{host}}/planos?situacao=APROVADO
 
 ### 6.5 Consultar planos CANCELADOS · demonstração 16
-# 200 — o plano 1.
+# 200 — o plano 1, cancelado no bloco 5.1, mais o 1004 do bloco 5.3.a. Se o
+# ensaio for antes de 19/10, o 1001 também aparece aqui.
 GET {{host}}/planos?situacao=CANCELADO
 
 ### 6.6 Consultar planos ABANDONADOS · demonstração 16
@@ -376,16 +434,16 @@ GET {{host}}/planos?situacao=CANCELADO
 GET {{host}}/planos?situacao=ABANDONADO
 
 ### 6.7 Consultar planos EM EDIÇÃO
-# 200 — os planos 2 a 8, que ficaram com problemas de validação.
+# 200 — os planos 2 a 9, que ficaram com problemas de validação.
 GET {{host}}/planos?situacao=EM_EDICAO
 
 ### 6.8 Consultar todos
-# 200 — os 10 planos.
+# 200 — 15 planos: os 11 criados por este roteiro e os 4 da carga inicial.
 GET {{host}}/planos
 
 ### 6.9 Consultar plano por id (UC13)
 # 200 — o plano com o percurso completo e os horários calculados.
-GET {{host}}/planos/9
+GET {{host}}/planos/10
 
 ### ═══════════════════════════════════════════════════════════════
 ### 7. ERROS DE REQUISIÇÃO
@@ -426,24 +484,123 @@ Content-Type: application/json
 { "aeroviaId": "R1", "altitude": 29000, "horarioEntrada": "2026-10-19T08:00:00" }
 
 ### ═══════════════════════════════════════════════════════════════
-### 8. CADASTROS — frente D1, AINDA NÃO IMPLEMENTADO
+### 8. CADASTROS E EXTENSIBILIDADE
 ### ═══════════════════════════════════════════════════════════════
 ###
 ### O enunciado (§2 e §8.1) exige que seja possível cadastrar novos aeroportos
 ### e aerovias, e que um aeroporto informado durante a avaliação entre em uso
-### SEM alteração de código. Esses quatro endpoints ainda não existem; as
-### requisições abaixo estão na forma prevista, para serem ligadas quando a
-### frente D1 entregar. Aerovia não terá PUT nem DELETE: é imutável.
+### SEM alteração de código. Esta seção é esse teste, de ponta a ponta.
 ###
-# POST {{host}}/aeroportos
-# { "codigo": "SDU", "nome": "Santos Dumont - Rio de Janeiro", "quantidadeVagas": 12 }
+### Deixada por último de propósito: ela cria o plano 12 e mudaria as contagens
+### da seção 6 se viesse antes.
 ###
-# POST {{host}}/aerovias
-# { "id": "R9", "origem": "GRU", "destino": "SDU", "distanciaKm": 365 }
-###
-# POST {{host}}/pilotos
-# { "nome": "Eduarda Nunes" }
-###
-# POST {{host}}/aeronaves
-# { "prefixo": "PR-NEW", "categoria": "PASSAGEIROS", "velocidadeCruzeiroKmh": 800,
-#   "autonomiaKm": 4200, "companhiaAerea": "Nova Linha", "capacidadePassageiros": 150 }
+### Os cadastros NÃO são casos de uso — ver docs/arquitetura/decisoes/
+### 0009-cadastros-fora-da-lista-de-casos-de-uso.md.
+
+### 8.1 Cadastrar um aeroporto novo
+# 201 — SDU criado, com 12 vagas.
+POST {{host}}/aeroportos
+Content-Type: application/json
+
+{ "codigo": "SDU", "nome": "Santos Dumont - Rio de Janeiro", "quantidadeVagas": 12 }
+
+### 8.2 Cadastrar uma aerovia que usa o aeroporto novo
+# 201 — R9, GRU -> SDU, 365 km.
+POST {{host}}/aerovias
+Content-Type: application/json
+
+{ "id": "R9", "origem": "GRU", "destino": "SDU", "distanciaKm": 365 }
+
+### 8.3 Cadastrar um piloto
+# 201 — id 101. A carga inicial usa os ids 1 a 4; os cadastrados pela API
+# começam em 101, então não colidem.
+POST {{host}}/pilotos
+Content-Type: application/json
+
+{ "nome": "Eduarda Nunes" }
+
+### 8.4 Cadastrar uma aeronave
+# 201 — PR-NEW. O controller não conhece as subclasses: quem escolhe pela
+# categoria é a FabricaDeAeronaves, no domínio (ADR 0006).
+POST {{host}}/aeronaves
+Content-Type: application/json
+
+{ "prefixo": "PR-NEW", "categoria": "PASSAGEIROS", "velocidadeCruzeiroKmh": 800,
+  "autonomiaKm": 4200, "companhiaAerea": "Nova Linha", "capacidadePassageiros": 150 }
+
+### 8.5 O TESTE DE EXTENSIBILIDADE: usar o que acabou de ser cadastrado
+# 201 — plano 12, GRU -> SDU, com o piloto e a aeronave novos. Nada foi
+# recompilado e a aplicação não foi reiniciada.
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 101, "aeronavePrefixo": "PR-NEW", "origem": "GRU", "destino": "SDU",
+  "partida": "2026-10-19T15:00:00" }
+
+### 8.5.a Trecho pela aerovia nova
+# 201 — 365 km a 800 km/h: chegada calculada às 15:27.
+POST {{host}}/planos/12/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R9", "altitude": 29000, "horarioEntrada": "2026-10-19T15:00:00",
+  "numeroVaga": 4, "permanenciaMinutos": 30 }
+
+### 8.5.b Validar
+# 200 — {"valido": true, "problemas": []}
+POST {{host}}/planos/12/validacao
+
+### 8.5.c Aprovar
+# 200 — APROVADO. O aeroporto cadastrado há um minuto tem plano aprovado e
+# vaga reservada. É o §2 do enunciado demonstrado.
+POST {{host}}/planos/12/aprovacao
+
+### ───────────────────────────────────────────────────────────────
+### 8.6 Erros dos cadastros
+### ───────────────────────────────────────────────────────────────
+
+### 8.6.a Aerovia com id já existente — aerovia é IMUTÁVEL
+# 409 — "A aerovia R1 já está cadastrada, e aerovia não pode ser alterada:
+#        cadastre uma nova, com outro id"
+POST {{host}}/aerovias
+Content-Type: application/json
+
+{ "id": "R1", "origem": "POA", "destino": "FLN", "distanciaKm": 363 }
+
+### 8.6.b Não existe alteração nem exclusão de aerovia
+# 404 nos dois: as rotas não existem. A imutabilidade é estrutural, não uma
+# validação que alguém possa esquecer de chamar.
+PUT {{host}}/aerovias/R1
+
+### 8.6.c
+DELETE {{host}}/aerovias/R1
+
+### 8.6.d Aerovia com aeroporto inexistente
+# 404 — "Aeroporto XXX não encontrado"
+POST {{host}}/aerovias
+Content-Type: application/json
+
+{ "id": "R10", "origem": "XXX", "destino": "SDU", "distanciaKm": 100 }
+
+### 8.6.e Categoria de aeronave desconhecida
+# 422 — "Categoria de aeronave desconhecida: FOGUETE
+#        (use PARTICULAR, PASSAGEIROS ou CARGA)"
+POST {{host}}/aeronaves
+Content-Type: application/json
+
+{ "prefixo": "PR-ZZZ", "categoria": "FOGUETE", "velocidadeCruzeiroKmh": 900, "autonomiaKm": 3000 }
+
+### 8.6.f Aeronave de carga sem a capacidade em toneladas
+# 422 — "capacidadeToneladas é obrigatório para aeronave CARGA".
+# Cada categoria exige os seus dados, e quem cobra isso é a fábrica no domínio.
+POST {{host}}/aeronaves
+Content-Type: application/json
+
+{ "prefixo": "PR-ZZ2", "categoria": "CARGA", "velocidadeCruzeiroKmh": 900,
+  "autonomiaKm": 3000, "companhiaAerea": "Sul Cargas" }
+
+### 8.6.g Aeroporto com código repetido
+# 409 — "O aeroporto POA já está cadastrado"
+POST {{host}}/aeroportos
+Content-Type: application/json
+
+{ "codigo": "POA", "nome": "Outro", "quantidadeVagas": 5 }
