@@ -73,33 +73,36 @@ dependem destas três respostas:
 **Pronto quando:** `./mvnw clean test` verde e nenhum desses testes sobe o
 Spring nem toca no banco.
 
-### B — Agregado e validação · Gustavo
+### B — Agregado e validação · Gustavo · ✅ concluída
 
-Branch: `feat/flight-plan-validation` · **depende de A** · começa sexta à tarde
+Branch: `feat/flight-plan-validation` · **concluída em 17/10** (PR #8)
 
-- [ ] `PlanoDeVoo.adicionarTrecho`, `.removerTrecho` — só em `EM_EDICAO` (UC06)
-- [ ] `PlanoDeVoo.validar() : List<String>` (UC09), com as seis verificações
-- [ ] `PlanoDeVoo.abandonar()` (UC11)
-- [ ] Persistência de `Trecho` e `Pouso`
-- [ ] API: `POST /planos/{id}/trechos`, `DELETE /planos/{id}/trechos/{ordem}`,
-      `POST /planos/{id}/validacao`, `POST /planos/{id}/abandono`
+- [x] `PlanoDeVoo.adicionarTrecho`, `.alterarTrecho`, `.removerTrecho` — só em
+      `EM_EDICAO`, com renumeração dos seguintes (UC06)
+- [x] `PlanoDeVoo.validar() : List<String>` (UC09), com as seis verificações
+- [x] `PlanoDeVoo.abandonar()` (UC11)
+- [x] Persistência de `Trecho` e `Pouso`
+- [x] API: `POST /planos/{id}/trechos`, `PUT /planos/{id}/trechos/{ordem}`,
+      `DELETE /planos/{id}/trechos/{ordem}`, `POST /planos/{id}/validacao`,
+      `POST /planos/{id}/abandono`
 
 **Pronto quando:** validar devolve a lista de problemas, **não muda estado** e
 **não cria reserva nenhuma**.
 
-### C — Reservas, aprovação e cancelamento · Redivo
+### C — Reservas, aprovação e cancelamento · Redivo · ✅ concluída
 
-Branch: `feat/reservations-and-approval` · **depende de A** · começa sexta à tarde
+Branch: `feat/reservations-and-approval` · **concluída em 18/10** (PR #10)
 
-- [ ] `ReservaAerovia` e `ReservaVaga` no domínio, com portas de saída
-- [ ] `schema.sql`: tabelas `trecho`, `reserva_aerovia`, `reserva_vaga`, com
+- [x] `ReservaAerovia` e `ReservaVaga` no domínio, com portas de saída
+- [x] `schema.sql`: tabelas `reserva_aerovia` e `reserva_vaga`, com
       `UNIQUE (aerovia_id, altitude, slot_inicio)` e
-      `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)`
-- [ ] UC07 e UC08: consultar altitudes e vagas livres por período
-- [ ] `AprovarPlanoUC` (UC10) em **uma** `@Transactional` — **só depois de B**
-- [ ] `CancelarPlanoUC` (UC12): só `APROVADO` com partida futura
-- [ ] **Teste que o enunciado cobra por escrito:** aprovação malsucedida não
-      deixa reserva parcial
+      `UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)` (a `trecho` veio no PR #8)
+- [x] UC07 e UC08: consultar altitudes e vagas livres por período
+- [x] `AprovarPlanoUC` (UC10) numa transação só — pela porta `Transacao`, e não
+      por `@Transactional`, que poria Spring dentro de `domain/` (ADR 0004)
+- [x] `CancelarPlanoUC` (UC12): só `APROVADO` com partida futura
+- [x] **Teste que o enunciado cobra por escrito:** aprovação malsucedida não
+      deixa reserva parcial (`AprovacaoAtomicaTest`)
 
 **Pronto quando:** aprovar a mesma altitude no mesmo slot duas vezes falha na
 segunda, e a primeira continua íntegra.
@@ -148,22 +151,22 @@ Branch: `docs/adrs-and-readme` · **a maior parte começa já**
 
 Pode escrever agora — os rascunhos das 8 decisões já estão em `logs/decisoes.md`:
 
-- [ ] ADR 0001 — estilo arquitetural (hexagonal × camadas)
-- [ ] ADR 0002 — entidade de domínio separada da de persistência
-- [ ] ADR 0003 — banco escolhido, e por que não em memória
-- [ ] ADR 0005 — cálculo de slots como value object
-- [ ] ADR 0006 — categoria nova de aeronave sem alterar a validação
-- [ ] ADR 0007 — herança da hierarquia de aeronaves no banco
-- [ ] ADR 0008 — idioma do código
-- [ ] ADR 0009 — cadastros fora da lista de casos de uso (orientação do
+- [x] ADR 0001 — estilo arquitetural (hexagonal × camadas)
+- [x] ADR 0002 — entidade de domínio separada da de persistência
+- [x] ADR 0003 — banco escolhido, e por que não em memória
+- [x] ADR 0005 — cálculo de slots como value object
+- [x] ADR 0006 — categoria nova de aeronave sem alterar a validação
+- [x] ADR 0007 — herança da hierarquia de aeronaves no banco
+- [x] ADR 0008 — idioma do código
+- [x] ADR 0009 — cadastros fora da lista de casos de uso (orientação do
       professor), mas mantidos na API por causa do enunciado §2 e §8.1
-- [ ] springdoc descomentado no `pom.xml`, com a versão compatível conferida, e
+- [x] springdoc descomentado no `pom.xml`, com a versão compatível conferida, e
       Swagger UI abrindo
 
 Depende das outras frentes:
 
-- [ ] ADR 0004 — atomicidade da aprovação · **depois de C**
-- [ ] `README.md`, os sete `[PREENCHER]` · a data de referência depende de D2
+- [x] ADR 0004 — atomicidade da aprovação (PR #11)
+- [x] `README.md`, os sete `[PREENCHER]` · data de referência declarada: 19/10/2026
 - [ ] `docs/api/requests.http` com as **17 demonstrações** do `CLAUDE.md` §16.3
       · cresce junto com os endpoints, fecha no domingo
 - [ ] Ensaiar o roteiro na ordem, cronometrado
@@ -229,7 +232,7 @@ Esta é a única tarefa da lista que, se for esquecida, anula todo o resto.
 
 ## 6. Decisão pendente que bloqueia a frente D
 
-**Data de referência: `[A CONFIRMAR]`**
+**Data de referência: `19/10/2026` — confirmada em 18/10 e declarada no `README.md`.**
 
 Recomendação: **19/10/2026**, o dia da apresentação. Com planos partindo de
 manhã e de noite no `data.sql`, uma data só resolve dois requisitos de uma vez
@@ -245,8 +248,12 @@ no mais tardar.
 
 ## 7. O que já está pronto
 
-- Estrutura hexagonal em `backend/`, com a regra de dependência respeitada
-- 7 dos 14 casos de uso: UC01 a UC05, UC13 e UC14
+- Estrutura hexagonal em `backend/`, com a regra de dependência respeitada — e
+  agora conferida automaticamente a cada push e PR, pelo CI (PR #12)
+- **Os 14 casos de uso**: UC01 a UC14, todos com endpoint. UC01–UC05, UC13 e
+  UC14 no PR #2; UC06, UC09 e UC11 no PR #8; UC07, UC08, UC10 e UC12 no PR #10
+- 88 testes automatizados, verdes, rodando também no CI com JDK 25
+- As nove decisões arquiteturais escritas como ADR, de 0001 a 0009
 - **Frente A concluída** (Vicenzo, 16/10): `Slot`, `Trecho` e `Pouso`, com testes.
   Borda decidida: intervalo `[início, fim)`, então 15:00 → 16:00 ocupa **1 slot**
 - H2 em arquivo, `schema.sql` e `data.sql` com malha, pilotos e aeronaves
