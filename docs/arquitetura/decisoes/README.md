@@ -10,9 +10,9 @@ principais alternativas consideradas e a justificativa da escolha** (seção 7.4
 
 | ADR | Decisão | Situação |
 |---|---|---|
-| 0001 | Estilo arquitetural (hexagonal × camadas × outro) | a escrever |
-| 0002 | Entidade de domínio separada da entidade de persistência | a escrever |
-| 0003 | Banco de dados escolhido (e por que não em memória) | a escrever |
+| 0001 | Estilo arquitetural (hexagonal × camadas × outro) | [escrita](0001-estilo-arquitetural-hexagonal.md) |
+| 0002 | Entidade de domínio separada da entidade de persistência | [escrita](0002-entidade-de-dominio-separada-da-de-persistencia.md) |
+| 0003 | Banco de dados escolhido (e por que não em memória) | [escrita](0003-banco-h2-em-arquivo.md) |
 | 0004 | Atomicidade da aprovação (transação, constraint, lock) | a escrever |
 | 0005 | Modelagem do cálculo de slots (value object `Slot`) | a escrever |
 | 0006 | Extensão para novas categorias de aeronave sem alterar a validação | a escrever |

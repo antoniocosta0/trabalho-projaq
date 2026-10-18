@@ -1093,7 +1093,7 @@ As que custam nota e são fáceis de deixar passar:
 - [x] C4 nível 1, 2 e 3, com tecnologias nas setas.
 - [x] Estrutura de pastas criada no repositório, não só desenhada.
 - [x] Regra de dependência escrita e respeitada.
-- [ ] ADR 0001 (estilo arquitetural) escrito, com alternativas.
+- [x] ADR 0001 (estilo arquitetural) escrito, com alternativas.
 
 **Entrega de 14/10 — 40% dos casos de uso**
 
