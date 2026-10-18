@@ -205,7 +205,7 @@ trabalho-1/
 │   │       └── 0000-template.md       formato do ADR
 │   └── api/
 │       ├── README.md
-│       └── requests.http              roteiro da apresentação, as 17 demonstrações
+│       └── requests.http              roteiro da apresentação: as 17 demonstrações e os cadastros
 ├── logs/
 │   ├── log.md                         o que foi feito (seção 9)
 │   └── decisoes.md                    o que foi decidido e por quê (seção 9)
@@ -218,7 +218,7 @@ trabalho-1/
     │   └── infra/{adapters/in/rest, adapters/out/persistence, config}
     ├── src/main/resources/
     │   ├── application.properties     H2 em arquivo, não em memória
-    │   └── db/{schema.sql, data.sql}  schema completo; data.sql sem os planos aprovados
+    │   └── db/{schema.sql, data.sql}  schema completo; data.sql com os planos aprovados
     └── src/test/java/...              espelha a árvore de main
 ```
 
@@ -1101,8 +1101,8 @@ As que custam nota e são fáceis de deixar passar:
 - [x] Ciclo completo de um plano funcionando pela API: criar, montar percurso,
       validar, aprovar, cancelar e abandonar.
 - [x] Banco persistindo entre reinicializações (H2 em arquivo).
-- [x] Carga inicial rodando do zero — malha, pilotos e aeronaves; os planos
-      aprovados ainda não entraram.
+- [x] Carga inicial rodando do zero: malha, pilotos, aeronaves e os quatro
+      planos aprovados com suas reservas.
 - [x] Testes das regras de cálculo passando: 88 testes, verdes também no CI.
 - [ ] Quais UCs estão prontos, listados no `log.md` — o log local desta máquina
       está sendo posto em dia.
@@ -1126,8 +1126,8 @@ As que custam nota e são fáceis de deixar passar:
 
 - [x] Banco apagado e recriado do zero, com sucesso (18/10).
 - [x] As 17 demonstrações da seção 16.3 testadas, em ordem, contra a aplicação.
-- [ ] Data de referência conferida: 5+ aerovias com ocupação — **0 hoje**,
-      depende dos planos aprovados no `data.sql`.
+- [x] Data de referência conferida: **6 das 8** aerovias com ocupação (PR #18),
+      verificado consultando a disponibilidade das oito.
 - [x] `requests.http` completo e numerado, com a resposta real de cada bloco.
 - [x] Swagger UI abrindo (conferido no PR #9).
 - [ ] README seguido por alguém de fora, do clone até a primeira requisição.
