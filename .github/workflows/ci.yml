@@ -1,0 +1,44 @@
+# Roda a suíte a cada push e a cada PR contra main. O JDK aqui é o 25, o mesmo
+# que o pom.xml exige: a máquina de quem abre o PR pode ter outro, o CI não.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Compilar e testar
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar o JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Compilar e rodar os testes
+        working-directory: backend
+        run: ./mvnw -B clean test
+
+      - name: Conferir a regra de dependência da hexagonal
+        run: |
+          if grep -rn "org.springframework\|jakarta.persistence\|infra\." \
+               backend/src/main/java/com/pucrs/planosdevoo/domain/; then
+            echo "::error::domain/ importa Spring, JPA ou infra — ver docs/arquitetura/decisoes/0001-estilo-arquitetural-hexagonal.md"
+            exit 1
+          fi
+          echo "Regra de dependência respeitada."
+
+      - name: Publicar o relatório dos testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend/target/surefire-reports/
