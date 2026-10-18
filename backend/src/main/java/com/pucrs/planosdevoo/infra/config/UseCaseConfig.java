@@ -1,20 +1,28 @@
 package com.pucrs.planosdevoo.infra.config;
 
+import com.pucrs.planosdevoo.domain.model.VerificadorDeConflitos;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.AprovarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.CancelarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAltitudesDisponiveisUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAeronavesUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAeroportosUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAeroviasUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarPilotosUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarVagasDisponiveisUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ListarPlanosUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.AbandonarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ValidarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.out.Transacao;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPilotos;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -65,12 +73,47 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public ValidarPlanoUC validarPlanoUC(RepositorioPlanosDeVoo planos) {
-        return new ValidarPlanoUC(planos);
+    public ValidarPlanoUC validarPlanoUC(RepositorioPlanosDeVoo planos, VerificadorDeConflitos verificador) {
+        return new ValidarPlanoUC(planos, verificador);
     }
 
     @Bean
     public AbandonarPlanoUC abandonarPlanoUC(RepositorioPlanosDeVoo planos) {
         return new AbandonarPlanoUC(planos);
+    }
+
+    @Bean
+    public VerificadorDeConflitos verificadorDeConflitos(RepositorioReservas reservas) {
+        return new VerificadorDeConflitos(reservas);
+    }
+
+    @Bean
+    public ConsultarAltitudesDisponiveisUC consultarAltitudesDisponiveisUC(RepositorioAerovias aerovias,
+                                                                           RepositorioReservas reservas) {
+        return new ConsultarAltitudesDisponiveisUC(aerovias, reservas);
+    }
+
+    @Bean
+    public ConsultarVagasDisponiveisUC consultarVagasDisponiveisUC(RepositorioAeroportos aeroportos,
+                                                                   RepositorioReservas reservas) {
+        return new ConsultarVagasDisponiveisUC(aeroportos, reservas);
+    }
+
+    @Bean
+    public AprovarPlanoUC aprovarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
+                                         VerificadorDeConflitos verificador, Transacao transacao) {
+        return new AprovarPlanoUC(planos, reservas, verificador, transacao);
+    }
+
+    @Bean
+    public CancelarPlanoUC cancelarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
+                                           Transacao transacao, Clock relogio) {
+        return new CancelarPlanoUC(planos, reservas, transacao, relogio);
+    }
+
+    // "Agora" vem de um Clock injetado para o cancelamento ser testável com hora fixa.
+    @Bean
+    public Clock relogio() {
+        return Clock.systemDefaultZone();
     }
 }

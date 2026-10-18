@@ -81,9 +81,11 @@ class PlanoDeVoo <<raiz de agregado>> {
   alterarTrecho(ordem, aerovia, altitude, entrada, pouso)
   removerTrecho(ordem)
   validar() : List<String>
-  aprovar()
+  aprovar(conflitosDeReserva)
   abandonar()
   cancelar(agora)
+  reservasDeAerovia() : List<ReservaAerovia>
+  reservasDeVaga() : List<ReservaVaga>
 }
 
 note top of PlanoDeVoo
@@ -101,6 +103,8 @@ class Trecho {
   --
   horarioChegada() : LocalDateTime
   slotsOcupados() : List<Slot>
+  slotsDaVaga() : List<Slot>
+  {static} altitudesPermitidas() : List<Integer>
 }
 
 class Pouso <<value object>> {
@@ -125,12 +129,24 @@ note bottom of Slot
 end note
 
 class ReservaAerovia {
+  planoId
   altitude
 }
 
 class ReservaVaga {
+  planoId
   numeroVaga
 }
+
+class VerificadorDeConflitos <<serviço de domínio>> {
+  verificar(plano) : List<String>
+}
+
+note bottom of VerificadorDeConflitos
+  Consulta as reservas dos outros planos
+  (porta de saída) e devolve os conflitos de
+  altitude e de vaga. Só consulta: nunca reserva.
+end note
 
 enum SituacaoPlano {
   EM_EDICAO
@@ -161,5 +177,6 @@ ReservaAerovia "*" --> "1" Aerovia
 ReservaAerovia "*" --> "1" Slot
 ReservaVaga "*" --> "1" Aeroporto
 ReservaVaga "*" --> "1" Slot
+VerificadorDeConflitos ..> PlanoDeVoo : confere
 
 @enduml
