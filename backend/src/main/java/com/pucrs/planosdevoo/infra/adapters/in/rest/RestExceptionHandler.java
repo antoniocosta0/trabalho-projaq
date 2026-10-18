@@ -4,8 +4,10 @@ import com.pucrs.planosdevoo.domain.model.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.model.PlanoInvalidoException;
 import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -27,6 +29,20 @@ public class RestExceptionHandler {
     @ExceptionHandler(OperacaoNaoPermitidaException.class)
     public ProblemDetail operacaoNaoPermitida(OperacaoNaoPermitidaException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    // Campo ausente ou inválido no corpo da requisição. Sem este tratamento a
+    // resposta cai no handler padrão do Spring, que devolve stack trace.
+    // O corpo traz a lista de problemas, um por campo, como o enunciado pede.
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail corpoInvalido(MethodArgumentNotValidException e) {
+        List<String> problemas = e.getBindingResult().getFieldErrors().stream()
+                .map(erro -> erro.getField() + ": " + erro.getDefaultMessage())
+                .toList();
+        ProblemDetail detalhe = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "Requisição inválida");
+        detalhe.setProperty("problemas", problemas);
+        return detalhe;
     }
 
     // Aprovação recusada: devolve a lista completa de problemas, não só o primeiro.
