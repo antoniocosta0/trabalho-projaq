@@ -86,6 +86,57 @@ public class PlanoDeVoo {
         situacao = SituacaoPlano.ABANDONADO;
     }
 
+    // ---------- aprovação e cancelamento (UC10, UC12) ----------
+
+    // Aprova se o próprio plano está válido e não há conflito de reserva. Os
+    // conflitos chegam de fora (VerificadorDeConflitos) porque dependem das
+    // reservas de outros planos; gravar as reservas é com o caso de uso.
+    public void aprovar(List<String> conflitosDeReserva) {
+        garantirEmEdicao("aprovar o plano");
+        List<String> problemas = new ArrayList<>(validar());
+        problemas.addAll(conflitosDeReserva);
+        if (!problemas.isEmpty()) {
+            throw new PlanoInvalidoException(problemas);
+        }
+        situacao = SituacaoPlano.APROVADO;
+    }
+
+    // Só plano aprovado e com partida ainda no futuro. Voo que já partiu foi
+    // executado: continua consultável, mas não se cancela.
+    public void cancelar(LocalDateTime agora) {
+        if (situacao != SituacaoPlano.APROVADO) {
+            throw new OperacaoNaoPermitidaException("Não é possível cancelar o plano: ele está " + situacao
+                    + ", e só planos APROVADO podem ser cancelados");
+        }
+        if (!partida.isAfter(agora)) {
+            throw new OperacaoNaoPermitidaException("Não é possível cancelar o plano: a partida (" + HORA.format(partida)
+                    + ") já ocorreu");
+        }
+        situacao = SituacaoPlano.CANCELADO;
+    }
+
+    // Uma reserva por trecho × slot, na altitude do trecho. O plano precisa já ter id.
+    public List<ReservaAerovia> reservasDeAerovia() {
+        List<ReservaAerovia> reservas = new ArrayList<>();
+        for (Trecho t : trechos) {
+            for (Slot slot : t.slotsOcupados()) {
+                reservas.add(new ReservaAerovia(id, t.getAerovia(), t.getAltitude(), slot));
+            }
+        }
+        return reservas;
+    }
+
+    // Uma reserva por pouso × slot, na vaga pretendida do aeroporto de destino do trecho.
+    public List<ReservaVaga> reservasDeVaga() {
+        List<ReservaVaga> reservas = new ArrayList<>();
+        for (Trecho t : trechos) {
+            for (Slot slot : t.slotsDaVaga()) {
+                reservas.add(new ReservaVaga(id, t.getAerovia().getDestino(), t.getPouso().getNumeroVaga(), slot));
+            }
+        }
+        return reservas;
+    }
+
     // ---------- validação (UC09) ----------
 
     // Confere tudo o que depende só do próprio plano e devolve a lista de

@@ -7,6 +7,8 @@ import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ListarPlanosUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.AbandonarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.AprovarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.usecases.CancelarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.TrechoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ValidarPlanoUC;
@@ -35,16 +37,21 @@ public class PlanoDeVooController {
     private final DefinirPercursoUC definirPercursoUC;
     private final ValidarPlanoUC validarPlanoUC;
     private final AbandonarPlanoUC abandonarPlanoUC;
+    private final AprovarPlanoUC aprovarPlanoUC;
+    private final CancelarPlanoUC cancelarPlanoUC;
 
     public PlanoDeVooController(CriarPlanoUC criarPlanoUC, ConsultarPlanoUC consultarPlanoUC,
                                 ListarPlanosUC listarPlanosUC, DefinirPercursoUC definirPercursoUC,
-                                ValidarPlanoUC validarPlanoUC, AbandonarPlanoUC abandonarPlanoUC) {
+                                ValidarPlanoUC validarPlanoUC, AbandonarPlanoUC abandonarPlanoUC,
+                                AprovarPlanoUC aprovarPlanoUC, CancelarPlanoUC cancelarPlanoUC) {
         this.criarPlanoUC = criarPlanoUC;
         this.consultarPlanoUC = consultarPlanoUC;
         this.listarPlanosUC = listarPlanosUC;
         this.definirPercursoUC = definirPercursoUC;
         this.validarPlanoUC = validarPlanoUC;
         this.abandonarPlanoUC = abandonarPlanoUC;
+        this.aprovarPlanoUC = aprovarPlanoUC;
+        this.cancelarPlanoUC = cancelarPlanoUC;
     }
 
     @PostMapping
@@ -92,6 +99,21 @@ public class PlanoDeVooController {
     @PostMapping("/{id}/validacao")
     public ValidacaoResponseDTO validar(@PathVariable Long id) {
         return ValidacaoResponseDTO.de(id, validarPlanoUC.executar(id));
+    }
+
+    // ---------- UC10: aprovar ----------
+
+    // Integral: reserva tudo e aprova, ou recusa com a lista de problemas e não muda nada.
+    @PostMapping("/{id}/aprovacao")
+    public PlanoResponseDTO aprovar(@PathVariable Long id) {
+        return PlanoResponseDTO.de(aprovarPlanoUC.executar(id));
+    }
+
+    // ---------- UC12: cancelar ----------
+
+    @PostMapping("/{id}/cancelamento")
+    public PlanoResponseDTO cancelar(@PathVariable Long id) {
+        return PlanoResponseDTO.de(cancelarPlanoUC.executar(id));
     }
 
     // ---------- UC11: abandonar ----------
