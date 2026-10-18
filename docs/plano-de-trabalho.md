@@ -139,9 +139,11 @@ Branch: `db/initial-seed` · **depende de C** · sábado
       na tabela de reservas
 - [ ] Deixar folga: não pode ficar tudo indisponível o dia inteiro, senão não
       dá para demonstrar aprovação bem-sucedida
-- [ ] Rodar o roteiro do `CLAUDE.md` §14.4: apaga o banco, sobe, confere as
-      contagens, cria/valida/aprova um plano, **reinicia** e confirma que
-      continua lá
+- [~] Rodar o roteiro do `CLAUDE.md` §14.4 — **rodado em 18/10 pelo Antônio**,
+      com o banco apagado: criou, validou, aprovou, reiniciou a aplicação e
+      confirmou que os planos e as reservas sobreviveram. Falta refazer **depois**
+      que a carga inicial tiver os planos aprovados, para conferir a contagem de
+      5 ou mais aerovias ocupadas
 
 Depende de C: combinar com o Redivo como cada reserva é gravada no banco.
 
@@ -167,8 +169,8 @@ Depende das outras frentes:
 
 - [x] ADR 0004 — atomicidade da aprovação (PR #11)
 - [x] `README.md`, os sete `[PREENCHER]` · data de referência declarada: 19/10/2026
-- [ ] `docs/api/requests.http` com as **17 demonstrações** do `CLAUDE.md` §16.3
-      · cresce junto com os endpoints, fecha no domingo
+- [x] `docs/api/requests.http` com as **17 demonstrações** do `CLAUDE.md` §16.3
+      — fechado em 18/10, com cada bloco executado contra a aplicação
 - [ ] Ensaiar o roteiro na ordem, cronometrado
 
 **Pronto quando:** alguém de fora clona o repositório, segue o README e faz a

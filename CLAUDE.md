@@ -205,7 +205,7 @@ trabalho-1/
 │   │       └── 0000-template.md       formato do ADR
 │   └── api/
 │       ├── README.md
-│       └── requests.http              roteiro da apresentação (8 das 17 demonstrações)
+│       └── requests.http              roteiro da apresentação, as 17 demonstrações
 ├── logs/
 │   ├── log.md                         o que foi feito (seção 9)
 │   └── decisoes.md                    o que foi decidido e por quê (seção 9)
@@ -1124,11 +1124,11 @@ As que custam nota e são fáceis de deixar passar:
 
 **Antes da apresentação de 19/10**
 
-- [ ] Banco apagado e recriado do zero, com sucesso.
-- [ ] As 17 demonstrações da seção 16.3 testadas, em ordem — **8 no roteiro**.
+- [x] Banco apagado e recriado do zero, com sucesso (18/10).
+- [x] As 17 demonstrações da seção 16.3 testadas, em ordem, contra a aplicação.
 - [ ] Data de referência conferida: 5+ aerovias com ocupação — **0 hoje**,
       depende dos planos aprovados no `data.sql`.
-- [ ] `requests.http` (ou coleção equivalente) completo e numerado.
+- [x] `requests.http` completo e numerado, com a resposta real de cada bloco.
 - [x] Swagger UI abrindo (conferido no PR #9).
 - [ ] README seguido por alguém de fora, do clone até a primeira requisição.
 - [x] Diagramas conferidos contra o código, um por um (PR #13).
