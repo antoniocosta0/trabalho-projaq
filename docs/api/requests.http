@@ -1,46 +1,59 @@
 ### Roteiro de requisições — Sistema de Gestão de Planos de Voo
 ### PUCRS · Projeto e Arquitetura de Software · 2026/2 · turma 340
 ###
-### Ordem da apresentação. Cada bloco traz o resultado esperado, conferido
-### contra a aplicação em 18/10/2026.
+### As 17 demonstrações da seção 16.3 do CLAUDE.md, na ordem da apresentação.
+### Cada bloco traz o resultado esperado. **Todas as respostas comentadas aqui
+### foram obtidas executando as requisições contra a aplicação em 18/10/2026**,
+### com o banco apagado antes — não são respostas presumidas.
+###
+### IMPORTANTE: o roteiro supõe o banco LIMPO e os blocos executados NA ORDEM.
+### Os planos recebem id 1, 2, 3... conforme vão sendo criados. Para recomeçar:
+###   cd backend && rm -rf ./data && ./mvnw spring-boot:run
 ###
 ### Pré-requisito: aplicação no ar em http://localhost:8080
-###   cd backend && ./mvnw spring-boot:run
-###
 ### Swagger UI: http://localhost:8080/swagger-ui.html
 ### OpenAPI:    http://localhost:8080/v3/api-docs
 
 @host = http://localhost:8080
 
-### ───────────────────────────────────────────────────────────────
-### 1. MALHA AÉREA
-### ───────────────────────────────────────────────────────────────
+### ═══════════════════════════════════════════════════════════════
+### 1. MALHA AÉREA, PILOTOS E FROTA          · demonstração 1
+### ═══════════════════════════════════════════════════════════════
 
 ### 1.1 Consultar aeroportos (UC01)
-# Esperado: 200, 4 aeroportos — POA 41 vagas, FLN 16, CWB 26, GRU 115.
+# 200 — 4 aeroportos: POA 41 vagas, FLN 16, CWB 26, GRU 115.
 GET {{host}}/aeroportos
 
 ### 1.2 Consultar aerovias (UC02)
-# Esperado: 200, 8 aerovias R1..R8. Repare que são ORIENTADAS:
-# R1 é POA->FLN e R8 é FLN->POA — registros distintos.
+# 200 — 8 aerovias R1..R8. São ORIENTADAS: R1 é POA->FLN e R8 é FLN->POA,
+# registros distintos. Aerovia não tem PUT nem DELETE: é imutável.
 GET {{host}}/aerovias
 
 ### 1.3 Consultar pilotos (UC03)
-# Esperado: 200, 4 pilotos.
+# 200 — 4 pilotos.
 GET {{host}}/pilotos
 
 ### 1.4 Consultar aeronaves (UC04)
-# Esperado: 200, 4 aeronaves das três categorias:
+# 200 — 4 aeronaves das três categorias:
 #   PP-PAR e PP-CUR (PARTICULAR), PR-PAX (PASSAGEIROS), PR-CRG (CARGA).
+# Repare no PP-CUR: autonomia de 1000 km, curta de propósito (ver 3.5).
 GET {{host}}/aeronaves
 
-### ───────────────────────────────────────────────────────────────
-### 2. CICLO DE UM PLANO — CAMINHO FELIZ
-### ───────────────────────────────────────────────────────────────
+### ═══════════════════════════════════════════════════════════════
+### 2. CICLO COMPLETO DE UM PLANO      · demonstrações 2, 3, 4 e 5
+### ═══════════════════════════════════════════════════════════════
 
-### 2.1 Criar plano de voo (UC05)
-# POA -> FLN, aeronave de passageiros, partindo às 08:00.
-# Esperado: 201, id 1, situacao EM_EDICAO, trechos vazio.
+### 2.1 Disponibilidade ANTES de tudo (UC07) · demonstração 3
+# 200 — as 11 altitudes livres: 25000..35000, de 1000 em 1000.
+# Guarde este número: ele vai mudar depois da aprovação, e só depois dela.
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+
+### 2.2 Vagas disponíveis em FLN (UC08) · demonstração 3
+# 200 — as 16 vagas livres.
+GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
+
+### 2.3 Criar o plano (UC05) · demonstração 2
+# 201 — id 1, situacao EM_EDICAO, trechos vazio.
 POST {{host}}/planos
 Content-Type: application/json
 
@@ -52,11 +65,11 @@ Content-Type: application/json
   "partida": "2026-10-19T08:00:00"
 }
 
-### 2.2 Adicionar o trecho do percurso (UC06)
-# R1 é POA->FLN, 363 km. O PR-PAX voa a 830 km/h, então a viagem dura 26 min.
-# FLN é o destino final: pouso obrigatório, com vaga e permanência.
-# Esperado: 200, horarioChegada "2026-10-19T08:26:00" CALCULADO pelo sistema,
-#           noDestino "POUSO", saidaDaVaga "2026-10-19T09:26:00".
+### 2.4 Montar o percurso (UC06) · demonstração 2
+# R1 é POA->FLN, 363 km. O PR-PAX voa a 830 km/h: a viagem dura 26 min.
+# FLN é o destino final, então o pouso é obrigatório, com vaga e permanência.
+# 201 — horarioChegada "2026-10-19T08:26:00" CALCULADO pelo sistema (não foi
+#       informado), noDestino "POUSO", saidaDaVaga "2026-10-19T09:26:00".
 POST {{host}}/planos/1/trechos
 Content-Type: application/json
 
@@ -68,179 +81,369 @@ Content-Type: application/json
   "permanenciaMinutos": 60
 }
 
-### 2.3 Validar o plano (UC09)
-# Esperado: 200, {"valido": true, "problemas": []}.
-# IMPORTANTE para a demonstração: validar NÃO muda a situação (continua
-# EM_EDICAO) e NÃO cria nenhuma reserva.
+### 2.5 Validar (UC09) · demonstração 4
+# 200 — {"planoId":1,"valido":true,"problemas":[]}
 POST {{host}}/planos/1/validacao
 
-### 2.4 Consultar o plano por id (UC13)
-# Esperado: 200, situacao ainda EM_EDICAO — prova que validar não aprovou.
+### 2.6 PROVA de que validar NÃO reservou · demonstração 4
+# 200 — ainda as 11 altitudes. Nada foi reservado pela validação.
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+
+### 2.7 PROVA de que validar NÃO mudou o estado · demonstração 4
+# 200 — situacao continua EM_EDICAO.
 GET {{host}}/planos/1
 
-### ───────────────────────────────────────────────────────────────
-### 3. CASOS DE FALHA DA VALIDAÇÃO
-### ───────────────────────────────────────────────────────────────
+### 2.8 Aprovar (UC10) · demonstração 5
+# 200 — situacao APROVADO. Aqui, e só aqui, as reservas são criadas:
+# uma por slot de aerovia e uma por slot de vaga, tudo numa transação só.
+POST {{host}}/planos/1/aprovacao
 
-### 3.1 Percurso inconsistente — preparação
-# POA -> GRU, mas o segundo trecho sai de CWB.
+### 2.9 PROVA de que aprovar reservou a altitude · demonstração 5
+# 200 — agora são 10 altitudes: a de 30000 sumiu da lista.
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+
+### 2.10 PROVA de que aprovar reservou a vaga · demonstração 5
+# 200 — agora são 15 vagas: a 3 sumiu. O pouso é 08:26 com 60 min de
+# permanência, então ela fica ocupada nos slots das 08:00 e das 09:00.
+GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
+
+### ═══════════════════════════════════════════════════════════════
+### 3. FALHAS DE VALIDAÇÃO         · demonstrações 6, 7, 8 e 9
+### ═══════════════════════════════════════════════════════════════
+
+### 3.1 PERCURSO INCONSISTENTE — preparação (plano 2) · demonstração 6
 POST {{host}}/planos
 Content-Type: application/json
 
-{
-  "pilotoId": 1,
-  "aeronavePrefixo": "PR-PAX",
-  "origem": "POA",
-  "destino": "GRU",
-  "partida": "2026-10-19T08:00:00"
-}
+{ "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "GRU",
+  "partida": "2026-10-19T08:00:00" }
 
-### 3.1.a Primeiro trecho: R1 (POA -> FLN)
+### 3.1.a Trecho 1: R1 (POA -> FLN)
 POST {{host}}/planos/2/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T08:00:00" }
+{ "aeroviaId": "R1", "altitude": 32000, "horarioEntrada": "2026-10-19T08:00:00" }
 
-### 3.1.b Segundo trecho: R6 (CWB -> GRU) — não encaixa com FLN
+### 3.1.b Trecho 2: R6 (CWB -> GRU) — não encaixa, o trecho 1 terminou em FLN
 POST {{host}}/planos/2/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R6", "altitude": 31000, "horarioEntrada": "2026-10-19T08:26:00",
+{ "aeroviaId": "R6", "altitude": 32000, "horarioEntrada": "2026-10-19T08:26:00",
   "numeroVaga": 5, "permanenciaMinutos": 30 }
 
-### 3.1.c Validar — PERCURSO INCONSISTENTE
-# Esperado: 200, valido false, problema:
+### 3.1.c Validar
+# 200 — valido false:
 #   "Trecho 2 sai de CWB, mas o trecho 1 termina em FLN"
 POST {{host}}/planos/2/validacao
 
-### 3.2 Restrição da aeronave — preparação
-# Aeronave PARTICULAR só pode voar a 25.000, 26.000 ou 27.000 pés.
+### 3.2 RESTRIÇÃO DA AERONAVE: particular acima do teto (plano 3) · demonstração 8
+# Aeronave PARTICULAR só opera a 25.000, 26.000 ou 27.000 pés.
 POST {{host}}/planos
 Content-Type: application/json
 
-{
-  "pilotoId": 2,
-  "aeronavePrefixo": "PP-PAR",
-  "origem": "POA",
-  "destino": "FLN",
-  "partida": "2026-10-19T08:00:00"
-}
+{ "pilotoId": 2, "aeronavePrefixo": "PP-PAR", "origem": "POA", "destino": "FLN",
+  "partida": "2026-10-19T14:00:00" }
 
-### 3.2.a Trecho a 30.000 pés — altitude proibida para a categoria
+### 3.2.a Trecho a 30.000 pés — proibido para a categoria
 POST {{host}}/planos/3/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T08:00:00",
+{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T14:00:00",
   "numeroVaga": 4, "permanenciaMinutos": 30 }
 
-### 3.2.b Validar — RESTRIÇÃO DA AERONAVE
-# Esperado: 200, valido false, problema:
+### 3.2.b Validar
+# 200 — valido false:
 #   "Trecho 1: a aeronave PP-PAR (PARTICULAR) não pode voar a 30000 pés
-#    entre 19/10 08:00 e 19/10 08:34"
+#    entre 19/10 14:00 e 19/10 14:34"
 POST {{host}}/planos/3/validacao
 
-### 3.3 Horário incompatível com a duração calculada — preparação
+### 3.3 RESTRIÇÃO DA AERONAVE: carga fora da janela (plano 4) · demonstração 8
+# Aeronave de CARGA só pode usar a aerovia entre 00:00 e 06:00. Esta parte 09:00.
 POST {{host}}/planos
 Content-Type: application/json
 
-{
-  "pilotoId": 1,
-  "aeronavePrefixo": "PR-PAX",
-  "origem": "POA",
-  "destino": "CWB",
-  "partida": "2026-10-19T08:00:00"
-}
+{ "pilotoId": 3, "aeronavePrefixo": "PR-CRG", "origem": "POA", "destino": "FLN",
+  "partida": "2026-10-19T09:00:00" }
 
-### 3.3.a R1 (POA -> FLN), chegada calculada: 08:26
+### 3.3.a Trecho às 09:00
 POST {{host}}/planos/4/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T08:00:00" }
+{ "aeroviaId": "R1", "altitude": 33000, "horarioEntrada": "2026-10-19T09:00:00",
+  "numeroVaga": 6, "permanenciaMinutos": 30 }
 
-### 3.3.b R4 (FLN -> CWB) entrando às 11:00 — não bate com a chegada
-POST {{host}}/planos/4/trechos
-Content-Type: application/json
-
-{ "aeroviaId": "R4", "altitude": 31000, "horarioEntrada": "2026-10-19T11:00:00",
-  "numeroVaga": 2, "permanenciaMinutos": 30 }
-
-### 3.3.c Validar — HORÁRIO INCOMPATÍVEL
-# Esperado: 200, valido false, problema:
-#   "Trecho 2: entrada às 19/10 11:00, mas deveria ser às 19/10 08:26"
+### 3.3.b Validar
+# 200 — valido false:
+#   "Trecho 1: a aeronave PR-CRG (CARGA) não pode voar a 33000 pés
+#    entre 19/10 09:00 e 19/10 09:28"
 POST {{host}}/planos/4/validacao
 
-### ───────────────────────────────────────────────────────────────
-### 4. ESTADOS DO PLANO
-### ───────────────────────────────────────────────────────────────
-
-### 4.1 Abandonar plano em edição (UC11)
-# Esperado: 200, situacao ABANDONADO.
-POST {{host}}/planos/1/abandono
-
-### 4.2 Tentar modificar plano que NÃO está em edição
-# Esperado: 409 Conflict —
-#   "Não é possível alterar o percurso: o plano está ABANDONADO, e só
-#    planos EM_EDICAO podem ser modificados"
-POST {{host}}/planos/1/trechos
+### 3.4 HORÁRIO INCOMPATÍVEL com a duração calculada (plano 5) · demonstração 7
+POST {{host}}/planos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T08:00:00" }
+{ "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "CWB",
+  "partida": "2026-10-19T08:00:00" }
 
-### 4.3 Plano abandonado continua consultável
-# Esperado: 200, com o percurso preservado.
-GET {{host}}/planos/1
+### 3.4.a Trecho 1: R1, chegada calculada 08:26
+POST {{host}}/planos/5/trechos
+Content-Type: application/json
 
-### 4.4 Consultar planos por situação (UC14)
-# Esperado: 200, só o plano abandonado.
+{ "aeroviaId": "R1", "altitude": 34000, "horarioEntrada": "2026-10-19T08:00:00" }
+
+### 3.4.b Trecho 2: R4 (FLN -> CWB) entrando às 11:00 — não bate com a chegada
+POST {{host}}/planos/5/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R4", "altitude": 34000, "horarioEntrada": "2026-10-19T11:00:00",
+  "numeroVaga": 2, "permanenciaMinutos": 30 }
+
+### 3.4.c Validar
+# 200 — valido false:
+#   "Trecho 2: entrada às 19/10 11:00, mas deveria ser às 19/10 08:26"
+POST {{host}}/planos/5/validacao
+
+### 3.5 AUTONOMIA INSUFICIENTE (plano 6) · demonstração 9
+# O PP-CUR tem autonomia de 1000 km, então só pode voar 850 (85%, margem de
+# segurança de 15%). A R2 (POA -> GRU) tem 865 km: 15 km além do limite.
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 4, "aeronavePrefixo": "PP-CUR", "origem": "POA", "destino": "GRU",
+  "partida": "2026-10-19T10:00:00" }
+
+### 3.5.a Trecho único: R2, 865 km
+POST {{host}}/planos/6/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R2", "altitude": 26000, "horarioEntrada": "2026-10-19T10:00:00",
+  "numeroVaga": 7, "permanenciaMinutos": 30 }
+
+### 3.5.b Validar
+# 200 — valido false:
+#   "Trecho 1: 865 km sem abastecer, acima do limite de 850 km
+#    (85% da autonomia de 1000 km)"
+POST {{host}}/planos/6/validacao
+
+### ═══════════════════════════════════════════════════════════════
+### 4. CONFLITO DE RECURSO E ATOMICIDADE  · demonstrações 10, 11 e 12
+### ═══════════════════════════════════════════════════════════════
+###
+### Estas três dependem do plano 1 estar APROVADO (bloco 2.8). É ele que
+### ocupa a altitude 30000 da R1 e a vaga 3 de FLN no slot das 08:00.
+
+### 4.1 CONFLITO DE ALTITUDE — preparação (plano 7) · demonstração 10
+# Mesma aerovia, mesma altitude, mesmo slot do plano 1 já aprovado.
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 2, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
+  "partida": "2026-10-19T08:00:00" }
+
+### 4.1.a Trecho na altitude já ocupada, mas em vaga livre
+POST {{host}}/planos/7/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T08:00:00",
+  "numeroVaga": 9, "permanenciaMinutos": 30 }
+
+### 4.1.b Validar — acusa o conflito
+# 200 — valido false:
+#   "Trecho 1: a altitude 30000 pés da aerovia R1 já está reservada
+#    no(s) slot(s) das 19/10 08:00"
+POST {{host}}/planos/7/validacao
+
+### 4.2 APROVAÇÃO RECUSADA · demonstração 12
+# 422 — Problem Detail com a LISTA completa de problemas em "problemas":
+#   "O plano não pode ser aprovado: 1 problema(s) encontrado(s)"
+POST {{host}}/planos/7/aprovacao
+
+### 4.2.a PROVA 1: o plano recusado continua EM_EDICAO · demonstração 12
+# 200 — situacao EM_EDICAO. A recusa não mudou o estado.
+GET {{host}}/planos/7
+
+### 4.2.b PROVA 2: a recusa não deixou RESERVA PARCIAL · demonstração 12
+# 200 — seguem 10 altitudes, exatamente como antes da tentativa. A vaga 9,
+# que estava livre e faria parte da aprovação, NÃO foi reservada.
+# É o teste que o enunciado cobra por escrito (§5.4), e ele também existe
+# automatizado, em AprovacaoAtomicaTest.
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+
+### 4.3 VAGA INDISPONÍVEL (plano 8) · demonstração 11
+# Agora o contrário: altitude livre (31000), mas a vaga 3 de FLN está ocupada
+# pelo plano 1.
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 3, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
+  "partida": "2026-10-19T08:00:00" }
+
+### 4.3.a Trecho em altitude livre, mas na vaga ocupada
+POST {{host}}/planos/8/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R1", "altitude": 31000, "horarioEntrada": "2026-10-19T08:00:00",
+  "numeroVaga": 3, "permanenciaMinutos": 60 }
+
+### 4.3.b Validar
+# 200 — valido false:
+#   "Trecho 1: a vaga 3 de FLN já está reservada no(s) slot(s) das
+#    19/10 08:00, 19/10 09:00"
+# Repare: DOIS slots, porque a permanência de 60 min a partir das 08:26
+# atravessa a hora cheia.
+POST {{host}}/planos/8/validacao
+
+### ═══════════════════════════════════════════════════════════════
+### 5. CANCELAMENTO                      · demonstrações 13 e 14
+### ═══════════════════════════════════════════════════════════════
+
+### 5.1 Cancelar plano aprovado FUTURO (UC12) · demonstração 13
+# 200 — situacao CANCELADO.
+POST {{host}}/planos/1/cancelamento
+
+### 5.1.a PROVA: as reservas de aerovia foram liberadas · demonstração 13
+# 200 — voltaram as 11 altitudes.
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+
+### 5.1.b PROVA: as reservas de vaga foram liberadas · demonstração 13
+# 200 — voltaram as 16 vagas.
+GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
+
+### 5.2 Plano com partida JÁ OCORRIDA — preparação (plano 9) · demonstração 14
+# Parte em 17/10, que já passou. Voo executado: consultável, não cancelável.
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
+  "partida": "2026-10-17T08:00:00" }
+
+### 5.2.a Trecho
+POST {{host}}/planos/9/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-17T08:00:00",
+  "numeroVaga": 3, "permanenciaMinutos": 60 }
+
+### 5.2.b Aprovar — funciona: a data passada não impede aprovar
+# 200 — situacao APROVADO.
+POST {{host}}/planos/9/aprovacao
+
+### 5.2.c Cancelar — RECUSADO · demonstração 14
+# 409 — "Não é possível cancelar o plano: a partida (17/10 08:00) já ocorreu"
+POST {{host}}/planos/9/cancelamento
+
+### ═══════════════════════════════════════════════════════════════
+### 6. ABANDONO, ESTADOS E CONSULTAS   · demonstrações 15, 16 e 17
+### ═══════════════════════════════════════════════════════════════
+
+### 6.1 Plano para abandonar — preparação (plano 10)
+POST {{host}}/planos
+Content-Type: application/json
+
+{ "pilotoId": 4, "aeronavePrefixo": "PP-PAR", "origem": "POA", "destino": "FLN",
+  "partida": "2026-10-19T20:00:00" }
+
+### 6.1.a Trecho (PP-PAR a 26.000 pés: altitude permitida para particular)
+POST {{host}}/planos/10/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R1", "altitude": 26000, "horarioEntrada": "2026-10-19T20:00:00",
+  "numeroVaga": 10, "permanenciaMinutos": 45 }
+
+### 6.2 Abandonar plano em edição (UC11) · demonstração 15
+# 200 — situacao ABANDONADO. Não havia reserva a liberar: plano em edição
+# nunca reserva nada.
+POST {{host}}/planos/10/abandono
+
+### 6.3 Tentar MODIFICAR plano fora de edição · demonstração 17
+# 409 — "Não é possível alterar o percurso: o plano está ABANDONADO,
+#        e só planos EM_EDICAO podem ser modificados"
+POST {{host}}/planos/10/trechos
+Content-Type: application/json
+
+{ "aeroviaId": "R1", "altitude": 26000, "horarioEntrada": "2026-10-19T20:00:00" }
+
+### 6.4 Consultar planos APROVADOS (UC14) · demonstração 16
+# 200 — o plano 9 (o de partida passada).
+GET {{host}}/planos?situacao=APROVADO
+
+### 6.5 Consultar planos CANCELADOS · demonstração 16
+# 200 — o plano 1.
+GET {{host}}/planos?situacao=CANCELADO
+
+### 6.6 Consultar planos ABANDONADOS · demonstração 16
+# 200 — o plano 10. Cancelado e abandonado seguem consultáveis.
 GET {{host}}/planos?situacao=ABANDONADO
 
-### 4.5 Consultar planos em edição
+### 6.7 Consultar planos EM EDIÇÃO
+# 200 — os planos 2 a 8, que ficaram com problemas de validação.
 GET {{host}}/planos?situacao=EM_EDICAO
 
-### 4.6 Consultar todos os planos
+### 6.8 Consultar todos
+# 200 — os 10 planos.
 GET {{host}}/planos
 
-### ───────────────────────────────────────────────────────────────
-### 5. ERROS DE REQUISIÇÃO
-### ───────────────────────────────────────────────────────────────
+### 6.9 Consultar plano por id (UC13)
+# 200 — o plano com o percurso completo e os horários calculados.
+GET {{host}}/planos/9
 
-### 5.1 Plano inexistente
-# Esperado: 404 — "Plano 999 não encontrado"
+### ═══════════════════════════════════════════════════════════════
+### 7. ERROS DE REQUISIÇÃO
+### ═══════════════════════════════════════════════════════════════
+###
+### Todas as respostas de erro seguem Problem Detail (RFC 7807) e nenhuma
+### traz stack trace.
+
+### 7.1 Plano inexistente
+# 404 — "Plano 999 não encontrado"
 GET {{host}}/planos/999
 
-### 5.2 Corpo incompleto
-# Esperado: 400, com a LISTA de campos que faltaram, um por linha, em
-# "problemas". Sem stack trace.
+### 7.2 Aerovia inexistente
+# 404 — "Aerovia R99 não encontrada"
+GET {{host}}/aerovias/R99/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+
+### 7.3 Corpo incompleto
+# 400 — "Requisição inválida", com a LISTA dos campos que faltaram em
+# "problemas", um por campo. Sem stack trace.
 POST {{host}}/planos
 Content-Type: application/json
 
 { "pilotoId": 1 }
 
-### 5.3 Remover trecho (UC06)
-DELETE {{host}}/planos/4/trechos/2
+### 7.4 Período invertido
+# 422 — "Fim deve ser posterior ao início"
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T10:00:00&fim=2026-10-19T08:00:00
 
-### ───────────────────────────────────────────────────────────────
-### 6. AINDA NÃO IMPLEMENTADO — frentes C e D
-### ───────────────────────────────────────────────────────────────
+### 7.5 Remover trecho de um plano em edição (UC06)
+# 200 — o trecho 2 do plano 5 sai e os seguintes são renumerados.
+DELETE {{host}}/planos/5/trechos/2
+
+### 7.6 Alterar trecho de um plano em edição (UC06)
+# 200 — o trecho 1 do plano 5 passa a 29.000 pés.
+PUT {{host}}/planos/5/trechos/1
+Content-Type: application/json
+
+{ "aeroviaId": "R1", "altitude": 29000, "horarioEntrada": "2026-10-19T08:00:00" }
+
+### ═══════════════════════════════════════════════════════════════
+### 8. CADASTROS — frente D1, AINDA NÃO IMPLEMENTADO
+### ═══════════════════════════════════════════════════════════════
 ###
-### As requisições abaixo dependem de código que ainda não existe. Estão
-### escritas na forma prevista para serem ligadas assim que as frentes
-### fecharem.
+### O enunciado (§2 e §8.1) exige que seja possível cadastrar novos aeroportos
+### e aerovias, e que um aeroporto informado durante a avaliação entre em uso
+### SEM alteração de código. Esses quatro endpoints ainda não existem; as
+### requisições abaixo estão na forma prevista, para serem ligadas quando a
+### frente D1 entregar. Aerovia não terá PUT nem DELETE: é imutável.
 ###
-### UC07 — consultar altitudes disponíveis numa aerovia por período
-# GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
-###
-### UC08 — consultar vagas disponíveis num aeroporto por período
-# GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
-###
-### UC10 — aprovar plano (cria as reservas, tudo ou nada)
-# POST {{host}}/planos/1/aprovacao
-###
-### UC12 — cancelar plano aprovado futuro (libera as reservas)
-# POST {{host}}/planos/1/cancelamento
-###
-### Cadastros (frente D)
 # POST {{host}}/aeroportos
+# { "codigo": "SDU", "nome": "Santos Dumont - Rio de Janeiro", "quantidadeVagas": 12 }
+###
 # POST {{host}}/aerovias
+# { "id": "R9", "origem": "GRU", "destino": "SDU", "distanciaKm": 365 }
+###
 # POST {{host}}/pilotos
+# { "nome": "Eduarda Nunes" }
+###
 # POST {{host}}/aeronaves
+# { "prefixo": "PR-NEW", "categoria": "PASSAGEIROS", "velocidadeCruzeiroKmh": 800,
+#   "autonomiaKm": 4200, "companhiaAerea": "Nova Linha", "capacidadePassageiros": 150 }
