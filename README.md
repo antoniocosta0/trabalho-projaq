@@ -24,9 +24,11 @@ de uma vez e aprovar.
 **19/10/2026.**
 
 É a data usada nos testes de disponibilidade, conflito e reserva durante a
-apresentação. A carga inicial traz **quatro planos já aprovados** voando nesse
-dia, e as reservas deles ocupam altitudes de aerovias e vagas de aeroportos:
-**6 das 8 aerovias** têm ocupação, acima do mínimo de 60% que o enunciado pede.
+apresentação. A carga inicial traz **cinco planos já aprovados**: quatro deles
+voam nesse dia, e as reservas desses quatro ocupam altitudes de aerovias e vagas
+de aeroportos — **6 das 8 aerovias** têm ocupação, acima do mínimo de 60% que o
+enunciado pede. O quinto (plano 1005) voa em 17/10, antes da data de referência,
+e existe para a demonstração de cancelamento recusado não depender do relógio.
 
 Dois desses planos partem de madrugada e de manhã (01:00 e 06:30) e dois à
 noite (20:00 e 21:00). No dia da apresentação, os primeiros já partiram e

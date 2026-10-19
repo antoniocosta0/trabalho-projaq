@@ -134,8 +134,9 @@ recompilar — é o teste de extensibilidade que o professor vai fazer.
 
 Branch: `db/initial-seed` · **concluída em 18/10** (PR #18)
 
-- [x] `data.sql`: quatro planos **aprovados** com suas reservas, ocupando
-      **6 das 8 aerovias** na data de referência
+- [x] `data.sql`: cinco planos **aprovados** com suas reservas — quatro na data
+      de referência, ocupando **6 das 8 aerovias**, e um em 17/10 para a
+      demonstração de cancelamento recusado
 - [x] As ocupações são consequência dos planos aprovados — conferido a cada
       build pelo `SeedConsistenciaTest`, que compara o seed com o que o domínio
       geraria
@@ -255,7 +256,7 @@ no mais tardar.
 - **Os 14 casos de uso**: UC01 a UC14, todos com endpoint. UC01–UC05, UC13 e
   UC14 no PR #2; UC06, UC09 e UC11 no PR #8; UC07, UC08, UC10 e UC12 no PR #10
 - **Todas as cinco frentes concluídas**, A a E
-- 127 testes automatizados, verdes, rodando também no CI com JDK 25
+- 144 testes automatizados, verdes, rodando também no CI com JDK 25
 - Carga inicial com planos aprovados, ocupando 6 das 8 aerovias na data de
   referência, e os quatro cadastros atendendo o §8.1
 - As nove decisões arquiteturais escritas como ADR, de 0001 a 0009
