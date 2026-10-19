@@ -43,11 +43,19 @@ class SeedConsistenciaTest {
     @Autowired RepositorioAeroportos aeroportos;
     @Autowired CriarPlanoUC criarPlano;
 
-    // Do início da data de referência até o fim do dia seguinte: a permanência
-    // no destino final pode passar da meia-noite.
+    // Dois dias antes da data de referência até o fim do dia seguinte a ela. A
+    // margem para trás cobre o plano 1005, que parte em 17/10 e existe para a
+    // demonstração de cancelamento recusado; a margem para a frente cobre a
+    // permanência no destino final, que pode passar da meia-noite.
     private static List<Slot> slotsDoPeriodo() {
+        LocalDateTime inicio = DATA_DE_REFERENCIA.minusDays(2).atStartOfDay();
+        return IntStream.range(0, 96).mapToObj(h -> new Slot(inicio.plusHours(h))).toList();
+    }
+
+    // As 24 horas da data de referência, independentes da janela acima.
+    private static List<Slot> slotsDaDataDeReferencia() {
         LocalDateTime inicio = DATA_DE_REFERENCIA.atStartOfDay();
-        return IntStream.range(0, 48).mapToObj(h -> new Slot(inicio.plusHours(h))).toList();
+        return IntStream.range(0, 24).mapToObj(h -> new Slot(inicio.plusHours(h))).toList();
     }
 
     private List<PlanoDeVoo> aprovados() {
@@ -85,8 +93,20 @@ class SeedConsistenciaTest {
             PlanoDeVoo copia = PlanoDeVoo.reconstituir(p.getId(), p.getPiloto(), p.getAeronave(), p.getOrigem(),
                     p.getDestino(), p.getPartida(), SituacaoPlano.EM_EDICAO, p.getTrechos());
             assertEquals(List.of(), copia.validar(), "plano " + p.getId());
-            assertEquals(DATA_DE_REFERENCIA, p.getPartida().toLocalDate(), "plano " + p.getId());
+            // Ou parte na data de referência, ou antes dela — este último é o
+            // plano que já partiu, usado na demonstração de cancelamento
+            // recusado. Depois da data de referência, nenhum.
+            assertFalse(p.getPartida().toLocalDate().isAfter(DATA_DE_REFERENCIA), "plano " + p.getId());
         }
+    }
+
+    // A demonstração 14 (cancelar plano que já partiu) precisa de um plano
+    // aprovado com partida anterior à data de referência, senão ela passa a
+    // depender da hora em que a apresentação acontece.
+    @Test
+    void aCargaTemPlanoAprovadoComPartidaJaOcorrida() {
+        assertTrue(aprovados().stream().anyMatch(p -> p.getPartida().toLocalDate().isBefore(DATA_DE_REFERENCIA)),
+                "nenhum plano aprovado da carga inicial tem partida anterior à data de referência");
     }
 
     @Test
@@ -104,7 +124,7 @@ class SeedConsistenciaTest {
 
     @Test
     void peloMenos60PorCentoDasAeroviasTemOcupacaoNaDataDeReferencia() {
-        List<Slot> doDia = slotsDoPeriodo().subList(0, 24);
+        List<Slot> doDia = slotsDaDataDeReferencia();
         List<Aerovia> todas = aerovias.listarTodas();
         long ocupadas = todas.stream()
                 .filter(a -> !reservas.buscarReservasAerovia(a.getId(), doDia).isEmpty())

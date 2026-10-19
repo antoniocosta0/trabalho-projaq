@@ -41,6 +41,10 @@ GET {{host}}/pilotos
 ### 1.4 Consultar aeronaves (UC04)
 # 200 — 4 aeronaves das três categorias:
 #   PP-PAR e PP-CUR (PARTICULAR), PR-PAX (PASSAGEIROS), PR-CRG (CARGA).
+# Cada uma traz os campos da SUA categoria, e só eles: empresaManutencao nas
+# particulares, companhiaAerea e capacidadePassageiros nas de passageiros,
+# companhiaAerea e capacidadeToneladas nas de carga. Quem decide isso é a
+# própria aeronave, por polimorfismo — ver ADR 0006.
 # Repare no PP-CUR: autonomia de 1000 km, curta de propósito (ver 3.5).
 GET {{host}}/aeronaves
 
@@ -344,37 +348,49 @@ GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=20
 # 200 — voltaram as 16 vagas.
 GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
 
-### 5.2 Plano com partida JÁ OCORRIDA — preparação (plano 10) · demonstração 14
-# Parte em 17/10, que já passou. Voo executado: consultável, não cancelável.
+### 5.2 Cancelar plano que JÁ PARTIU — RECUSADO · demonstração 14
+# O plano 1005 vem da carga inicial, já aprovado, partindo em 17/10. Como ele
+# parte antes da data de referência, ele já partiu em QUALQUER dia em que a
+# demonstração for feita — não depende da hora da apresentação.
+# 409 — "Não é possível cancelar o plano: a partida (17/10 08:00) já ocorreu"
+POST {{host}}/planos/1005/cancelamento
+
+### 5.2.a O plano recusado continua consultável
+# 200 — situacao ainda APROVADO, com o percurso intacto. Voo executado não é
+# cancelável, mas não desaparece.
+GET {{host}}/planos/1005
+
+### 5.2.b E aprovar um plano que já partiu também é recusado
+# Não se aprova um voo que já decolou. Criação do plano: 201.
 POST {{host}}/planos
 Content-Type: application/json
 
 { "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
-  "partida": "2026-10-17T08:00:00" }
+  "partida": "2026-10-17T14:00:00" }
 
-### 5.2.a Trecho
+### 5.2.c Trecho
 POST {{host}}/planos/10/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-17T08:00:00",
-  "numeroVaga": 3, "permanenciaMinutos": 60 }
+{ "aeroviaId": "R1", "altitude": 29000, "horarioEntrada": "2026-10-17T14:00:00",
+  "numeroVaga": 7, "permanenciaMinutos": 30 }
 
-### 5.2.b Aprovar — funciona: a data passada não impede aprovar
-# 200 — situacao APROVADO.
+### 5.2.d Aprovar — RECUSADO
+# 422 — na lista "problemas":
+#   "A partida (17/10 14:00) já ocorreu: um voo que já partiu não pode ser aprovado"
+# O plano continua EM_EDICAO.
 POST {{host}}/planos/10/aprovacao
 
-### 5.2.c Cancelar — RECUSADO · demonstração 14
-# 409 — "Não é possível cancelar o plano: a partida (17/10 08:00) já ocorreu"
-POST {{host}}/planos/10/cancelamento
-
-### 5.3 A MESMA RECUSA, com um plano da carga inicial · demonstração 14
+### 5.3 A MESMA RECUSA, com um plano do dia da apresentação · demonstração 14
 ###
-### ATENÇÃO: este bloco só devolve 409 **no dia 19/10**, porque o plano 1001
-### parte às 01:00 daquele dia. Ensaiando antes, ele ainda é futuro e o
-### cancelamento é ACEITO (200) — o que não é defeito, é o relógio. Para
-### ensaiar a recusa em qualquer dia, use o 5.2 acima, cujo plano parte em
-### 17/10. Na apresentação, este é o bloco mais realista: um voo que o sistema
-### já trazia aprovado e que decolou de madrugada.
+### ATENÇÃO: este bloco só devolve 409 **no dia 19/10 depois das 01:00**, porque
+### é essa a partida do plano 1001. Ensaiando antes, ele ainda é futuro e o
+### cancelamento é ACEITO (200) — não é defeito, é o relógio. A demonstração
+### garantida em qualquer dia é a do bloco 5.2.
+###
+### Para ensaiar este bloco hoje, suba a aplicação com o relógio fixo no dia da
+### apresentação (ver README, "Ensaiar com o relógio fixo"):
+###   ./mvnw spring-boot:run -Dspring-boot.run.arguments=--app.relogio.instante-fixo=2026-10-19T10:00:00
 ###
 # 409 em 19/10 — "Não é possível cancelar o plano: a partida (19/10 01:00) já ocorreu"
 POST {{host}}/planos/1001/cancelamento

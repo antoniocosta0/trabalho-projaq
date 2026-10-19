@@ -6,6 +6,8 @@ import com.pucrs.planosdevoo.domain.model.VerificadorDeConflitos;
 import com.pucrs.planosdevoo.domain.ports.out.Transacao;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import java.time.Clock;
+import java.time.LocalDateTime;
 
 // UC10 — Aprovar plano. Integral: ou aprova e reserva tudo, ou não muda nada.
 public class AprovarPlanoUC {
@@ -14,13 +16,15 @@ public class AprovarPlanoUC {
     private final RepositorioReservas reservas;
     private final VerificadorDeConflitos verificador;
     private final Transacao transacao;
+    private final Clock relogio;
 
     public AprovarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
-                          VerificadorDeConflitos verificador, Transacao transacao) {
+                          VerificadorDeConflitos verificador, Transacao transacao, Clock relogio) {
         this.planos = planos;
         this.reservas = reservas;
         this.verificador = verificador;
         this.transacao = transacao;
+        this.relogio = relogio;
     }
 
     // Tudo roda numa transação só: a situação e as reservas são gravadas juntas.
@@ -31,7 +35,7 @@ public class AprovarPlanoUC {
         return transacao.executar(() -> {
             PlanoDeVoo plano = planos.buscarPorId(planoId)
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Plano " + planoId + " não encontrado"));
-            plano.aprovar(verificador.verificar(plano));
+            plano.aprovar(verificador.verificar(plano), LocalDateTime.now(relogio));
             PlanoDeVoo aprovado = planos.salvar(plano);
             reservas.reservar(aprovado.reservasDeAerovia(), aprovado.reservasDeVaga());
             return aprovado;

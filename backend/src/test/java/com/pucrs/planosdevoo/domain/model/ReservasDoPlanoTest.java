@@ -27,6 +27,9 @@ class ReservasDoPlanoTest {
         return LocalDateTime.of(2026, 10, 19, hora, minuto);
     }
 
+    // "Agora" na véspera: todo plano destes testes ainda está no futuro.
+    private static final LocalDateTime ANTES_DA_PARTIDA = LocalDateTime.of(2026, 10, 18, 12, 0);
+
     // POA -> FLN (sobrevoo) -> CWB (pouso na vaga 1, 30 min), partindo às 10:00.
     private static PlanoDeVoo planoValido(SituacaoPlano situacao, LocalDateTime partida) {
         PlanoDeVoo p = PlanoDeVoo.reconstituir(7L, PILOTO, PASSAGEIROS, POA, CWB, partida,
@@ -104,7 +107,7 @@ class ReservasDoPlanoTest {
     void aprovarPlanoValidoSemConflitoMudaParaAprovado() {
         PlanoDeVoo p = planoValido(SituacaoPlano.EM_EDICAO, em(10, 0));
 
-        p.aprovar(List.of());
+        p.aprovar(List.of(), ANTES_DA_PARTIDA);
 
         assertEquals(SituacaoPlano.APROVADO, p.getSituacao());
     }
@@ -114,7 +117,7 @@ class ReservasDoPlanoTest {
         PlanoDeVoo p = planoValido(SituacaoPlano.EM_EDICAO, em(10, 0));
 
         PlanoInvalidoException e = assertThrows(PlanoInvalidoException.class,
-                () -> p.aprovar(List.of("Trecho 1: altitude ocupada")));
+                () -> p.aprovar(List.of("Trecho 1: altitude ocupada"), ANTES_DA_PARTIDA));
 
         assertEquals(List.of("Trecho 1: altitude ocupada"), e.getProblemas());
         assertEquals(SituacaoPlano.EM_EDICAO, p.getSituacao());
@@ -125,17 +128,45 @@ class ReservasDoPlanoTest {
         PlanoDeVoo p = PlanoDeVoo.reconstituir(7L, PILOTO, PASSAGEIROS, POA, CWB, em(10, 0),
                 SituacaoPlano.EM_EDICAO, List.of());
 
-        PlanoInvalidoException e = assertThrows(PlanoInvalidoException.class, () -> p.aprovar(List.of()));
+        PlanoInvalidoException e = assertThrows(PlanoInvalidoException.class, () -> p.aprovar(List.of(), ANTES_DA_PARTIDA));
 
         assertTrue(e.getProblemas().get(0).contains("nenhum trecho"));
         assertEquals(SituacaoPlano.EM_EDICAO, p.getSituacao());
     }
 
     @Test
+    void naoAprovaPlanoCujaPartidaJaOcorreu() {
+        PlanoDeVoo p = planoValido(SituacaoPlano.EM_EDICAO, em(10, 0));
+        LocalDateTime depoisDaPartida = em(10, 1);
+
+        PlanoInvalidoException e = assertThrows(PlanoInvalidoException.class,
+                () -> p.aprovar(List.of(), depoisDaPartida));
+
+        assertTrue(e.getProblemas().stream().anyMatch(m -> m.contains("já ocorreu")));
+        assertEquals(SituacaoPlano.EM_EDICAO, p.getSituacao());
+    }
+
+    @Test
+    void aprovaPlanoQueParteNoInstanteSeguinteAoAgora() {
+        PlanoDeVoo p = planoValido(SituacaoPlano.EM_EDICAO, em(10, 0));
+
+        p.aprovar(List.of(), em(9, 59));
+
+        assertEquals(SituacaoPlano.APROVADO, p.getSituacao());
+    }
+
+    @Test
+    void naoAprovaPlanoQueParteExatamenteAgora() {
+        PlanoDeVoo p = planoValido(SituacaoPlano.EM_EDICAO, em(10, 0));
+
+        assertThrows(PlanoInvalidoException.class, () -> p.aprovar(List.of(), em(10, 0)));
+    }
+
+    @Test
     void soPlanoEmEdicaoPodeSerAprovado() {
         PlanoDeVoo p = planoValido(SituacaoPlano.APROVADO, em(10, 0));
 
-        assertThrows(OperacaoNaoPermitidaException.class, () -> p.aprovar(List.of()));
+        assertThrows(OperacaoNaoPermitidaException.class, () -> p.aprovar(List.of(), ANTES_DA_PARTIDA));
     }
 
     // ---------- cancelar (UC12) ----------

@@ -33,6 +33,18 @@ public abstract class Aeronave {
 
     public abstract String getCategoria();
 
+    // Os dados de cadastro, incluindo os que só existem na categoria. Cada
+    // subclasse responde pelos seus, então nem o controller nem o mapeador
+    // precisam perguntar "que tipo de aeronave é esta?".
+    public abstract DadosAeronave dados();
+
+    // Base comum, para as subclasses só preencherem o que é delas.
+    protected DadosAeronave dadosComuns(String empresaManutencao, String companhiaAerea,
+                                        Integer capacidadePassageiros, Double capacidadeToneladas) {
+        return new DadosAeronave(prefixo, getCategoria(), velocidadeCruzeiroKmh, autonomiaKm,
+                empresaManutencao, companhiaAerea, capacidadePassageiros, capacidadeToneladas);
+    }
+
     public String getPrefixo() { return prefixo; }
     public double getVelocidadeCruzeiroKmh() { return velocidadeCruzeiroKmh; }
     public double getAutonomiaKm() { return autonomiaKm; }

@@ -12,6 +12,9 @@ public class AeronaveParticular extends Aeronave {
     public AeronaveParticular(String prefixo, double velocidadeCruzeiroKmh, double autonomiaKm,
                               String empresaManutencao) {
         super(prefixo, velocidadeCruzeiroKmh, autonomiaKm);
+        if (empresaManutencao == null || empresaManutencao.isBlank()) {
+            throw new IllegalArgumentException("empresaManutencao é obrigatório para aeronave PARTICULAR");
+        }
         this.empresaManutencao = empresaManutencao;
     }
 
@@ -22,6 +25,11 @@ public class AeronaveParticular extends Aeronave {
 
     @Override
     public String getCategoria() { return "PARTICULAR"; }
+
+    @Override
+    public DadosAeronave dados() {
+        return dadosComuns(empresaManutencao, null, null, null);
+    }
 
     public String getEmpresaManutencao() { return empresaManutencao; }
 }
