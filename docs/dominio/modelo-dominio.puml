@@ -48,6 +48,11 @@ abstract class Aeronave {
   --
   distanciaMaxSemAbastecer() : double
   {abstract} podeOperar(altitude, entrada, saida) : boolean
+  {abstract} dados() : DadosAeronave
+}
+
+class FabricaDeAeronaves <<fábrica>> {
+  {static} criar(dados) : Aeronave
 }
 
 note left of Aeronave
@@ -56,7 +61,19 @@ note left of Aeronave
   e de janela de horário. Categoria nova
   entra como subclasse nova, sem alterar
   a validação do plano.
+  dados() faz o caminho inverso: cada
+  categoria responde pelos próprios
+  campos de cadastro.
 end note
+
+note right of FabricaDeAeronaves
+  Único ponto que conhece as subclasses.
+  Usada no cadastro (POST /aeronaves) e
+  ao ler do banco. Categoria nova = um
+  case novo aqui. Ver ADR 0006.
+end note
+
+FabricaDeAeronaves ..> Aeronave : cria
 
 class AeronaveParticular {
   empresaManutencao
@@ -81,7 +98,7 @@ class PlanoDeVoo <<raiz de agregado>> {
   alterarTrecho(ordem, aerovia, altitude, entrada, pouso)
   removerTrecho(ordem)
   validar() : List<String>
-  aprovar(conflitosDeReserva)
+  aprovar(conflitosDeReserva, agora)
   abandonar()
   cancelar(agora)
   reservasDeAerovia() : List<ReservaAerovia>

@@ -10,22 +10,22 @@ title
   <size:11>Exportado em 2026-10-18</size>
 end title
 
-System_Ext(cliente, "Cliente HTTP", "Postman, arquivo .http ou Swagger UI")
+System_Ext(cliente, "Cliente HTTP", "Postman, VS Code REST Client, curl. O Swagger UI nao entra aqui: e servido pelo proprio backend")
 ContainerDb(banco, "Banco de dados", "H2 em arquivo", "Rede aérea, pilotos, aeronaves, planos, trechos e reservas")
 
 Container_Boundary(api, "Backend (Spring Boot)") {
 
-  Component(adaptadores_entrada, "Adaptadores de entrada (REST)", "Spring Web MVC", "Controllers e DTOs de requisição e resposta, agrupados por assunto: Malha Aérea, Frota e Planos de Voo. Traduzem HTTP/JSON e códigos de status; nenhuma regra de negócio mora aqui")
+  Component(adaptadores_entrada, "Adaptadores de entrada (REST)", "Spring Web MVC", "Quatro controllers, por assunto: MalhaAerea, Frota, Disponibilidade e PlanoDeVoo. Mais os DTOs de requisição e resposta e o RestExceptionHandler, que traduz exceção de domínio em Problem Detail. Nenhuma regra de negócio mora aqui")
 
   Component(portas_entrada, "Portas de entrada (casos de uso)", "Java puro, publicados como beans", "Um caso de uso por operação: consultar malha e frota, criar plano, definir percurso, consultar disponibilidade, validar, aprovar, abandonar, cancelar e consultar planos. Orquestram o modelo e as portas de saída")
 
-  Component(modelo, "Modelo de domínio", "Java puro, sem framework", "PlanoDeVoo (raiz de agregado), Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e suas categorias, ReservaAerovia, ReservaVaga e o serviço VerificadorDeConflitos. Concentra as regras: percurso, horários, autonomia, altitudes e ocupação")
+  Component(modelo, "Modelo de domínio", "Java puro, sem framework", "PlanoDeVoo (raiz de agregado), Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e suas categorias, ReservaAerovia, ReservaVaga, o serviço VerificadorDeConflitos e a fábrica FabricaDeAeronaves. Concentra as regras: percurso, horários, autonomia, altitudes e ocupação")
 
   Component(portas_saida, "Portas de saída (repositórios)", "Interfaces Java", "RepositorioPlanosDeVoo, RepositorioAerovias, RepositorioAeroportos, RepositorioAeronaves, RepositorioPilotos, RepositorioReservas e Transacao (o bloco que grava tudo ou nada). Abstraem o acesso à persistência")
 
   Component(adaptadores_saida, "Adaptadores de persistência", "Spring Data JPA", "Implementam as portas de saída. Entidades de banco separadas das entidades de domínio, com mapeadores entre as duas")
 
-  Component(config, "Configuração", "Spring @Configuration", "Monta os casos de uso injetando os adaptadores por construtor (UseCaseConfig)")
+  Component(config, "Configuração", "Spring @Configuration", "UseCaseConfig monta os casos de uso injetando os adaptadores por construtor, e publica o Clock usado por aprovação e cancelamento. OpenApiConfig descreve o documento OpenAPI")
 }
 
 Rel(cliente, adaptadores_entrada, "Requisições", "HTTP/JSON")
