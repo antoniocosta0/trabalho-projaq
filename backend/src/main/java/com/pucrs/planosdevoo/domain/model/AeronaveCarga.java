@@ -13,6 +13,12 @@ public class AeronaveCarga extends Aeronave {
     public AeronaveCarga(String prefixo, double velocidadeCruzeiroKmh, double autonomiaKm,
                          String companhiaAerea, double capacidadeToneladas) {
         super(prefixo, velocidadeCruzeiroKmh, autonomiaKm);
+        if (companhiaAerea == null || companhiaAerea.isBlank()) {
+            throw new IllegalArgumentException("companhiaAerea é obrigatório para aeronave CARGA");
+        }
+        if (capacidadeToneladas <= 0) {
+            throw new IllegalArgumentException("capacidadeToneladas deve ser positiva");
+        }
         this.companhiaAerea = companhiaAerea;
         this.capacidadeToneladas = capacidadeToneladas;
     }
@@ -28,6 +34,11 @@ public class AeronaveCarga extends Aeronave {
 
     @Override
     public String getCategoria() { return "CARGA"; }
+
+    @Override
+    public DadosAeronave dados() {
+        return dadosComuns(null, companhiaAerea, null, capacidadeToneladas);
+    }
 
     public String getCompanhiaAerea() { return companhiaAerea; }
     public double getCapacidadeToneladas() { return capacidadeToneladas; }

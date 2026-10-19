@@ -41,6 +41,10 @@ GET {{host}}/pilotos
 ### 1.4 Consultar aeronaves (UC04)
 # 200 — 4 aeronaves das três categorias:
 #   PP-PAR e PP-CUR (PARTICULAR), PR-PAX (PASSAGEIROS), PR-CRG (CARGA).
+# Cada uma traz os campos da SUA categoria, e só eles: empresaManutencao nas
+# particulares, companhiaAerea e capacidadePassageiros nas de passageiros,
+# companhiaAerea e capacidadeToneladas nas de carga. Quem decide isso é a
+# própria aeronave, por polimorfismo — ver ADR 0006.
 # Repare no PP-CUR: autonomia de 1000 km, curta de propósito (ver 3.5).
 GET {{host}}/aeronaves
 
