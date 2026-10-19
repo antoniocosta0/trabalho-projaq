@@ -53,6 +53,15 @@
 		</dependency>
 
 		<!-- OpenAPI / Swagger UI (exigido pelo enunciado, secao 8.5). -->
+		<!-- MockMvc: no Spring Boot 4 o suporte saiu do starter-test e virou
+		     modulo proprio. Usado pelos testes de API em
+		     infra/adapters/in/rest. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
