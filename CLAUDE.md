@@ -744,7 +744,7 @@ essencial:
 
 | Elemento | Convenção | Exemplo |
 |---|---|---|
-| Classe / interface / record | `PascalCase` | `PlanoDeVoo`, `AprovarPlanoUseCase` |
+| Classe / interface / record | `PascalCase` | `PlanoDeVoo`, `AprovarPlanoUC` |
 | Arquivo | `PascalCase.java`, nome da classe pública | `PlanoDeVoo.java` |
 | Método | `camelCase`, começa com verbo | `adicionarTrecho`, `slotsOcupados` |
 | Booleano | prefixo `is`/`has`/`can`/`should` ou `pode`/`possui` | `podeOperar`, `possuiVaga` |
@@ -755,10 +755,13 @@ essencial:
 | Classe de teste | `<Classe>Test` | `SlotTest.java` |
 
 **Sufixos da hexagonal** — o sufixo diz em que pasta a classe mora:
-`...UseCase` (porta de entrada), `...Repository` (porta de saída),
-`Jpa...Repository` (adaptador de saída), `...Entity` e `...Mapper`
-(persistência), `...Controller` (adaptador de entrada), `...Request` /
-`...Response` (DTOs), `...Config` (configuração).
+`...UC` (caso de uso, classe concreta em `domain.ports.in.usecases`),
+`Repositorio...` (porta de saída), `Repositorio...JPA` e
+`...SpringDataRepository` (adaptadores de saída), `...JpaEntity` e `...Mapper`
+(persistência), `...Controller` (adaptador de entrada), `...RequestDTO` /
+`...ResponseDTO` (DTOs), `...Config` (configuração). Os pacotes de
+`infra.adapters` são planos: nada de subpastas `dto/`, `entity/` ou `mapper/`.
+A tabela completa está em `docs/padroes-desenvolvimento.md`, seção 2.1.
 
 **Idioma:** domínio em **português**, infraestrutura em **inglês**. É uma
 divergência consciente do padrão de AGES II (que manda tudo em inglês), porque
@@ -1103,7 +1106,7 @@ As que custam nota e são fáceis de deixar passar:
 - [x] Banco persistindo entre reinicializações (H2 em arquivo).
 - [x] Carga inicial rodando do zero: malha, pilotos, aeronaves e os quatro
       planos aprovados com suas reservas.
-- [x] Testes das regras de cálculo passando: 88 testes, verdes também no CI.
+- [x] Testes das regras de cálculo passando: 127 testes, verdes também no CI.
 - [ ] Quais UCs estão prontos, listados no `log.md` — o log local desta máquina
       está sendo posto em dia.
 

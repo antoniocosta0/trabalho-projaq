@@ -316,13 +316,14 @@ Na prática: você anota as classes como beans (`@Component`, `@Service`,
 teste sem subir o Spring:
 
 ```java
-@Service
-public class AprovarPlanoService implements AprovarPlanoUseCase {
+// Sem anotação do Spring: quem registra o caso de uso como bean é a
+// UseCaseConfig, em infra/config. Assim domain/ não importa framework.
+public class AprovarPlanoUC {
 
-    private final PlanoRepository planoRepository;
+    private final RepositorioPlanosDeVoo planos;
 
-    public AprovarPlanoService(PlanoRepository planoRepository) {
-        this.planoRepository = planoRepository;
+    public AprovarPlanoUC(RepositorioPlanosDeVoo planos) {
+        this.planos = planos;
     }
 }
 ```
@@ -849,21 +850,20 @@ backend/
     ├── main/java/com/pucrs/planosdevoo/
     │   ├── PlanosDeVooApplication.java  ponto de entrada do Spring Boot
     │   ├── domain/                      NÃO conhece Spring, JPA nem infra
-    │   │   ├── model/                   entidades, value objects, enums, serviços de domínio
-    │   │   ├── servicos/                implementações dos casos de uso (...Service)
+    │   │   ├── model/                 entidades, value objects, enums, serviços de domínio e fábricas
     │   │   └── ports/
-    │   │       ├── in/                  interfaces dos casos de uso (...UseCase)
-    │   │       └── out/                 interfaces dos repositórios (...Repository)
-    │   └── infra/                       conhece domain; a seta é sempre para dentro
+    │   │       ├── in/usecases/        casos de uso (...UC) e parâmetros (...Command)
+    │   │       └── out/
+    │   │           ├── Transacao       porta de transação
+    │   │           └── repositories/   portas de persistência (Repositorio...)
+    │   └── infra/                      conhece domain; a seta é sempre para dentro
     │       ├── adapters/
-    │       │   ├── in/rest/             controllers (...Controller)
-    │       │   │   ├── dto/             ...Request e ...Response
-    │       │   │   └── exception/       erro de domínio → status HTTP
-    │       │   └── out/persistence/
-    │       │       ├── entity/          entidades de banco (...Entity)
-    │       │       ├── repository/      implementação das portas (Jpa...Repository)
-    │       │       └── mapper/          conversão domínio ↔ persistência (...Mapper)
-    │       └── config/                  beans de configuração (...Config)
+    │       │   ├── in/rest/            controllers (...Controller), DTOs (...RequestDTO,
+    │       │   │                       ...ResponseDTO) e o RestExceptionHandler
+    │       │   └── out/persistence/    entidades de banco (...JpaEntity), repositórios do
+    │       │                           Spring Data (...SpringDataRepository), adaptadores
+    │       │                           (Repositorio...JPA) e mapeadores (...Mapper)
+    │       └── config/                 UseCaseConfig e OpenApiConfig
     ├── main/resources/
     │   ├── application.properties
     │   └── db/{schema.sql, data.sql}
@@ -896,11 +896,11 @@ o isolamento. É a decisão que precisa ser defendida explicitamente.
 | Pasta | O que mora aqui | O que NÃO mora aqui |
 |---|---|---|
 | `domain/model` | `PlanoDeVoo`, `Trecho`, `Pouso`, `Aerovia`, `Aeroporto`, `Aeronave` e subclasses, `Piloto`, `ReservaAerovia`, `ReservaVaga`, `Slot`, os enums | qualquer `import` de framework |
-| `domain/servicos` | `AprovarPlanoService`, `ValidarPlanoService` — orquestração | regra que pertence à entidade |
-| `domain/ports/in` | `CriarPlanoUseCase`, `AprovarPlanoUseCase`… (interfaces) | implementação |
-| `domain/ports/out` | `PlanoRepository`, `AeroviaRepository`… (interfaces) | JPA, SQL |
-| `infra/adapters/in/rest` | `PlanoController`, `MalhaController` | regra de negócio, consulta ao banco |
-| `infra/adapters/out/persistence` | `PlanoEntity`, `JpaPlanoRepository`, `PlanoMapper` | regra de negócio |
+| `domain/model` | além das entidades: `VerificadorDeConflitos` (serviço de domínio) e `FabricaDeAeronaves` | qualquer import de Spring ou JPA |
+| `domain/ports/in/usecases` | `CriarPlanoUC`, `AprovarPlanoUC`… — **classes concretas**, não interfaces | regra que pertence à entidade |
+| `domain/ports/out` | `RepositorioPlanosDeVoo`, `RepositorioAerovias`… (interfaces) e `Transacao` | JPA, SQL |
+| `infra/adapters/in/rest` | `PlanoDeVooController`, `MalhaAereaController`, `FrotaController`, `DisponibilidadeController`, DTOs e `RestExceptionHandler` | regra de negócio, consulta ao banco |
+| `infra/adapters/out/persistence` | `PlanoDeVooJpaEntity`, `RepositorioPlanosDeVooJPA`, `PlanoDeVooMapper`, `TransacaoSpring` | regra de negócio |
 | `infra/config` | ligação entre porta e adaptador | lógica |
 
 ### 11.3 Regras de implementação
@@ -929,10 +929,17 @@ o isolamento. É a decisão que precisa ser defendida explicitamente.
 ### 11.5 Um desvio da referência, registrado
 
 O estudo de caso da cadeira coloca entidades **e** serviços juntos em
-`Domain/Model`. Aqui os serviços que implementam casos de uso foram separados em
-`domain/servicos/`, para que `model/` fique só com o modelo. É um refinamento,
-não uma mudança de estilo — mas, por ser desvio da referência, está registrado e
-deve ser citado na apresentação.
+`Domain/Model`, e marca os casos de uso com `@Component`. Aqui há dois desvios,
+ambos deliberados e citáveis na apresentação:
+
+1. **Os casos de uso não têm anotação nenhuma do Spring.** Viram beans em
+   `infra/config/UseCaseConfig`, por construtor. O `P7a` pede "a maior
+   independência possível" do modelo em relação ao framework, e assim `domain/`
+   fica sem um único import de Spring — o que o CI verifica a cada push.
+2. **O serviço de domínio ficou em `model/`, não numa pasta `servicos/`.** O
+   `VerificadorDeConflitos` é a única peça desse tipo: uma pasta só para ele
+   separaria por tipo técnico em vez de por assunto. Se aparecer um segundo
+   serviço, vale reavaliar.
 
 ---
 
@@ -971,7 +978,7 @@ ruim, mesmo com o código certo.
 
 | Elemento | Formato | Exemplo |
 |---|---|---|
-| Classe / interface / record | `PascalCase` | `PlanoDeVoo`, `AprovarPlanoUseCase` |
+| Classe / interface / record | `PascalCase` | `PlanoDeVoo`, `AprovarPlanoUC` |
 | Arquivo | `PascalCase.java`, nome da classe pública | `PlanoDeVoo.java` |
 | Pacote | minúsculas, sem `_` nem hífen | `com.pucrs.planosdevoo.domain.model` |
 | Método | `camelCase`, começa com verbo | `adicionarTrecho()`, `slotsOcupados()` |
@@ -987,10 +994,10 @@ ruim, mesmo com o código certo.
 
 | Papel | Sufixo | Pacote |
 |---|---|---|
-| Porta de entrada | `UseCase` | `domain.ports.in` |
+| Caso de uso | `UC` | `domain.ports.in.usecases` |
 | Implementação do caso de uso | `Service` | `domain.servicos` |
 | Porta de saída | `Repository` | `domain.ports.out` |
-| Adaptador de saída | `Jpa...Repository` | `infra.adapters.out.persistence.repository` |
+| Adaptador de saída | `Repositorio...JPA` | `infra.adapters.out.persistence` |
 | Entidade de persistência | `Entity` | `...persistence.entity` |
 | Mapeador | `Mapper` | `...persistence.mapper` |
 | Adaptador de entrada | `Controller` | `infra.adapters.in.rest` |

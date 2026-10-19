@@ -64,7 +64,7 @@ Trocar JPA por JDBC, se a decisão mudar, altera só os adaptadores de saída.
 
 **Custa.** Duplicação de estrutura. Cada atributo novo em uma entidade de
 domínio exige o atributo correspondente na entidade JPA e as duas linhas no
-mapeador. Para `Trecho`, `Pouso` e as duas reservas, que ainda vão ser
+mapeador. Para `Trecho`, `Pouso` e as duas reservas, que foram
 escritos, são seis classes a mais do que seriam com a alternativa 1. É o custo
 que esta decisão assume conscientemente.
 
