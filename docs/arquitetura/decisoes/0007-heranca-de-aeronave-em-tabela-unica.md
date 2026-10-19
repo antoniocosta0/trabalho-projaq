@@ -48,7 +48,8 @@ colunas específicas de cada categoria, anuláveis: `empresa_manutencao`,
 
 Do lado Java há **uma única** entidade de persistência plana,
 `AeronaveJpaEntity`, sem anotação de herança. A coluna `categoria` é o
-discriminador, e o `FrotaMapper` decide qual subclasse de domínio instanciar.
+discriminador, e a `FabricaDeAeronaves` decide qual subclasse de domínio
+instanciar — o `FrotaMapper` apenas a chama.
 
 ## Consequências
 
@@ -60,7 +61,9 @@ e, se tiver atributo próprio, uma coluna anulável a mais.
 **Custa.** Colunas nulas: uma aeronave particular tem `companhia_aerea`,
 `capacidade_passageiros` e `capacidade_toneladas` em branco. O banco não
 consegue impor "aeronave de carga tem que ter capacidade em toneladas" — essa
-validação passa a ser responsabilidade do domínio, no construtor da subclasse.
+validação passa a ser responsabilidade do domínio: o construtor de cada
+subclasse recusa o que não faz sentido para a categoria, e a
+`FabricaDeAeronaves` recusa antes disso o campo ausente.
 É a troca consciente desta decisão: menos integridade declarativa, mais
 flexibilidade de extensão.
 
@@ -69,7 +72,7 @@ flexibilidade de extensão.
 - A obrigatoriedade dos atributos de cada categoria é validada no construtor da
   subclasse correspondente, já que o banco não pode fazê-lo.
 - O valor de `categoria` gravado é a `String` devolvida por
-  `Aeronave.getCategoria()`, e precisa bater com o `case` do `FrotaMapper`.
+  `Aeronave.getCategoria()`, e precisa bater com o `case` da `FabricaDeAeronaves`.
   Nunca gravar ordinal de enum.
 - Atributo novo de categoria entra como coluna **anulável**, para não quebrar
   as linhas das outras categorias.

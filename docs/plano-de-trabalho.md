@@ -255,7 +255,7 @@ no mais tardar.
 - **Os 14 casos de uso**: UC01 a UC14, todos com endpoint. UC01–UC05, UC13 e
   UC14 no PR #2; UC06, UC09 e UC11 no PR #8; UC07, UC08, UC10 e UC12 no PR #10
 - **Todas as cinco frentes concluídas**, A a E
-- 104 testes automatizados, verdes, rodando também no CI com JDK 25
+- 127 testes automatizados, verdes, rodando também no CI com JDK 25
 - Carga inicial com planos aprovados, ocupando 6 das 8 aerovias na data de
   referência, e os quatro cadastros atendendo o §8.1
 - As nove decisões arquiteturais escritas como ADR, de 0001 a 0009

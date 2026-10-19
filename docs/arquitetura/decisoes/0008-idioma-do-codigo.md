@@ -28,7 +28,7 @@ ser o nome que aparece no código, sem tradução no meio do caminho.
 2. **Tudo em português, inclusive a infraestrutura.** Vantagem: um idioma só,
    sem regra para decorar. Desvantagem: a infraestrutura conversa com
    bibliotecas em inglês, e sairiam nomes híbridos como
-   `PlanoDeVooRestControlador` ou `RepositorioJpaDeAerovias` ao lado de
+   `PlanoDeVooRestControlador` ou `RepositorioDeAeroviasJpa` ao lado de
    `JpaRepository` e `@RestController`. Não foi escolhida por ficar pior nos
    dois lados.
 

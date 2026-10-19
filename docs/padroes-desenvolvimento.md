@@ -47,7 +47,7 @@ commits.
 
 | Elemento | Formato | Regra | Exemplos |
 |---|---|---|---|
-| **Classe / interface / record** | `PascalCase` | nome representando entidade ou responsabilidade | `PlanoDeVoo` · `AprovarPlanoUseCase` |
+| **Classe / interface / record** | `PascalCase` | nome representando entidade ou responsabilidade | `PlanoDeVoo` · `AprovarPlanoUC` |
 | **Arquivo** | `PascalCase.java` | mesmo nome da classe pública | `PlanoDeVoo.java` |
 | **Pacote** | minúsculas, sem `_` nem hífen | um segmento por nível da arquitetura | `com.<grupo>.planosdevoo.domain.model` |
 | **Método** | `camelCase` | preferencialmente iniciar com verbo | `calcularChegada()` · `slotsOcupados()` |
@@ -65,16 +65,28 @@ Cada papel tem um sufixo, e o sufixo diz em que pasta a classe mora:
 
 | Papel | Sufixo | Pacote | Exemplo |
 |---|---|---|---|
-| Porta de entrada (caso de uso) | `UseCase` | `domain.ports.in` | `AprovarPlanoUseCase` |
-| Implementação do caso de uso | `Service` | `domain.servicos` | `AprovarPlanoService` |
-| Porta de saída | `Repository` | `domain.ports.out` | `PlanoRepository` |
-| Adaptador de saída | prefixo da tecnologia + `Repository` | `infra.adapters.out.persistence` | `JpaPlanoRepository` |
-| Entidade de persistência | sufixo `Entity` | `infra.adapters.out.persistence` | `PlanoEntity` |
-| Mapeador domínio ↔ persistência | sufixo `Mapper` | `infra.adapters.out.persistence` | `PlanoMapper` |
-| Adaptador de entrada | `Controller` | `infra.adapters.in.rest` | `PlanoController` |
-| DTO de entrada | `Request` | `infra.adapters.in.rest.dto` | `CriarPlanoRequest` |
-| DTO de saída | `Response` | `infra.adapters.in.rest.dto` | `PlanoResponse` |
-| Bean de configuração | `Config` | `infra.config` | `BeansConfig` |
+| Caso de uso (porta de entrada) | `UC` | `domain.ports.in.usecases` | `AprovarPlanoUC` |
+| Parâmetros de um caso de uso | `Command` | `domain.ports.in.usecases` | `CriarPlanoCommand` |
+| Porta de saída de persistência | prefixo `Repositorio` | `domain.ports.out.repositories` | `RepositorioPlanosDeVoo` |
+| Outras portas de saída | sem sufixo | `domain.ports.out` | `Transacao` |
+| Serviço de domínio | sem sufixo | `domain.model` | `VerificadorDeConflitos` |
+| Fábrica de domínio | prefixo `Fabrica` | `domain.model` | `FabricaDeAeronaves` |
+| Adaptador de saída | `JPA` | `infra.adapters.out.persistence` | `RepositorioAeroviasJPA` |
+| Repositório do Spring Data | `SpringDataRepository` | `infra.adapters.out.persistence` | `AeroviaSpringDataRepository` |
+| Entidade de persistência | `JpaEntity` | `infra.adapters.out.persistence` | `PlanoDeVooJpaEntity` |
+| Mapeador domínio e persistência | `Mapper` | `infra.adapters.out.persistence` | `PlanoDeVooMapper` |
+| Adaptador de entrada | `Controller` | `infra.adapters.in.rest` | `PlanoDeVooController` |
+| DTO de entrada | `RequestDTO` | `infra.adapters.in.rest` | `TrechoRequestDTO` |
+| DTO de saída | `ResponseDTO` | `infra.adapters.in.rest` | `PlanoResponseDTO` |
+| Bean de configuração | `Config` | `infra.config` | `UseCaseConfig` |
+
+**Os pacotes de `infra.adapters` são planos**: DTOs, entidades, mapeadores e
+repositórios convivem na mesma pasta, distinguidos pelo sufixo. Não há
+subpastas `dto/`, `entity/`, `repository/` nem `mapper/`.
+
+**O caso de uso é uma classe concreta, não uma interface com implementação
+separada.** É o que o estudo de caso da cadeira faz, e evita uma interface com
+um único implementador — ver a ADR 0001.
 
 Classe sem sufixo reconhecível em pasta de infraestrutura é sinal de que o
 papel dela não foi pensado.

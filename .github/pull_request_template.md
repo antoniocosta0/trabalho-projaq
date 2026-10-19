@@ -21,7 +21,7 @@
 ## Validação de Arquitetura
 
 - [ ] `domain/` não importa `infra`, `org.springframework` nem `jakarta.persistence` (nem anotação).
-- [ ] Caso de uso novo tem porta em `domain/ports/in`, com o sufixo `UseCase`.
+- [ ] Caso de uso novo é uma classe `...UC` em `domain/ports/in/usecases`.
 - [ ] Acesso a dado novo passa por porta em `domain/ports/out`, implementada em `infra/adapters/out/persistence`.
 - [ ] Controller só traduz HTTP: sem regra de negócio, sem consulta ao banco.
 - [ ] Entrada e saída da API são DTOs (`...Request` / `...Response`), nunca a entidade de domínio serializada.

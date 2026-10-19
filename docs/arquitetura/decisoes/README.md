@@ -19,3 +19,4 @@ principais alternativas consideradas e a justificativa da escolha** (seção 7.4
 | 0007 | Estratégia de herança da hierarquia de aeronaves no banco | [escrita](0007-heranca-de-aeronave-em-tabela-unica.md) |
 | 0008 | Idioma do código: domínio em português, infraestrutura em inglês | [escrita](0008-idioma-do-codigo.md) |
 | 0009 | Cadastros fora da lista de casos de uso | [escrita](0009-cadastros-fora-da-lista-de-casos-de-uso.md) |
+| 0010 | Interpretações do enunciado (bordas de slot, janela da carga, arredondamento, relógio) | [escrita](0010-interpretacoes-do-enunciado.md) |

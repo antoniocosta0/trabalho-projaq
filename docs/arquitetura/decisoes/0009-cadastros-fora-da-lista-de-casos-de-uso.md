@@ -79,7 +79,8 @@ arquitetura.
   `domain/ports/in`, DTO de entrada e de saída, controller sem regra. Não são
   exceção por serem CRUD.
 - O cadastro de aeronave instancia a subclasse pela categoria em um único ponto
-  (`FrotaMapper`), sem `instanceof` nem `switch` espalhado — é a mesma restrição
+  (`FabricaDeAeronaves`, no domínio), sem `instanceof` nem `switch` espalhado —
+  é a mesma restrição
   da ADR 0006, e é o que faz o §2 valer para categorias novas.
 - Um aeroporto cadastrado pela API precisa poder ser usado num plano na mesma
   execução, sem reiniciar a aplicação: é esse o teste do §2.

@@ -81,6 +81,15 @@ infra/
 
 ## Consequências
 
+**As portas de entrada são classes concretas, não interfaces.** `AprovarPlanoUC`
+é a própria classe, em `domain/ports/in/usecases`, e não uma interface
+`AprovarPlanoUseCase` com um `AprovarPlanoService` que a implementa. É o que o
+estudo de caso da cadeira faz, e evita uma interface com um único implementador
+— abstração que não abstrai nada e dobra o número de arquivos. O custo: trocar a
+implementação de um caso de uso exige editar a classe, não apontar o bean para
+outra. Para este sistema, onde não há duas implementações de caso de uso nem
+previsão de haver, o custo não se realiza.
+
 **Facilita.** Toda regra de negócio é testável sem subir o Spring e sem banco:
 `SlotTest`, `TrechoTest` e os testes de validação do plano rodam como JUnit
 puro. Trocar JPA por JDBC, ou H2 por PostgreSQL, não toca em nenhuma classe de
