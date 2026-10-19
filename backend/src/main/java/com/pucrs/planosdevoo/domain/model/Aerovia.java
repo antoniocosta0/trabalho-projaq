@@ -17,6 +17,12 @@ public class Aerovia {
         if (origem == null || destino == null) {
             throw new IllegalArgumentException("Aerovia precisa de origem e destino");
         }
+        // Aerovia e orientada e liga DOIS aeroportos: um trecho que sai e chega
+        // no mesmo lugar nao e percurso, e passaria por toda a validacao.
+        if (origem.getCodigo().equals(destino.getCodigo())) {
+            throw new IllegalArgumentException("Aerovia precisa ligar dois aeroportos diferentes: "
+                    + origem.getCodigo() + " foi informado como origem e destino");
+        }
         if (distanciaKm <= 0) {
             throw new IllegalArgumentException("Distância da aerovia deve ser positiva");
         }

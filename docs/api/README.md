@@ -20,8 +20,9 @@ falha, não só o caminho feliz.
 > aeroporto e uma aerovia novos e usá-los num plano aprovado, sem reiniciar a
 > aplicação.
 
-O formato é o mesmo do `testRequests.http` do exemplo da biblioteca, em
-`PROJAQ/Exercícios e Trabalhos/SemanaDia31-08/ex1-biblioteca-v3-rotasComParametros/`.
+O formato é o do REST Client do VS Code, que também abre no IntelliJ. Quem
+preferir linha de comando pode traduzir cada bloco para `curl`: método, rota,
+cabeçalho e corpo estão explícitos.
 
 A documentação formal da API é gerada por OpenAPI (springdoc), e o Swagger UI
 serve como ferramenta de demonstração.

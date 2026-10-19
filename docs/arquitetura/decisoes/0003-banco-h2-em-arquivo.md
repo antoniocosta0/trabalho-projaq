@@ -66,7 +66,7 @@ ser revisados — o código Java, não, por causa das ADRs 0001 e 0002.
 - `data.sql` usa `MERGE ... KEY (...)` em vez de `INSERT`, porque o script roda
   a cada inicialização e o banco em arquivo persiste entre elas.
 - O `README.md` precisa dizer como apagar o banco e recomeçar do zero.
-- O roteiro de verificação do `CLAUDE.md` §14.4 — apagar o banco, subir,
+- O roteiro de verificação da entrega — apagar o banco, subir,
   conferir as contagens, aprovar um plano, **reiniciar** e confirmar que ele
   continua lá — é a prova de que esta decisão atende o §8.2, e precisa rodar
   antes da entrega.

@@ -90,12 +90,48 @@ cd backend
 A aplicação sobe em **http://localhost:8080**. O primeiro start demora mais,
 porque o Maven baixa as dependências.
 
+No Windows, use `mvnw.cmd` no lugar de `./mvnw`:
+
+```bat
+cd backend
+mvnw.cmd spring-boot:run
+```
+
 Para compilar e rodar os testes:
 
 ```sh
 cd backend
 ./mvnw clean test
 ```
+
+### Primeira requisição, em dois minutos
+
+Com a aplicação no ar, esta consulta mostra a ocupação que a carga inicial já
+traz na data de referência — a altitude de 31.000 pés **não** aparece na lista,
+porque um plano aprovado do seed a reservou:
+
+```sh
+curl "http://localhost:8080/aerovias/R2/altitudes-disponiveis?inicio=2026-10-19T21:00:00&fim=2026-10-19T23:00:00"
+```
+
+E esta mostra de onde veio essa ocupação:
+
+```sh
+curl http://localhost:8080/planos/1003
+```
+
+O roteiro completo, com as 17 demonstrações, está em
+[`docs/api/requests.http`](docs/api/requests.http) e resumido em
+[`docs/roteiro-apresentacao.md`](docs/roteiro-apresentacao.md).
+
+### Se algo der errado
+
+| Sintoma | O que fazer |
+|---|---|
+| `Web server failed to start. Port 8080 was already in use` | outra aplicação está na porta: `lsof -ti:8080 \| xargs kill` (no Windows, `netstat -ano \| findstr :8080` e `taskkill /PID <pid> /F`) |
+| `release version 25 not supported` | o Java no `PATH` não é o 25: confira com `java -version` |
+| `Database may be already in use` ou um `.lock.db` preso | a aplicação não encerrou direito: `rm -rf backend/data` (no Windows, `rmdir /s /q backend\data`) e suba de novo |
+| As demonstrações de cancelamento não dão o resultado esperado | elas dependem da data: veja *Ensaiar com o relógio fixo* |
 
 Para gerar o `.jar`:
 
@@ -154,6 +190,7 @@ URL base: **http://localhost:8080**
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | Documento OpenAPI | http://localhost:8080/v3/api-docs |
 | Roteiro de requisições | [`docs/api/requests.http`](docs/api/requests.http) |
+| Roteiro da apresentação, as 17 demonstrações | [`docs/roteiro-apresentacao.md`](docs/roteiro-apresentacao.md) |
 
 O `requests.http` cobre o ciclo completo de um plano e os casos de falha, na
 ordem da apresentação, com o resultado esperado comentado em cada bloco. Abre
@@ -180,6 +217,41 @@ de problemas quando há mais de um:
 | Corpo da requisição inválido | 400 |
 | Regra de negócio violada | 422 |
 
+### Endpoints
+
+| Método | Rota | O que faz |
+|---|---|---|
+| `GET` | `/aeroportos` · `/aerovias` · `/pilotos` · `/aeronaves` | consultam a malha e a frota (UC01 a UC04) |
+| `POST` | `/aeroportos` · `/aerovias` · `/pilotos` · `/aeronaves` | cadastram. Aerovia não tem `PUT` nem `DELETE`: é imutável |
+| `GET` | `/aerovias/{id}/altitudes-disponiveis?inicio=&fim=` | altitudes livres no período (UC07) |
+| `GET` | `/aeroportos/{codigo}/vagas-disponiveis?inicio=&fim=` | vagas livres no período (UC08) |
+| `POST` | `/planos` | cria o plano, em edição (UC05) |
+| `GET` | `/planos` · `/planos?situacao=` · `/planos/{id}` | consultam (UC13, UC14) |
+| `POST` `PUT` `DELETE` | `/planos/{id}/trechos[/{ordem}]` | montam e alteram o percurso (UC06) |
+| `POST` | `/planos/{id}/validacao` | valida sem alterar nada (UC09) |
+| `POST` | `/planos/{id}/aprovacao` | aprova e reserva, tudo ou nada (UC10) |
+| `POST` | `/planos/{id}/cancelamento` | cancela e libera as reservas (UC12) |
+| `POST` | `/planos/{id}/abandono` | abandona um plano em edição (UC11) |
+
+## Limitações conhecidas
+
+São escolhas, não defeitos — e estão registradas em
+[`docs/arquitetura/decisoes/0010-interpretacoes-do-enunciado.md`](docs/arquitetura/decisoes/0010-interpretacoes-do-enunciado.md):
+
+- **A duração de cada trecho é arredondada ao minuto.** 363 km a 830 km/h dá 26
+  min e 14 s, e o sistema usa 26 min. Sem isso, nenhum horário digitado pelo
+  usuário bateria com a chegada calculada.
+- **Cancelar e aprovar dependem do relógio**, porque as duas regras falam da
+  partida ter ocorrido ou não. Para ensaiar em outra data, veja a seção
+  *Ensaiar com o relógio fixo*.
+- **Só o percurso é editável** depois de criado o plano. Trocar piloto, aeronave
+  ou horário de partida exige criar outro plano — mudar a aeronave invalidaria
+  todos os horários já calculados.
+- **O console do H2 fica habilitado** em `/h2-console`. É conveniência de
+  demonstração; num sistema real ele não iria para produção assim.
+- **Não há autenticação.** O enunciado não pede, e a API é exposta apenas em
+  `localhost`.
+
 ## Documentação
 
 | O que | Onde |
@@ -190,7 +262,7 @@ de problemas quando há mais de um:
 | Decisões arquiteturais (ADR) | [`docs/arquitetura/decisoes/`](docs/arquitetura/decisoes/) |
 | Padrões de desenvolvimento | [`docs/padroes-desenvolvimento.md`](docs/padroes-desenvolvimento.md) |
 | Plano de trabalho da equipe | [`docs/plano-de-trabalho.md`](docs/plano-de-trabalho.md) |
-| Guia de contexto do repositório | [`CLAUDE.md`](CLAUDE.md) |
+| Guia de contexto para ferramentas de IA (não faz parte da entrega) | [`CLAUDE.md`](CLAUDE.md) e `CONTEXT_NEW.md` |
 | Enunciado | `PAS_TF_2026_2_PlanosDeVoo (1).md` |
 
 ## Arquitetura, em uma olhada

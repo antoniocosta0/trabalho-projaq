@@ -1,7 +1,9 @@
 ### Roteiro de requisições — Sistema de Gestão de Planos de Voo
 ### PUCRS · Projeto e Arquitetura de Software · 2026/2 · turma 340
 ###
-### As 17 demonstrações da seção 16.3 do CLAUDE.md, na ordem da apresentação.
+### As 17 demonstrações exigidas, na ordem da apresentação. O mapa de cada
+### uma está em ../roteiro-apresentacao.md.
+###
 ### Cada bloco traz o resultado esperado. **Todas as respostas comentadas aqui
 ### foram obtidas executando as requisições contra a aplicação em 18/10/2026**,
 ### com o banco apagado antes — não são respostas presumidas.

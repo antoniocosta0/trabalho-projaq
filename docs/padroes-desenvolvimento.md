@@ -2,7 +2,7 @@
 
 Adaptado dos padrões usados no projeto de AGES II, trocando React/TS e Python
 por **Java 25 + Spring Boot**, e acrescentando os sufixos da arquitetura
-hexagonal (ver `CLAUDE.md`, seção 8).
+hexagonal (ver `../backend/README.md` e a ADR 0001).
 
 Branch de integração: **`main`**.
 
@@ -35,7 +35,7 @@ commits.
 ### 1.2 Regras
 
 - **Sem ID de task no nome da branch.** Este trabalho não usa ferramenta de
-  tasks; o rastro é o caso de uso (UC01–UC14, `CLAUDE.md` seção 7) e a entrega
+  tasks; o rastro é o caso de uso (UC01–UC14, `dominio/casos-de-uso.md`) e a entrega
   do cronograma, citados no corpo do PR.
 - Branch sai sempre de `main` atualizada.
 - PR é aberto contra `main`, sem conflito.
@@ -114,7 +114,7 @@ O que **não** vale: misturar dentro do mesmo pacote. `PlanoDeVoo.getFlightId()`
 
 ## 3. Regras de arquitetura
 
-As que o PR cobra (ver `CLAUDE.md` seção 8):
+As que o PR cobra (ver `../backend/README.md` e a ADR 0001):
 
 - `domain/` **não importa** `infra`, `org.springframework`, `jakarta.persistence`
   nem nada de tecnologia. Nem anotação.

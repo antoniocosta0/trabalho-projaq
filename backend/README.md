@@ -28,9 +28,9 @@ src/main/resources/
 src/test/java/com/pucrs/planosdevoo/     espelha a árvore de main
 ```
 
-É a mesma organização do estudo de caso da cadeira (`P7a`) e do exemplo
-`ex3-sist-vendas-hexagonal`: **Domain** (Model, Ports In UseCases, Ports Out
-Repositories) e **Infra** (Adapters In Rest, Adapters Out Persistence, Config).
+É a organização do estudo de caso de arquitetura hexagonal da cadeira:
+**Domain** (Model, Ports In UseCases, Ports Out Repositories) e **Infra**
+(Adapters In Rest, Adapters Out Persistence, Config).
 
 ## O que vai em cada pasta
 
@@ -60,7 +60,7 @@ Esse comando tem que devolver **nada**.
 No exemplo do professor, os casos de uso têm `@Component`. Aqui eles não têm
 nenhuma anotação: viram beans em `infra/config/UseCaseConfig`. O `P7a` pede "a
 maior independência possível" do modelo em relação ao Spring, e assim
-`domain/` fica sem nenhum import de framework. Registrado em `logs/decisoes.md`.
+`domain/` fica sem nenhum import de framework. Registrado na ADR 0001.
 
 ## Comandos
 
