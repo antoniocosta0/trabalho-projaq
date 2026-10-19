@@ -59,12 +59,16 @@ class AprovarECancelarPlanoUCTest {
         return Clock.fixed(agora.atZone(ZONA).toInstant(), ZONA);
     }
 
+    // Véspera da data de referência: todos os planos destes testes partem em
+    // 19/10, então na hora de aprovar eles ainda estão no futuro.
+    private static final LocalDateTime VESPERA = LocalDateTime.of(2026, 10, 18, 12, 0);
+
     @BeforeEach
     void preparar() {
         planos = new PlanosEmMemoria();
         reservas = new ReservasEmMemoria();
         VerificadorDeConflitos verificador = new VerificadorDeConflitos(reservas);
-        aprovar = new AprovarPlanoUC(planos, reservas, verificador, new TransacaoDireta());
+        aprovar = new AprovarPlanoUC(planos, reservas, verificador, new TransacaoDireta(), relogioEm(VESPERA));
         validar = new ValidarPlanoUC(planos, verificador);
         cancelar = cancelarCom(relogioEm(em(8, 0)));
     }

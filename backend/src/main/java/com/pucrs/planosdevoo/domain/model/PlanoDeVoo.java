@@ -88,13 +88,18 @@ public class PlanoDeVoo {
 
     // ---------- aprovação e cancelamento (UC10, UC12) ----------
 
-    // Aprova se o próprio plano está válido e não há conflito de reserva. Os
-    // conflitos chegam de fora (VerificadorDeConflitos) porque dependem das
-    // reservas de outros planos; gravar as reservas é com o caso de uso.
-    public void aprovar(List<String> conflitosDeReserva) {
+    // Aprova se o próprio plano está válido, não há conflito de reserva e o voo
+    // ainda não partiu. Os conflitos chegam de fora (VerificadorDeConflitos)
+    // porque dependem das reservas de outros planos; gravar as reservas é com o
+    // caso de uso. "agora" chega de fora pelo mesmo motivo que em cancelar().
+    public void aprovar(List<String> conflitosDeReserva, LocalDateTime agora) {
         garantirEmEdicao("aprovar o plano");
         List<String> problemas = new ArrayList<>(validar());
         problemas.addAll(conflitosDeReserva);
+        if (!partida.isAfter(agora)) {
+            problemas.add("A partida (" + HORA.format(partida) + ") já ocorreu: um voo que já partiu"
+                    + " não pode ser aprovado");
+        }
         if (!problemas.isEmpty()) {
             throw new PlanoInvalidoException(problemas);
         }

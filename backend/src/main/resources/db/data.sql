@@ -64,9 +64,15 @@ MERGE INTO aeronave (prefixo, categoria, velocidade_cruzeiro_kmh, autonomia_km,
 --   1002 PR-PAX CWB -R5-> FLN (sobrevoo) -R8-> POA 06:30
 --   1003 PR-PAX POA -R2-> GRU                      21:00  permanencia vira o dia
 --   1004 PP-PAR FLN -R4-> CWB (pouso) -R6-> GRU    20:00
+--   1005 PR-PAX POA -R1-> FLN (pouso)             17/10 08:00  JA PARTIU
 --
 -- 1001 e 1002 partem de madrugada/manha: durante a apresentacao ja partiram e
 -- nao podem ser cancelados. 1003 e 1004 sao a noite e podem.
+--
+-- O 1005 parte em 17/10, ANTES da data de referencia: ele ja partiu em qualquer
+-- dia em que a demonstracao for feita, entao a recusa de cancelamento (demo 14)
+-- nao depende do relogio. Usa a R1 e a vaga 3 de FLN, mas em 17/10, portanto
+-- nao conflita com o roteiro, que trabalha em 19/10.
 --
 -- Aqui NAO se usa MERGE ... KEY como acima: ele reescreveria a linha a cada
 -- inicializacao e desfaria um cancelamento feito pela API. MERGE ... USING com
@@ -76,7 +82,8 @@ MERGE INTO plano_de_voo t USING (VALUES
     (1001, 3, 'PR-CRG', 'POA', 'CWB', TIMESTAMP '2026-10-19 01:00:00', 'APROVADO'),
     (1002, 1, 'PR-PAX', 'CWB', 'POA', TIMESTAMP '2026-10-19 06:30:00', 'APROVADO'),
     (1003, 2, 'PR-PAX', 'POA', 'GRU', TIMESTAMP '2026-10-19 21:00:00', 'APROVADO'),
-    (1004, 4, 'PP-PAR', 'FLN', 'GRU', TIMESTAMP '2026-10-19 20:00:00', 'APROVADO')
+    (1004, 4, 'PP-PAR', 'FLN', 'GRU', TIMESTAMP '2026-10-19 20:00:00', 'APROVADO'),
+    (1005, 2, 'PR-PAX', 'POA', 'FLN', TIMESTAMP '2026-10-17 08:00:00', 'APROVADO')
 ) AS s (id, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
 ON t.id = s.id
 WHEN NOT MATCHED THEN INSERT (id, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
@@ -95,7 +102,9 @@ MERGE INTO trecho t USING (VALUES
     (1003, 1, 'R2', 31000, TIMESTAMP '2026-10-19 21:00:00', 20, 120),
     -- 1004: R4 20:00-20:23, CWB ate 20:53; R6 20:53-21:26, GRU ate 23:26
     (1004, 1, 'R4', 26000, TIMESTAMP '2026-10-19 20:00:00', 8, 30),
-    (1004, 2, 'R6', 26000, TIMESTAMP '2026-10-19 20:53:00', 21, 120)
+    (1004, 2, 'R6', 26000, TIMESTAMP '2026-10-19 20:53:00', 21, 120),
+    -- 1005: R1 08:00-08:26 em 17/10, FLN ate 09:26
+    (1005, 1, 'R1', 30000, TIMESTAMP '2026-10-17 08:00:00', 3, 60)
 ) AS s (plano_id, ordem, aerovia_id, altitude, horario_entrada, numero_vaga, permanencia_minutos)
 ON t.plano_id = s.plano_id AND t.ordem = s.ordem
 WHEN NOT MATCHED THEN INSERT (plano_id, ordem, aerovia_id, altitude, horario_entrada, numero_vaga, permanencia_minutos)
@@ -114,7 +123,8 @@ MERGE INTO reserva_aerovia t USING (SELECT v.* FROM (VALUES
     (1003, 'R2', 31000, TIMESTAMP '2026-10-19 22:00:00'),
     (1004, 'R4', 26000, TIMESTAMP '2026-10-19 20:00:00'),
     (1004, 'R6', 26000, TIMESTAMP '2026-10-19 20:00:00'),
-    (1004, 'R6', 26000, TIMESTAMP '2026-10-19 21:00:00')
+    (1004, 'R6', 26000, TIMESTAMP '2026-10-19 21:00:00'),
+    (1005, 'R1', 30000, TIMESTAMP '2026-10-17 08:00:00')
 ) AS v (plano_id, aerovia_id, altitude, slot_inicio)
 JOIN plano_de_voo p ON p.id = v.plano_id AND p.situacao = 'APROVADO') s
 ON t.aerovia_id = s.aerovia_id AND t.altitude = s.altitude AND t.slot_inicio = s.slot_inicio
@@ -134,7 +144,9 @@ MERGE INTO reserva_vaga t USING (SELECT v.* FROM (VALUES
     (1004, 'CWB',  8, TIMESTAMP '2026-10-19 20:00:00'),
     (1004, 'GRU', 21, TIMESTAMP '2026-10-19 21:00:00'),
     (1004, 'GRU', 21, TIMESTAMP '2026-10-19 22:00:00'),
-    (1004, 'GRU', 21, TIMESTAMP '2026-10-19 23:00:00')
+    (1004, 'GRU', 21, TIMESTAMP '2026-10-19 23:00:00'),
+    (1005, 'FLN',  3, TIMESTAMP '2026-10-17 08:00:00'),
+    (1005, 'FLN',  3, TIMESTAMP '2026-10-17 09:00:00')
 ) AS v (plano_id, aeroporto_codigo, numero_vaga, slot_inicio)
 JOIN plano_de_voo p ON p.id = v.plano_id AND p.situacao = 'APROVADO') s
 ON t.aeroporto_codigo = s.aeroporto_codigo AND t.numero_vaga = s.numero_vaga AND t.slot_inicio = s.slot_inicio

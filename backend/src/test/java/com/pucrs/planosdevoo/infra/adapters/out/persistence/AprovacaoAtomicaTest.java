@@ -124,7 +124,7 @@ class AprovacaoAtomicaTest {
         ReservaVaga ocupada = new ReservaVaga(disputa.getId(), fln, 3, slot);
 
         assertThrows(ConflitoDeReservaException.class, () -> transacao.executar(() -> {
-            disputa.aprovar(List.of());
+            disputa.aprovar(List.of(), em(1, 0, 0));
             planos.salvar(disputa);
             reservas.reservar(List.of(livre), List.of());
             reservas.reservar(List.of(), List.of(ocupada));

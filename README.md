@@ -36,6 +36,37 @@ ainda são futuros e demonstram o cancelamento com liberação das reservas.
 A R1 e a R3 ficam livres o dia inteiro de propósito, para que sempre haja
 recurso disponível para demonstrar uma aprovação bem-sucedida.
 
+## Ensaiar com o relógio fixo
+
+Duas regras dependem da hora real: **cancelar** um plano exige que a partida
+ainda não tenha ocorrido, e **aprovar**, também. Isso significa que as
+demonstrações de cancelamento mudam de resultado conforme o dia em que são
+feitas.
+
+Para ensaiar a apresentação em qualquer data, suba a aplicação com o relógio
+fixado no dia e hora que quiser:
+
+```sh
+cd backend
+./mvnw spring-boot:run \
+  -Dspring-boot.run.arguments=--app.relogio.instante-fixo=2026-10-19T10:00:00
+```
+
+Com isso o sistema acredita que são 10:00 de 19/10/2026: os planos da carga
+inicial que partem de madrugada já partiram, e os da noite ainda não.
+
+| Propriedade | Padrão | O que faz |
+|---|---|---|
+| `app.relogio.zona` | `America/Sao_Paulo` | fuso usado para o "agora" |
+| `app.relogio.instante-fixo` | *(vazio)* | data e hora fixas, formato ISO. Vazio = relógio real |
+
+Sem essas propriedades, o relógio é o real, no fuso de São Paulo — que é como a
+aplicação roda por padrão.
+
+**O que não depende do relógio:** o plano 1005 da carga inicial parte em
+17/10, antes da data de referência, então ele já partiu em qualquer dia. É por
+isso que a demonstração de cancelamento recusado funciona sem ajuste nenhum.
+
 ## Preparação do ambiente
 
 Só é preciso ter **Java 25** instalado. O Maven vem junto, pelo wrapper

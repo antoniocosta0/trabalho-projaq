@@ -27,6 +27,9 @@ import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPilotos;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
 import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -125,8 +128,9 @@ public class UseCaseConfig {
 
     @Bean
     public AprovarPlanoUC aprovarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
-                                         VerificadorDeConflitos verificador, Transacao transacao) {
-        return new AprovarPlanoUC(planos, reservas, verificador, transacao);
+                                         VerificadorDeConflitos verificador, Transacao transacao,
+                                         Clock relogio) {
+        return new AprovarPlanoUC(planos, reservas, verificador, transacao, relogio);
     }
 
     @Bean
@@ -135,9 +139,18 @@ public class UseCaseConfig {
         return new CancelarPlanoUC(planos, reservas, transacao, relogio);
     }
 
-    // "Agora" vem de um Clock injetado para o cancelamento ser testável com hora fixa.
+    // "Agora" vem de um Clock injetado, para aprovação e cancelamento serem
+    // testáveis com hora fixa. Em produção é o relógio real, na zona
+    // configurada; para ensaiar a apresentação em outro dia, basta definir
+    // app.relogio.instante-fixo no application.properties ou na linha de
+    // comando (ver README, seção "Ensaiar com o relógio fixo").
     @Bean
-    public Clock relogio() {
-        return Clock.systemDefaultZone();
+    public Clock relogio(@Value("${app.relogio.zona:America/Sao_Paulo}") String zona,
+                         @Value("${app.relogio.instante-fixo:}") String instanteFixo) {
+        ZoneId fuso = ZoneId.of(zona);
+        if (instanteFixo == null || instanteFixo.isBlank()) {
+            return Clock.system(fuso);
+        }
+        return Clock.fixed(LocalDateTime.parse(instanteFixo).atZone(fuso).toInstant(), fuso);
     }
 }
