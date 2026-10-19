@@ -12,7 +12,7 @@
 ### Os planos criados aqui recebem id 1, 2, 3... Para recomeçar:
 ###   cd backend && rm -rf ./data && ./mvnw spring-boot:run
 ###
-### A carga inicial já traz QUATRO planos aprovados, com ids 1001 a 1004, que
+### A carga inicial já traz CINCO planos aprovados, com ids 1001 a 1005, que
 ### ocupam 6 das 8 aerovias em 19/10. Eles não atrapalham este roteiro: o seed
 ### deixa a R1 livre o dia inteiro e não usa nenhuma vaga em FLN, que são os
 ### recursos usados no caminho feliz abaixo.

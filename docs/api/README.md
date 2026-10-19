@@ -12,7 +12,7 @@ falha, não só o caminho feliz.
 > — as respostas comentadas no arquivo são as reais, não presumidas.
 >
 > O roteiro supõe banco limpo e execução na ordem: os ids dos planos (1 a 12)
-> são atribuídos na criação. Os planos 1001 a 1004 vêm da carga inicial e não
+> são atribuídos na criação. Os planos 1001 a 1005 vêm da carga inicial e não
 > atrapalham — o seed deixa a R1 livre e não usa vaga em FLN, que são os
 > recursos do caminho feliz.
 >
