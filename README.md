@@ -256,14 +256,33 @@ São escolhas, não defeitos — e estão registradas em
 
 | O que | Onde |
 |---|---|
-| Modelo de domínio (UML) | [`docs/dominio/`](docs/dominio/) |
+| Modelo de domínio (UML) | [`docs/dominio/modelo-dominio.png`](docs/dominio/modelo-dominio.png) — abaixo |
 | Casos de uso UC01–UC14 | [`docs/dominio/casos-de-uso.md`](docs/dominio/casos-de-uso.md) |
-| Diagramas C4 (contexto, containers, componentes) | [`docs/arquitetura/`](docs/arquitetura/) |
+| Diagramas C4 (contexto, containers, componentes) | [`docs/arquitetura/`](docs/arquitetura/) — abaixo |
 | Decisões arquiteturais (ADR) | [`docs/arquitetura/decisoes/`](docs/arquitetura/decisoes/) |
 | Padrões de desenvolvimento | [`docs/padroes-desenvolvimento.md`](docs/padroes-desenvolvimento.md) |
 | Plano de trabalho da equipe | [`docs/plano-de-trabalho.md`](docs/plano-de-trabalho.md) |
 | Guia de contexto para ferramentas de IA (não faz parte da entrega) | [`CLAUDE.md`](CLAUDE.md) e `CONTEXT_NEW.md` |
 | Enunciado | `PAS_TF_2026_2_PlanosDeVoo (1).md` |
+
+Cada `.png` é exportado do `.puml` ao lado, que é a fonte versionada. A data de
+exportação fica no rodapé da própria imagem, para flagrar diagrama defasado.
+
+### Modelo de domínio
+
+![Modelo de domínio](docs/dominio/modelo-dominio.png)
+
+### C4 nível 1 — Contexto
+
+![C4 nível 1, contexto](docs/arquitetura/c4-contexto.png)
+
+### C4 nível 2 — Containers
+
+![C4 nível 2, containers](docs/arquitetura/c4-containers.png)
+
+### C4 nível 3 — Componentes do backend
+
+![C4 nível 3, componentes](docs/arquitetura/c4-componentes.png)
 
 ## Arquitetura, em uma olhada
 
