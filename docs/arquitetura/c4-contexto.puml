@@ -5,14 +5,21 @@
 
 title
   Nível 1 - Contexto
-  <size:11>Exportado em 2026-10-15</size>
+  <size:11>Exportado em 2026-10-18</size>
 end title
 
 Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
-System_Ext(cliente, "Cliente HTTP", "Postman, arquivo .http ou Swagger UI. Não faz parte do escopo de implementação")
-System(sistema, "Sistema de Gestão de Planos de Voo", "Controla rede aérea, pilotos, aeronaves, planos de voo e reservas de altitudes e vagas")
+System_Ext(cliente, "Cliente HTTP", "Postman, VS Code REST Client, curl. Não faz parte do escopo de implementação")
+System(sistema, "Sistema de Gestão de Planos de Voo", "Controla rede aérea, pilotos, aeronaves, planos de voo e reservas de altitudes e vagas. Serve também a própria documentação OpenAPI")
 
 Rel(usuario, cliente, "Usa")
 Rel(cliente, sistema, "Envia requisições", "HTTP/JSON (API REST)")
+Rel(usuario, sistema, "Explora a API pelo Swagger UI", "HTTP")
+
+note right of sistema
+  O Swagger UI nao e um sistema externo: e servido
+  pelo proprio backend, em /swagger-ui.html, a partir
+  do documento OpenAPI que ele gera.
+end note
 
 @enduml

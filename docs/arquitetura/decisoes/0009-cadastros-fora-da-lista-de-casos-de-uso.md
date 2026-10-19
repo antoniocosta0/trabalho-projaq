@@ -18,7 +18,7 @@ plano de voo, não a manutenção de tabelas de apoio.
 
 A primeira modelagem da equipe tinha ido para o outro lado: cadastrar aeroporto,
 aerovia, piloto e aeronave eram quatro casos de uso numerados, dentro de uma
-lista de dezenove (registro em `logs/decisoes.md`, 15/10). Com a orientação do
+lista de dezenove, decidida em 15/10. Com a orientação do
 professor, essa decisão precisou ser revista — e a revisão não é cosmética,
 porque muda o que é entregue como caso de uso, o que entra nos diagramas e o que
 a apresentação precisa demonstrar.
@@ -85,5 +85,4 @@ arquitetura.
 - Um aeroporto cadastrado pela API precisa poder ser usado num plano na mesma
   execução, sem reiniciar a aplicação: é esse o teste do §2.
 - A numeração UC01–UC14 é a oficial. Qualquer artefato que ainda cite UC01–UC19
-  (guias antigos, `logs/decisoes.md` de 15/10) está defasado e perde para esta
-  decisão.
+  (guias antigos, anotações de 15/10) está defasado e perde para esta decisão.

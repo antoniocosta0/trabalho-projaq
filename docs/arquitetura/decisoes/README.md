@@ -1,7 +1,7 @@
 # Decisões arquiteturais (ADR)
 
 Um arquivo por decisão, no formato de `0000-template.md`. O rascunho de cada
-uma nasce em `logs/decisoes.md`; aqui fica a versão limpa, que é entregue.
+uma nasce nas anotações de trabalho da equipe; aqui fica a versão entregue.
 
 O enunciado exige, para cada decisão relevante: **a decisão adotada, as
 principais alternativas consideradas e a justificativa da escolha** (seção 7.4).

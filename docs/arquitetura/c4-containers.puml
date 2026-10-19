@@ -5,14 +5,14 @@
 
 title
   Nível 2 - Containers
-  <size:11>Exportado em 2026-10-15</size>
+  <size:11>Exportado em 2026-10-18</size>
 end title
 
 Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
-System_Ext(cliente, "Cliente HTTP", "Postman, arquivo .http ou Swagger UI")
+System_Ext(cliente, "Cliente HTTP", "Postman, VS Code REST Client, curl")
 
 System_Boundary(sistema, "Sistema de Gestão de Planos de Voo") {
-  Container(api, "Backend", "Java 25, Spring Boot 4.1.1", "Expõe a API REST, aplica as regras de negócio dos planos de voo e controla a ocupação de aerovias e vagas")
+  Container(api, "Backend", "Java 25, Spring Boot 4.1.1", "Expõe a API REST, aplica as regras de negócio dos planos de voo e controla a ocupação de aerovias e vagas. Serve também o Swagger UI (/swagger-ui.html), o documento OpenAPI (/v3/api-docs) e o console do H2 (/h2-console)")
   ContainerDb(banco, "Banco de dados", "H2 2.4.240, modo arquivo (./data/planosdevoo)", "Guarda rede aérea, pilotos, aeronaves, planos, trechos e reservas. O estado sobrevive à reinicialização da aplicação")
 }
 
@@ -23,7 +23,9 @@ Rel(api, banco, "Lê e grava dados", "JPA/Hibernate sobre JDBC")
 note right of banco
   Schema criado por src/main/resources/db/schema.sql
   e carga inicial aplicada por db/data.sql, na
-  inicialização. Reprodutível a partir do repositório.
+  inicializacao. Reproduzivel a partir do repositorio.
+  O console do H2 e servido pelo backend, e nao e um
+  container a parte: e so uma tela sobre este banco.
 end note
 
 @enduml
