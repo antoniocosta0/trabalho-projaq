@@ -129,4 +129,27 @@ class ErrosDaApiTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("EM_EDICAO")));
     }
+
+    @Test
+    void rotaInexistenteDevolve404ENao500() throws Exception {
+        mvc.perform(get("/esta-rota-nao-existe"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("Rota não encontrada")));
+    }
+
+    @Test
+    void metodoNaoSuportadoDevolve405ENao500() throws Exception {
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .put("/aeroportos"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value(405));
+    }
+
+    @Test
+    void contentTypeAusenteDevolve415ENao500() throws Exception {
+        mvc.perform(post("/planos").content(PLANO_VALIDO))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(jsonPath("$.status").value(415));
+    }
 }

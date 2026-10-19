@@ -256,13 +256,12 @@ no mais tardar.
 - **Os 14 casos de uso**: UC01 a UC14, todos com endpoint. UC01–UC05, UC13 e
   UC14 no PR #2; UC06, UC09 e UC11 no PR #8; UC07, UC08, UC10 e UC12 no PR #10
 - **Todas as cinco frentes concluídas**, A a E
-- 144 testes automatizados, verdes, rodando também no CI com JDK 25
+- 147 testes automatizados, verdes, rodando também no CI com JDK 25
 - Carga inicial com planos aprovados, ocupando 6 das 8 aerovias na data de
   referência, e os quatro cadastros atendendo o §8.1
-- As nove decisões arquiteturais escritas como ADR, de 0001 a 0009
+- As dez decisões arquiteturais escritas como ADR, de 0001 a 0010
 - **Frente A concluída** (Vicenzo, 16/10): `Slot`, `Trecho` e `Pouso`, com testes.
   Borda decidida: intervalo `[início, fim)`, então 15:00 → 16:00 ocupa **1 slot**
 - H2 em arquivo, `schema.sql` e `data.sql` com malha, pilotos e aeronaves
 - Modelo de domínio e os três C4, em `docs/` (PR #3)
-- As 8 decisões arquiteturais registradas em `logs/decisoes.md`, prontas para
-  virar ADR
+- As decisões arquiteturais publicadas em `docs/arquitetura/decisoes/` (ADR 0001 a 0010)

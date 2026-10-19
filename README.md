@@ -55,7 +55,10 @@ cd backend
 ```
 
 Com isso o sistema acredita que são 10:00 de 19/10/2026: os planos da carga
-inicial que partem de madrugada já partiram, e os da noite ainda não.
+inicial que partem de madrugada já partiram, e os da noite ainda não. O
+caminho feliz do roteiro parte às **23:00**, então a aprovação continua
+válida nesse relógio e também durante a apresentação, desde que ela termine
+antes das 23:00.
 
 | Propriedade | Padrão | O que faz |
 |---|---|---|
@@ -206,7 +209,7 @@ de problemas quando há mais de um:
   "status": 400,
   "title": "Bad Request",
   "detail": "Requisição inválida",
-  "problemas": ["origem: must not be blank", "partida: must not be null"]
+  "problemas": ["origem: é obrigatório", "partida: é obrigatório"]
 }
 ```
 
@@ -214,7 +217,9 @@ de problemas quando há mais de um:
 |---|---|
 | Consulta bem-sucedida | 200 |
 | Criação de plano | 201 |
-| Recurso inexistente | 404 |
+| Recurso ou rota inexistente | 404 |
+| Método HTTP não suportado na rota | 405 |
+| `Content-Type` ausente ou diferente de JSON | 415 |
 | Operação não permitida no estado atual do plano | 409 |
 | Corpo da requisição inválido | 400 |
 | Regra de negócio violada | 422 |

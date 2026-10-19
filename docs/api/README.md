@@ -7,9 +7,10 @@
 O `requests.http` segue a ordem da apresentação de 19/10 e inclui os casos de
 falha, não só o caminho feliz.
 
-> **Cobertura: as 17 demonstrações** da seção 16.3 do `CLAUDE.md`, fechadas em
-> 18/10. Todas foram **executadas contra a aplicação** com o banco apagado antes
-> — as respostas comentadas no arquivo são as reais, não presumidas.
+> **Cobertura: as 17 demonstrações** da seção 16.3 do `CLAUDE.md`, revalidadas
+> em 18/10 com o relógio fixo em 19/10 10:00. O caminho feliz parte às **23:00**
+> para a aprovação não cair durante a apresentação. As respostas comentadas no
+> arquivo batem com essa execução.
 >
 > O roteiro supõe banco limpo e execução na ordem: os ids dos planos (1 a 12)
 > são atribuídos na criação. Os planos 1001 a 1005 vêm da carga inicial e não

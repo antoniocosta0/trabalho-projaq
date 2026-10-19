@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 
 // Para pouso, informe numeroVaga e permanenciaMinutos. Sem os dois, é sobrevoo.
 public record TrechoRequestDTO(
-        @NotBlank String aeroviaId,
-        @NotNull Integer altitude,
-        @NotNull LocalDateTime horarioEntrada,
+        @NotBlank(message = "é obrigatório") String aeroviaId,
+        @NotNull(message = "é obrigatório") Integer altitude,
+        @NotNull(message = "é obrigatório") LocalDateTime horarioEntrada,
         Integer numeroVaga,
         Integer permanenciaMinutos) {
 }

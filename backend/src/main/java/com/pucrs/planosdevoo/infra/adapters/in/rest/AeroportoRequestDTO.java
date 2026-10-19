@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record AeroportoRequestDTO(
-        @NotBlank String codigo,
-        @NotBlank String nome,
-        @NotNull Integer quantidadeVagas) {
+        @NotBlank(message = "é obrigatório") String codigo,
+        @NotBlank(message = "é obrigatório") String nome,
+        @NotNull(message = "é obrigatório") Integer quantidadeVagas) {
 }

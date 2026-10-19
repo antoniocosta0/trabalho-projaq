@@ -9,7 +9,7 @@ Cada categoria de aeronave tem a sua própria regra de altitude e de janela de
 horário (§3 do enunciado): particular só opera entre 25.000 e 27.000 pés;
 comercial de passageiros exige 28.000 pés ou mais; comercial de carga pode usar
 qualquer altitude prevista, mas todo o uso da aerovia precisa ocorrer entre
-00:00 e 06:00.
+00:00, inclusive, e 06:00, exclusive.
 
 O enunciado avisa em seguida que **"novas categorias e novas regras podem
 aparecer durante o desenvolvimento"**, e o critério de avaliação fala em

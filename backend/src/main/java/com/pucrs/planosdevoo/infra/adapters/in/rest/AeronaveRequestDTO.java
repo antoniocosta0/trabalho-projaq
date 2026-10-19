@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotNull;
 // Um corpo só para todas as categorias. Os campos próprios de cada uma são
 // opcionais aqui: quem sabe quais são obrigatórios é a FabricaDeAeronaves.
 public record AeronaveRequestDTO(
-        @NotBlank String prefixo,
-        @NotBlank String categoria,
-        @NotNull Double velocidadeCruzeiroKmh,
-        @NotNull Double autonomiaKm,
+        @NotBlank(message = "é obrigatório") String prefixo,
+        @NotBlank(message = "é obrigatório") String categoria,
+        @NotNull(message = "é obrigatório") Double velocidadeCruzeiroKmh,
+        @NotNull(message = "é obrigatório") Double autonomiaKm,
         String empresaManutencao,
         String companhiaAerea,
         Integer capacidadePassageiros,

@@ -1106,7 +1106,7 @@ As que custam nota e são fáceis de deixar passar:
 - [x] Banco persistindo entre reinicializações (H2 em arquivo).
 - [x] Carga inicial rodando do zero: malha, pilotos, aeronaves e os quatro
       planos aprovados com suas reservas.
-- [x] Testes das regras de cálculo passando: 144 testes, verdes também no CI.
+- [x] Testes das regras de cálculo passando: 147 testes, verdes também no CI.
 - [ ] Quais UCs estão prontos, listados no `log.md` — o log local desta máquina
       está sendo posto em dia.
 

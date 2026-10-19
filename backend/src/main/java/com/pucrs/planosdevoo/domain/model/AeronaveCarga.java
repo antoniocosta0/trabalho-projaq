@@ -24,12 +24,13 @@ public class AeronaveCarga extends Aeronave {
     }
 
     // Todo o uso da aerovia precisa caber entre 00:00 (inclusive) e 06:00
-    // (exclusive) do mesmo dia. Uso que termina exatamente às 06:00 é aceito.
+    // (exclusive) do mesmo dia, como o §3 do enunciado: a saída às 06:00
+    // exatamente já está fora da janela.
     @Override
     public boolean podeOperar(int altitude, LocalDateTime entrada, LocalDateTime saida) {
         boolean mesmoDia = entrada.toLocalDate().equals(saida.toLocalDate());
         return mesmoDia && entrada.toLocalTime().isBefore(FIM_DA_JANELA)
-                && !saida.toLocalTime().isAfter(FIM_DA_JANELA);
+                && saida.toLocalTime().isBefore(FIM_DA_JANELA);
     }
 
     @Override

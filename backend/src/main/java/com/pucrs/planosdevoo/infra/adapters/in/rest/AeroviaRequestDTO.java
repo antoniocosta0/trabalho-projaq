@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record AeroviaRequestDTO(
-        @NotBlank String id,
-        @NotBlank String origem,
-        @NotBlank String destino,
-        @NotNull Double distanciaKm) {
+        @NotBlank(message = "é obrigatório") String id,
+        @NotBlank(message = "é obrigatório") String origem,
+        @NotBlank(message = "é obrigatório") String destino,
+        @NotNull(message = "é obrigatório") Double distanciaKm) {
 }

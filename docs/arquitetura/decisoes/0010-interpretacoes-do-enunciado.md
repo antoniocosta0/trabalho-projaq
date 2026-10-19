@@ -33,15 +33,17 @@ enunciado (15:52 a 17:07 ocupando três slots) é compatível com as duas leitur
 esta é a que não cobra do usuário um slot que ele não usou. Detalhada na ADR
 0005.
 
-### 2. A janela da aeronave de carga fecha do mesmo jeito
+### 2. A janela da aeronave de carga segue o enunciado ao pé da letra
 
 O §3 diz que a aeronave de carga opera entre 00:00 **inclusive** e 06:00
-**exclusive**. Um voo que termina exatamente às 06:00 é **aceito**, pela mesma
-regra de borda do item 1: às 06:00 a aerovia já está livre.
+**exclusive**, e que **todo** o período de utilização da aerovia deve estar
+nesse intervalo. Um voo que termina exatamente às 06:00 é **recusado**: a
+saída já não pertence a `[00:00, 06:00)`.
 
-Alternativa descartada: recusar, pela leitura literal de "exclusive". Ela
-tornaria a borda da janela diferente da borda do slot, e duas regras de borda
-opostas no mesmo sistema é o tipo de inconsistência que gera bug.
+Alternativa descartada: aceitar a saída às 06:00 em nome da mesma borda
+semiaberta dos slots (item 1). Ela deixaria a API mais simétrica, mas
+contradiz o texto do enunciado — e a banca avalia contra o enunciado, não
+contra a analogia com o `Slot`.
 
 ### 3. Duração arredondada ao minuto
 

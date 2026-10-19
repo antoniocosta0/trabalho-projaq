@@ -13,11 +13,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 // Traduz os erros do domínio e os da borda HTTP para Problem Detail (RFC 7807).
 // Nenhuma resposta de erro leva stack trace: o que não estiver tratado aqui cai
@@ -121,6 +124,27 @@ public class RestExceptionHandler {
         log.warn("Violação de integridade no banco", e);
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
                 "O registro conflita com um que já existe. Confira o código, o prefixo ou o identificador.");
+    }
+
+    // Sem estes três, o handler genérico de Exception abaixo engolia a
+    // exceção do Spring e devolvia 500 para rota inexistente, método
+    // errado e Content-Type ausente — o oposto do que o §8.4 avalia.
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail rotaInexistente(NoResourceFoundException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
+                "Rota não encontrada");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ProblemDetail metodoNaoSuportado(HttpRequestMethodNotSupportedException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED,
+                "Método HTTP não suportado nesta rota");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ProblemDetail tipoDeConteudoNaoSuportado(HttpMediaTypeNotSupportedException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Content-Type não suportado. Use application/json");
     }
 
     // Rede de segurança: qualquer coisa não prevista vira 500 com corpo limpo.

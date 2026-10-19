@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record CriarPlanoRequestDTO(
-        @NotNull Long pilotoId,
-        @NotBlank String aeronavePrefixo,
-        @NotBlank String origem,
-        @NotBlank String destino,
-        @NotNull LocalDateTime partida) {
+        @NotNull(message = "é obrigatório") Long pilotoId,
+        @NotBlank(message = "é obrigatório") String aeronavePrefixo,
+        @NotBlank(message = "é obrigatório") String origem,
+        @NotBlank(message = "é obrigatório") String destino,
+        @NotNull(message = "é obrigatório") LocalDateTime partida) {
 }

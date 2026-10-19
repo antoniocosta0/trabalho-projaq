@@ -5,11 +5,18 @@ As 17 demonstrações exigidas, na ordem, com o bloco correspondente em
 `.http` é o que se executa, e cada bloco lá traz a resposta real conferida
 contra a aplicação.
 
-**Antes de começar:** banco limpo e aplicação no ar.
+**Antes de começar:** banco limpo e aplicação no ar. O caminho feliz parte às
+**23:00** de 19/10, para a aprovação não cair se a banca for depois das 08:00.
+A apresentação precisa terminar **antes das 23:00**. Para ensaiar em qualquer
+data com o mesmo resultado do dia 19/10 às 10:00:
 
 ```sh
-cd backend && rm -rf ./data && ./mvnw spring-boot:run
+cd backend && rm -rf ./data && ./mvnw spring-boot:run \
+  -Dspring-boot.run.arguments=--app.relogio.instante-fixo=2026-10-19T10:00:00
 ```
+
+Sem o relógio fixo, no próprio dia 19/10 durante o horário de aula, o roteiro
+também funciona — os voos aprovados ainda são futuros.
 
 Os blocos supõem execução **na ordem**: os planos criados recebem id 1, 2, 3… em
 sequência. Os planos 1001 a 1005 vêm da carga inicial.
@@ -17,7 +24,7 @@ sequência. Os planos 1001 a 1005 vêm da carga inicial.
 | # | O que demonstrar | Bloco | Resultado esperado |
 |---|---|---|---|
 | 1 | Consultar a malha aérea | 1.1 a 1.4 | 4 aeroportos, 8 aerovias orientadas, 4 pilotos, 4 aeronaves com os dados da sua categoria |
-| 2 | Criar plano e montar o percurso | 2.3, 2.4 | 201; `horarioChegada` 08:26 **calculado** pelo sistema |
+| 2 | Criar plano e montar o percurso | 2.3, 2.4 | 201; `horarioChegada` 23:26 **calculado** pelo sistema |
 | 3 | Consultar disponibilidade | 2.1, 2.2 | 11 altitudes e 16 vagas livres |
 | 4 | Validar **sem** reservar | 2.5 a 2.7 | `valido: true`; a disponibilidade **não muda** e o plano segue `EM_EDICAO` |
 | 5 | Aprovar **com** reserva | 2.8 a 2.10 | `APROVADO`; 10 altitudes e 15 vagas |
@@ -59,7 +66,8 @@ enunciado: cadastrar um aeroporto e uma aerovia novos e usá-los num plano
 aprovado, **sem reiniciar a aplicação**. É o que o professor costuma pedir fora
 do roteiro.
 
-A seção **7** cobre os erros: 404, 400 com a lista de campos, 422 de período
+A seção **7** cobre os erros: 404 de recurso e de rota inexistente, 400 com a
+lista de campos, 405 de método, 415 sem `Content-Type`, 422 de período
 invertido, e `PUT`/`DELETE` de aerovia devolvendo 404 porque as rotas não
 existem — a imutabilidade é estrutural.
 

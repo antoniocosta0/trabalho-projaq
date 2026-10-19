@@ -26,10 +26,10 @@ class BordasDoEnunciadoTest {
     // ---------- borda 2 da ADR 0010: a janela da aeronave de carga ----------
 
     @Test
-    void cargaQueTerminaExatamenteAs0600EAceita() {
+    void cargaQueTerminaExatamenteAs0600ERecusada() {
         AeronaveCarga carga = new AeronaveCarga("PR-CRG", 780, 4500, "Sul Cargas", 20);
 
-        assertTrue(carga.podeOperar(30_000, em(19, 5, 0), em(19, 6, 0)));
+        assertFalse(carga.podeOperar(30_000, em(19, 5, 0), em(19, 6, 0)));
     }
 
     @Test

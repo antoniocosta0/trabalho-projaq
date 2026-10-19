@@ -12,6 +12,13 @@
 ### Os planos criados aqui recebem id 1, 2, 3... Para recomeçar:
 ###   cd backend && rm -rf ./data && ./mvnw spring-boot:run
 ###
+### Relógio: desde o PR #20, aprovar um plano cuja partida já passou é recusado.
+### O caminho feliz (seção 2) e o conflito com ele (seção 4) partem às 23:00
+### de 19/10, para a aprovação funcionar durante a apresentação e também com
+### o relógio fixo em 10:00 (README). Os blocos 3.x só validam — o horário
+### deles não precisa ser futuro. O bloco 8.5 (aprovar cadastro novo) parte
+### às 22:00 pelo mesmo motivo.
+###
 ### A carga inicial já traz CINCO planos aprovados, com ids 1001 a 1005, que
 ### ocupam 6 das 8 aerovias em 19/10. Eles não atrapalham este roteiro: o seed
 ### deixa a R1 livre o dia inteiro e não usa nenhuma vaga em FLN, que são os
@@ -59,11 +66,11 @@ GET {{host}}/aeronaves
 # porque a carga inicial a deixou de fora de propósito; as outras sete aerovias
 # têm ocupação neste dia (ver 4.4).
 # Guarde este número: ele vai mudar depois da aprovação, e só depois dela.
-GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
 
 ### 2.2 Vagas disponíveis em FLN (UC08) · demonstração 3
 # 200 — as 16 vagas livres.
-GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
+GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T01:00:00
 
 ### 2.3 Criar o plano (UC05) · demonstração 2
 # 201 — id 1, situacao EM_EDICAO, trechos vazio.
@@ -75,21 +82,21 @@ Content-Type: application/json
   "aeronavePrefixo": "PR-PAX",
   "origem": "POA",
   "destino": "FLN",
-  "partida": "2026-10-19T08:00:00"
+  "partida": "2026-10-19T23:00:00"
 }
 
 ### 2.4 Montar o percurso (UC06) · demonstração 2
 # R1 é POA->FLN, 363 km. O PR-PAX voa a 830 km/h: a viagem dura 26 min.
 # FLN é o destino final, então o pouso é obrigatório, com vaga e permanência.
-# 201 — horarioChegada "2026-10-19T08:26:00" CALCULADO pelo sistema (não foi
-#       informado), noDestino "POUSO", saidaDaVaga "2026-10-19T09:26:00".
+# 201 — horarioChegada "2026-10-19T23:26:00" CALCULADO pelo sistema (não foi
+#       informado), noDestino "POUSO", saidaDaVaga "2026-10-20T00:26:00".
 POST {{host}}/planos/1/trechos
 Content-Type: application/json
 
 {
   "aeroviaId": "R1",
   "altitude": 30000,
-  "horarioEntrada": "2026-10-19T08:00:00",
+  "horarioEntrada": "2026-10-19T23:00:00",
   "numeroVaga": 3,
   "permanenciaMinutos": 60
 }
@@ -100,7 +107,7 @@ POST {{host}}/planos/1/validacao
 
 ### 2.6 PROVA de que validar NÃO reservou · demonstração 4
 # 200 — ainda as 11 altitudes. Nada foi reservado pela validação.
-GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
 
 ### 2.7 PROVA de que validar NÃO mudou o estado · demonstração 4
 # 200 — situacao continua EM_EDICAO.
@@ -113,12 +120,12 @@ POST {{host}}/planos/1/aprovacao
 
 ### 2.9 PROVA de que aprovar reservou a altitude · demonstração 5
 # 200 — agora são 10 altitudes: a de 30000 sumiu da lista.
-GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
 
 ### 2.10 PROVA de que aprovar reservou a vaga · demonstração 5
-# 200 — agora são 15 vagas: a 3 sumiu. O pouso é 08:26 com 60 min de
-# permanência, então ela fica ocupada nos slots das 08:00 e das 09:00.
-GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
+# 200 — agora são 15 vagas: a 3 sumiu. O pouso é 23:26 com 60 min de
+# permanência, então ela fica ocupada nos slots das 23:00 e das 00:00 do dia 20.
+GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T01:00:00
 
 ### ═══════════════════════════════════════════════════════════════
 ### 3. FALHAS DE VALIDAÇÃO         · demonstrações 6, 7, 8 e 9
@@ -243,7 +250,7 @@ POST {{host}}/planos/6/validacao
 ### ═══════════════════════════════════════════════════════════════
 ###
 ### Estas três dependem do plano 1 estar APROVADO (bloco 2.8). É ele que
-### ocupa a altitude 30000 da R1 e a vaga 3 de FLN no slot das 08:00.
+### ocupa a altitude 30000 da R1 e a vaga 3 de FLN no slot das 23:00.
 
 ### 4.1 CONFLITO DE ALTITUDE — preparação (plano 7) · demonstração 10
 # Mesma aerovia, mesma altitude, mesmo slot do plano 1 já aprovado.
@@ -251,19 +258,19 @@ POST {{host}}/planos
 Content-Type: application/json
 
 { "pilotoId": 2, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
-  "partida": "2026-10-19T08:00:00" }
+  "partida": "2026-10-19T23:00:00" }
 
 ### 4.1.a Trecho na altitude já ocupada, mas em vaga livre
 POST {{host}}/planos/7/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T08:00:00",
+{ "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T23:00:00",
   "numeroVaga": 9, "permanenciaMinutos": 30 }
 
 ### 4.1.b Validar — acusa o conflito
 # 200 — valido false:
 #   "Trecho 1: a altitude 30000 pés da aerovia R1 já está reservada
-#    no(s) slot(s) das 19/10 08:00"
+#    no(s) slot(s) das 19/10 23:00"
 POST {{host}}/planos/7/validacao
 
 ### 4.2 APROVAÇÃO RECUSADA · demonstração 12
@@ -280,7 +287,7 @@ GET {{host}}/planos/7
 # que estava livre e faria parte da aprovação, NÃO foi reservada.
 # É o teste que o enunciado cobra por escrito (§5.4), e ele também existe
 # automatizado, em AprovacaoAtomicaTest.
-GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
 
 ### 4.3 VAGA INDISPONÍVEL (plano 8) · demonstração 11
 # Agora o contrário: altitude livre (31000), mas a vaga 3 de FLN está ocupada
@@ -289,21 +296,21 @@ POST {{host}}/planos
 Content-Type: application/json
 
 { "pilotoId": 3, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
-  "partida": "2026-10-19T08:00:00" }
+  "partida": "2026-10-19T23:00:00" }
 
 ### 4.3.a Trecho em altitude livre, mas na vaga ocupada
 POST {{host}}/planos/8/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R1", "altitude": 31000, "horarioEntrada": "2026-10-19T08:00:00",
+{ "aeroviaId": "R1", "altitude": 31000, "horarioEntrada": "2026-10-19T23:00:00",
   "numeroVaga": 3, "permanenciaMinutos": 60 }
 
 ### 4.3.b Validar
 # 200 — valido false:
 #   "Trecho 1: a vaga 3 de FLN já está reservada no(s) slot(s) das
-#    19/10 08:00, 19/10 09:00"
-# Repare: DOIS slots, porque a permanência de 60 min a partir das 08:26
-# atravessa a hora cheia.
+#    19/10 23:00, 20/10 00:00"
+# Repare: DOIS slots, porque a permanência de 60 min a partir das 23:26
+# atravessa a meia-noite.
 POST {{host}}/planos/8/validacao
 
 ### 4.4 CONFLITO CONTRA UM PLANO DA CARGA INICIAL · demonstração 10
@@ -344,11 +351,11 @@ POST {{host}}/planos/1/cancelamento
 
 ### 5.1.a PROVA: as reservas de aerovia foram liberadas · demonstração 13
 # 200 — voltaram as 11 altitudes.
-GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
+GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
 
 ### 5.1.b PROVA: as reservas de vaga foram liberadas · demonstração 13
 # 200 — voltaram as 16 vagas.
-GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T10:00:00
+GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T01:00:00
 
 ### 5.2 Cancelar plano que JÁ PARTIU — RECUSADO · demonstração 14
 # O plano 1005 vem da carga inicial, já aprovado, partindo em 17/10. Como ele
@@ -448,7 +455,7 @@ GET {{host}}/planos?situacao=APROVADO
 GET {{host}}/planos?situacao=CANCELADO
 
 ### 6.6 Consultar planos ABANDONADOS · demonstração 16
-# 200 — o plano 10. Cancelado e abandonado seguem consultáveis.
+# 200 — o plano 11, abandonado no bloco 6.2. Cancelado e abandonado seguem consultáveis.
 GET {{host}}/planos?situacao=ABANDONADO
 
 ### 6.7 Consultar planos EM EDIÇÃO
@@ -456,7 +463,8 @@ GET {{host}}/planos?situacao=ABANDONADO
 GET {{host}}/planos?situacao=EM_EDICAO
 
 ### 6.8 Consultar todos
-# 200 — 15 planos: os 11 criados por este roteiro e os 4 da carga inicial.
+# 200 — 16 planos: os 11 criados até aqui e os 5 da carga inicial. Depois da
+# seção 8 entra o plano 12, e a conta passa a 17.
 GET {{host}}/planos
 
 ### 6.9 Consultar plano por id (UC13)
@@ -500,6 +508,21 @@ PUT {{host}}/planos/5/trechos/1
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 29000, "horarioEntrada": "2026-10-19T08:00:00" }
+
+### 7.7 Rota inexistente
+# 404 — Problem Detail, "Rota não encontrada". Não é 500.
+GET {{host}}/esta-rota-nao-existe
+
+### 7.8 Método não suportado
+# 405 — POST /aeroportos existe; PUT nessa coleção não.
+PUT {{host}}/aeroportos
+
+### 7.9 Content-Type incompatível
+# 415 — "Content-Type não suportado. Use application/json"
+POST {{host}}/planos
+Content-Type: text/plain
+
+nao-e-json
 
 ### ═══════════════════════════════════════════════════════════════
 ### 8. CADASTROS E EXTENSIBILIDADE
@@ -553,14 +576,14 @@ POST {{host}}/planos
 Content-Type: application/json
 
 { "pilotoId": 101, "aeronavePrefixo": "PR-NEW", "origem": "GRU", "destino": "SDU",
-  "partida": "2026-10-19T15:00:00" }
+  "partida": "2026-10-19T22:00:00" }
 
 ### 8.5.a Trecho pela aerovia nova
-# 201 — 365 km a 800 km/h: chegada calculada às 15:27.
+# 201 — 365 km a 800 km/h: chegada calculada às 22:27.
 POST {{host}}/planos/12/trechos
 Content-Type: application/json
 
-{ "aeroviaId": "R9", "altitude": 29000, "horarioEntrada": "2026-10-19T15:00:00",
+{ "aeroviaId": "R9", "altitude": 29000, "horarioEntrada": "2026-10-19T22:00:00",
   "numeroVaga": 4, "permanenciaMinutos": 30 }
 
 ### 8.5.b Validar
@@ -585,8 +608,8 @@ Content-Type: application/json
 { "id": "R1", "origem": "POA", "destino": "FLN", "distanciaKm": 363 }
 
 ### 8.6.b Não existe alteração nem exclusão de aerovia
-# 404 nos dois: as rotas não existem. A imutabilidade é estrutural, não uma
-# validação que alguém possa esquecer de chamar.
+# 404 nos dois: as rotas não existem (Problem Detail, não 500). A
+# imutabilidade é estrutural, não uma validação que alguém possa esquecer.
 PUT {{host}}/aerovias/R1
 
 ### 8.6.c
