@@ -1,17 +1,14 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
-import com.pucrs.planosdevoo.domain.ports.in.FrotaUseCase;
-
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.Piloto;
+import com.pucrs.planosdevoo.domain.ports.in.FrotaUseCase;
+import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.AeronaveRequest;
+import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.AeronaveResponse;
+import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.PilotoRequest;
+import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.PilotoResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ProblemDetail;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -22,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Frota", description = "Pilotos e aeronaves. Cada categoria de aeronave tem a sua regra de "
-        + "operação: particular só voa a 25.000, 26.000 e 27.000 pés; passageiros a 28.000 ou mais; "
-        + "carga em qualquer altitude, mas só entre 00:00 e 06:00.")
+@Tag(name = "Pilotos e aeronaves")
 public class FrotaController {
 
     private final FrotaUseCase frota;
@@ -33,53 +28,32 @@ public class FrotaController {
         this.frota = frota;
     }
 
-    @Operation(summary = "Consultar pilotos (UC03)")
-    @ApiResponse(responseCode = "200", description = "Lista de pilotos")
+    @Operation(summary = "Listar pilotos")
     @GetMapping("/pilotos")
-    public List<PilotoResponseDTO> listarPilotos() {
-        return frota.listarPilotos().stream().map(PilotoResponseDTO::de).toList();
+    public List<PilotoResponse> listarPilotos() {
+        return frota.listarPilotos().stream().map(PilotoResponse::de).toList();
     }
 
-    @Operation(summary = "Consultar aeronaves (UC04)",
-            description = "Lista as aeronaves com prefixo, categoria, velocidade de cruzeiro e autonomia.")
-    @ApiResponse(responseCode = "200", description = "Lista de aeronaves")
+    @Operation(summary = "Listar aeronaves")
     @GetMapping("/aeronaves")
-    public List<AeronaveResponseDTO> listarAeronaves() {
-        return frota.listarAeronaves().stream().map(AeronaveResponseDTO::de).toList();
+    public List<AeronaveResponse> listarAeronaves() {
+        return frota.listarAeronaves().stream().map(AeronaveResponse::de).toList();
     }
 
-    @Operation(summary = "Cadastrar piloto",
-            description = "O id é gerado pelo banco, a partir de 101 — os ids 1 a 4 são da carga inicial.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Piloto cadastrado"),
-            @ApiResponse(responseCode = "400", description = "Nome ausente",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
+    @Operation(summary = "Cadastrar piloto")
     @PostMapping("/pilotos")
-    public ResponseEntity<PilotoResponseDTO> cadastrarPiloto(@Valid @RequestBody PilotoRequestDTO req) {
+    public ResponseEntity<PilotoResponse> cadastrarPiloto(@Valid @RequestBody PilotoRequest req) {
         Piloto piloto = frota.cadastrarPiloto(req.nome());
-        return ResponseEntity.created(URI.create("/pilotos/" + piloto.getId())).body(PilotoResponseDTO.de(piloto));
+        return ResponseEntity.created(URI.create("/pilotos/" + piloto.getId())).body(PilotoResponse.de(piloto));
     }
 
-    // O controller não conhece as subclasses de Aeronave: repassa os dados e a
-    // FabricaDeAeronaves, no domínio, escolhe a categoria.
     @Operation(summary = "Cadastrar aeronave",
-            description = "A categoria determina a subclasse criada e quais campos são obrigatórios: "
-                    + "`empresaManutencao` para PARTICULAR, `companhiaAerea` e `capacidadePassageiros` "
-                    + "para PASSAGEIROS, `companhiaAerea` e `capacidadeToneladas` para CARGA. "
-                    + "Uma categoria nova entra como subclasse nova, sem alterar a validação do plano.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Aeronave cadastrada"),
-            @ApiResponse(responseCode = "400", description = "Corpo inválido",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
-            @ApiResponse(responseCode = "409", description = "Já existe aeronave com esse prefixo",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
-            @ApiResponse(responseCode = "422",
-                    description = "Categoria desconhecida, ou falta um campo obrigatório da categoria",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
+            description = "Categoria PARTICULAR exige empresaManutencao; PASSAGEIROS exige companhiaAerea e "
+                    + "capacidadePassageiros; CARGA exige companhiaAerea e capacidadeToneladas.")
     @PostMapping("/aeronaves")
-    public ResponseEntity<AeronaveResponseDTO> cadastrarAeronave(@Valid @RequestBody AeronaveRequestDTO req) {
+    public ResponseEntity<AeronaveResponse> cadastrarAeronave(@Valid @RequestBody AeronaveRequest req) {
         Aeronave aeronave = frota.cadastrarAeronave(req.paraComando());
         return ResponseEntity.created(URI.create("/aeronaves/" + aeronave.getPrefixo()))
-                .body(AeronaveResponseDTO.de(aeronave));
+                .body(AeronaveResponse.de(aeronave));
     }
 }
