@@ -4,8 +4,8 @@ import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.out.Transacao;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.sql.DataSource;
@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:reexecucao;DB_CLOSE_DELAY=-1")
 class SeedReexecucaoTest {
 
-    @Autowired RepositorioPlanosDeVoo planos;
-    @Autowired RepositorioReservas reservas;
+    @Autowired PlanoDeVooRepository planos;
+    @Autowired ReservaRepository reservas;
     @Autowired Transacao transacao;
     @Autowired DataSource dataSource;
 

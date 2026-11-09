@@ -1,6 +1,6 @@
 package com.pucrs.planosdevoo.domain.model;
 
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,9 +15,9 @@ public class VerificadorDeConflitos {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
-    private final RepositorioReservas reservas;
+    private final ReservaRepository reservas;
 
-    public VerificadorDeConflitos(RepositorioReservas reservas) {
+    public VerificadorDeConflitos(ReservaRepository reservas) {
         this.reservas = reservas;
     }
 

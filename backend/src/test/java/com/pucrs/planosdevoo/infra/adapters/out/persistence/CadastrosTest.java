@@ -17,8 +17,8 @@ import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.TrechoCommand;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
+import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
@@ -43,8 +43,8 @@ class CadastrosTest {
     @Autowired CriarPlanoUC criarPlano;
     @Autowired DefinirPercursoUC definirPercurso;
     @Autowired AprovarPlanoUC aprovarPlano;
-    @Autowired RepositorioAerovias aerovias;
-    @Autowired RepositorioAeronaves aeronaves;
+    @Autowired AeroviaRepository aerovias;
+    @Autowired AeronaveRepository aeronaves;
 
     @Test
     void cadastrosNovosEntramEmUsoNumPlanoNaMesmaExecucao() {

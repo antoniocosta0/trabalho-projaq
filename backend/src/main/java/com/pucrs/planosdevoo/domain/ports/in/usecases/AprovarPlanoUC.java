@@ -4,21 +4,21 @@ import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.VerificadorDeConflitos;
 import com.pucrs.planosdevoo.domain.ports.out.Transacao;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
 // UC10 — Aprovar plano. Integral: ou aprova e reserva tudo, ou não muda nada.
 public class AprovarPlanoUC {
 
-    private final RepositorioPlanosDeVoo planos;
-    private final RepositorioReservas reservas;
+    private final PlanoDeVooRepository planos;
+    private final ReservaRepository reservas;
     private final VerificadorDeConflitos verificador;
     private final Transacao transacao;
     private final Clock relogio;
 
-    public AprovarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
+    public AprovarPlanoUC(PlanoDeVooRepository planos, ReservaRepository reservas,
                           VerificadorDeConflitos verificador, Transacao transacao, Clock relogio) {
         this.planos = planos;
         this.reservas = reservas;

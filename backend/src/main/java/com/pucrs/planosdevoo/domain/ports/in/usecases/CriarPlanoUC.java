@@ -5,20 +5,20 @@ import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.model.Piloto;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPilotos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 
 public class CriarPlanoUC {
 
-    private final RepositorioPlanosDeVoo planos;
-    private final RepositorioPilotos pilotos;
-    private final RepositorioAeronaves aeronaves;
-    private final RepositorioAeroportos aeroportos;
+    private final PlanoDeVooRepository planos;
+    private final PilotoRepository pilotos;
+    private final AeronaveRepository aeronaves;
+    private final AeroportoRepository aeroportos;
 
-    public CriarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioPilotos pilotos,
-                        RepositorioAeronaves aeronaves, RepositorioAeroportos aeroportos) {
+    public CriarPlanoUC(PlanoDeVooRepository planos, PilotoRepository pilotos,
+                        AeronaveRepository aeronaves, AeroportoRepository aeroportos) {
         this.planos = planos;
         this.pilotos = pilotos;
         this.aeronaves = aeronaves;

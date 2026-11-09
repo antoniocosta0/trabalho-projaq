@@ -1,14 +1,14 @@
 package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.Aeronave;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
+import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
 import java.util.List;
 
 public class ConsultarAeronavesUC {
 
-    private final RepositorioAeronaves aeronaves;
+    private final AeronaveRepository aeronaves;
 
-    public ConsultarAeronavesUC(RepositorioAeronaves aeronaves) {
+    public ConsultarAeronavesUC(AeronaveRepository aeronaves) {
         this.aeronaves = aeronaves;
     }
 

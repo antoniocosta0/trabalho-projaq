@@ -4,8 +4,8 @@ import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -15,10 +15,10 @@ import java.util.stream.IntStream;
 // UC08 — Consultar vagas disponíveis em um aeroporto por período. Só consulta: não reserva.
 public class ConsultarVagasDisponiveisUC {
 
-    private final RepositorioAeroportos aeroportos;
-    private final RepositorioReservas reservas;
+    private final AeroportoRepository aeroportos;
+    private final ReservaRepository reservas;
 
-    public ConsultarVagasDisponiveisUC(RepositorioAeroportos aeroportos, RepositorioReservas reservas) {
+    public ConsultarVagasDisponiveisUC(AeroportoRepository aeroportos, ReservaRepository reservas) {
         this.aeroportos = aeroportos;
         this.reservas = reservas;
     }

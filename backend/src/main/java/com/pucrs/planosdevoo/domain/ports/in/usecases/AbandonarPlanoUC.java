@@ -2,15 +2,15 @@ package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 
 // UC11 — Abandonar plano. Plano em edição não tem reservas, então não há nada
 // a liberar.
 public class AbandonarPlanoUC {
 
-    private final RepositorioPlanosDeVoo planos;
+    private final PlanoDeVooRepository planos;
 
-    public AbandonarPlanoUC(RepositorioPlanosDeVoo planos) {
+    public AbandonarPlanoUC(PlanoDeVooRepository planos) {
         this.planos = planos;
     }
 

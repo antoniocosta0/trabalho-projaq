@@ -2,14 +2,14 @@ package com.pucrs.planosdevoo.domain.fakes;
 
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 // Repositório de teste: o plano guarda o que foi salvo, sem banco. O id vem
 // de quem monta o teste (PlanoDeVoo.reconstituir).
-public class PlanosEmMemoria implements RepositorioPlanosDeVoo {
+public class PlanosEmMemoria implements PlanoDeVooRepository {
 
     private final List<PlanoDeVoo> planos = new ArrayList<>();
 

@@ -8,10 +8,10 @@ import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -37,10 +37,10 @@ class SeedConsistenciaTest {
 
     private static final LocalDate DATA_DE_REFERENCIA = LocalDate.of(2026, 10, 19);
 
-    @Autowired RepositorioPlanosDeVoo planos;
-    @Autowired RepositorioReservas reservas;
-    @Autowired RepositorioAerovias aerovias;
-    @Autowired RepositorioAeroportos aeroportos;
+    @Autowired PlanoDeVooRepository planos;
+    @Autowired ReservaRepository reservas;
+    @Autowired AeroviaRepository aerovias;
+    @Autowired AeroportoRepository aeroportos;
     @Autowired CriarPlanoUC criarPlano;
 
     // Dois dias antes da data de referência até o fim do dia seguinte a ela. A

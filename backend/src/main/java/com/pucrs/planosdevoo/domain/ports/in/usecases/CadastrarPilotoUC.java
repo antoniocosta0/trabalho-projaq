@@ -1,13 +1,13 @@
 package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.Piloto;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPilotos;
+import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
 
 public class CadastrarPilotoUC {
 
-    private final RepositorioPilotos pilotos;
+    private final PilotoRepository pilotos;
 
-    public CadastrarPilotoUC(RepositorioPilotos pilotos) {
+    public CadastrarPilotoUC(PilotoRepository pilotos) {
         this.pilotos = pilotos;
     }
 

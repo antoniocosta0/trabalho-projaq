@@ -12,8 +12,8 @@ import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.TrechoCommand;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -44,8 +44,8 @@ class AprovacaoConcorrenteTest {
     @Autowired DefinirPercursoUC definirPercurso;
     @Autowired AprovarPlanoUC aprovarPlano;
     @Autowired ConsultarAltitudesDisponiveisUC consultarAltitudes;
-    @Autowired RepositorioPlanosDeVoo planos;
-    @Autowired RepositorioReservas reservas;
+    @Autowired PlanoDeVooRepository planos;
+    @Autowired ReservaRepository reservas;
 
     private static LocalDateTime em(int hora, int minuto) {
         return LocalDateTime.of(2031, 5, 20, hora, minuto);

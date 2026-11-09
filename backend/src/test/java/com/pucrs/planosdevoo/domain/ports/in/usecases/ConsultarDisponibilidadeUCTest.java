@@ -10,8 +10,8 @@ import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -47,10 +47,10 @@ class ConsultarDisponibilidadeUCTest {
     @BeforeEach
     void preparar() {
         reservas = new ReservasEmMemoria();
-        RepositorioAerovias aerovias = mock(RepositorioAerovias.class);
+        AeroviaRepository aerovias = mock(AeroviaRepository.class);
         when(aerovias.buscarPorId("R1")).thenReturn(Optional.of(R1));
         when(aerovias.buscarPorId("R99")).thenReturn(Optional.empty());
-        RepositorioAeroportos aeroportos = mock(RepositorioAeroportos.class);
+        AeroportoRepository aeroportos = mock(AeroportoRepository.class);
         when(aeroportos.buscarPorCodigo("FLN")).thenReturn(Optional.of(FLN));
         when(aeroportos.buscarPorCodigo("XXX")).thenReturn(Optional.empty());
         altitudes = new ConsultarAltitudesDisponiveisUC(aerovias, reservas);

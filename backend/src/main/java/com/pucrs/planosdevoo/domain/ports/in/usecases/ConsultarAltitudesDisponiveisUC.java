@@ -4,8 +4,8 @@ import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.model.Trecho;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 // UC07 — Consultar altitudes disponíveis em uma aerovia por período. Só consulta: não reserva.
 public class ConsultarAltitudesDisponiveisUC {
 
-    private final RepositorioAerovias aerovias;
-    private final RepositorioReservas reservas;
+    private final AeroviaRepository aerovias;
+    private final ReservaRepository reservas;
 
-    public ConsultarAltitudesDisponiveisUC(RepositorioAerovias aerovias, RepositorioReservas reservas) {
+    public ConsultarAltitudesDisponiveisUC(AeroviaRepository aerovias, ReservaRepository reservas) {
         this.aerovias = aerovias;
         this.reservas = reservas;
     }

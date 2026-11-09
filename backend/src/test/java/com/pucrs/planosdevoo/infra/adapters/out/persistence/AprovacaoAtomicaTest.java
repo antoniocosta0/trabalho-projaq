@@ -18,10 +18,10 @@ import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.TrechoCommand;
 import com.pucrs.planosdevoo.domain.ports.out.Transacao;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,10 +47,10 @@ class AprovacaoAtomicaTest {
     @Autowired CancelarPlanoUC cancelarPlano;
     @Autowired ConsultarAltitudesDisponiveisUC consultarAltitudes;
     @Autowired ConsultarVagasDisponiveisUC consultarVagas;
-    @Autowired RepositorioPlanosDeVoo planos;
-    @Autowired RepositorioReservas reservas;
-    @Autowired RepositorioAerovias aerovias;
-    @Autowired RepositorioAeroportos aeroportos;
+    @Autowired PlanoDeVooRepository planos;
+    @Autowired ReservaRepository reservas;
+    @Autowired AeroviaRepository aerovias;
+    @Autowired AeroportoRepository aeroportos;
     @Autowired Transacao transacao;
 
     private static LocalDateTime em(int dia, int hora, int minuto) {

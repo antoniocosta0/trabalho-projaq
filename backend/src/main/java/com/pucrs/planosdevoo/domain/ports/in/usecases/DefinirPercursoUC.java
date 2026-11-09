@@ -4,18 +4,18 @@ import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 
 // UC06 — Definir ou alterar o percurso. As regras (só em edição, ordem dos
 // trechos, velocidade da aeronave) ficam no PlanoDeVoo; aqui só se busca o que
 // a requisição referencia por identificador e se salva o resultado.
 public class DefinirPercursoUC {
 
-    private final RepositorioPlanosDeVoo planos;
-    private final RepositorioAerovias aerovias;
+    private final PlanoDeVooRepository planos;
+    private final AeroviaRepository aerovias;
 
-    public DefinirPercursoUC(RepositorioPlanosDeVoo planos, RepositorioAerovias aerovias) {
+    public DefinirPercursoUC(PlanoDeVooRepository planos, AeroviaRepository aerovias) {
         this.planos = planos;
         this.aerovias = aerovias;
     }

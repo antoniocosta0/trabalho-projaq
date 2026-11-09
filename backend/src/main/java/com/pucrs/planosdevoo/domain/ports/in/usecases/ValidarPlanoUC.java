@@ -3,17 +3,17 @@ package com.pucrs.planosdevoo.domain.ports.in.usecases;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.VerificadorDeConflitos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import java.util.ArrayList;
 import java.util.List;
 
 // UC09 — Validar plano. Não muda a situação e não cria reserva.
 public class ValidarPlanoUC {
 
-    private final RepositorioPlanosDeVoo planos;
+    private final PlanoDeVooRepository planos;
     private final VerificadorDeConflitos verificador;
 
-    public ValidarPlanoUC(RepositorioPlanosDeVoo planos, VerificadorDeConflitos verificador) {
+    public ValidarPlanoUC(PlanoDeVooRepository planos, VerificadorDeConflitos verificador) {
         this.planos = planos;
         this.verificador = verificador;
     }

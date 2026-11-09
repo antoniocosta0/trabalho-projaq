@@ -4,13 +4,13 @@ import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.util.ArrayList;
 import java.util.List;
 
 // Repositório de teste: guarda as reservas numa lista, sem banco. Recusa
 // reserva repetida como o UNIQUE do banco faria.
-public class ReservasEmMemoria implements RepositorioReservas {
+public class ReservasEmMemoria implements ReservaRepository {
 
     public final List<ReservaAerovia> aerovias = new ArrayList<>();
     public final List<ReservaVaga> vagas = new ArrayList<>();

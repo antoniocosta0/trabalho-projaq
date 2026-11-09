@@ -4,17 +4,17 @@ import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 
 // Aerovia é imutável: só se cadastra nova, com id novo. Id repetido é recusado,
 // e não tratado como alteração da existente.
 public class CadastrarAeroviaUC {
 
-    private final RepositorioAerovias aerovias;
-    private final RepositorioAeroportos aeroportos;
+    private final AeroviaRepository aerovias;
+    private final AeroportoRepository aeroportos;
 
-    public CadastrarAeroviaUC(RepositorioAerovias aerovias, RepositorioAeroportos aeroportos) {
+    public CadastrarAeroviaUC(AeroviaRepository aerovias, AeroportoRepository aeroportos) {
         this.aerovias = aerovias;
         this.aeroportos = aeroportos;
     }

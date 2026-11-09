@@ -2,14 +2,14 @@ package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import java.util.List;
 
 public class ListarPlanosUC {
 
-    private final RepositorioPlanosDeVoo planos;
+    private final PlanoDeVooRepository planos;
 
-    public ListarPlanosUC(RepositorioPlanosDeVoo planos) {
+    public ListarPlanosUC(PlanoDeVooRepository planos) {
         this.planos = planos;
     }
 

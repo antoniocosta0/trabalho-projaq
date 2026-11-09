@@ -20,12 +20,12 @@ import com.pucrs.planosdevoo.domain.ports.in.usecases.AbandonarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.DefinirPercursoUC;
 import com.pucrs.planosdevoo.domain.ports.in.usecases.ValidarPlanoUC;
 import com.pucrs.planosdevoo.domain.ports.out.Transacao;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAerovias;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPilotos;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioReservas;
+import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
+import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,102 +39,102 @@ import org.springframework.context.annotation.Configuration;
 public class UseCaseConfig {
 
     @Bean
-    public ConsultarAeroportosUC consultarAeroportosUC(RepositorioAeroportos aeroportos) {
+    public ConsultarAeroportosUC consultarAeroportosUC(AeroportoRepository aeroportos) {
         return new ConsultarAeroportosUC(aeroportos);
     }
 
     @Bean
-    public ConsultarAeroviasUC consultarAeroviasUC(RepositorioAerovias aerovias) {
+    public ConsultarAeroviasUC consultarAeroviasUC(AeroviaRepository aerovias) {
         return new ConsultarAeroviasUC(aerovias);
     }
 
     @Bean
-    public ConsultarPilotosUC consultarPilotosUC(RepositorioPilotos pilotos) {
+    public ConsultarPilotosUC consultarPilotosUC(PilotoRepository pilotos) {
         return new ConsultarPilotosUC(pilotos);
     }
 
     @Bean
-    public ConsultarAeronavesUC consultarAeronavesUC(RepositorioAeronaves aeronaves) {
+    public ConsultarAeronavesUC consultarAeronavesUC(AeronaveRepository aeronaves) {
         return new ConsultarAeronavesUC(aeronaves);
     }
 
     @Bean
-    public CadastrarAeroportoUC cadastrarAeroportoUC(RepositorioAeroportos aeroportos) {
+    public CadastrarAeroportoUC cadastrarAeroportoUC(AeroportoRepository aeroportos) {
         return new CadastrarAeroportoUC(aeroportos);
     }
 
     @Bean
-    public CadastrarAeroviaUC cadastrarAeroviaUC(RepositorioAerovias aerovias, RepositorioAeroportos aeroportos) {
+    public CadastrarAeroviaUC cadastrarAeroviaUC(AeroviaRepository aerovias, AeroportoRepository aeroportos) {
         return new CadastrarAeroviaUC(aerovias, aeroportos);
     }
 
     @Bean
-    public CadastrarPilotoUC cadastrarPilotoUC(RepositorioPilotos pilotos) {
+    public CadastrarPilotoUC cadastrarPilotoUC(PilotoRepository pilotos) {
         return new CadastrarPilotoUC(pilotos);
     }
 
     @Bean
-    public CadastrarAeronaveUC cadastrarAeronaveUC(RepositorioAeronaves aeronaves) {
+    public CadastrarAeronaveUC cadastrarAeronaveUC(AeronaveRepository aeronaves) {
         return new CadastrarAeronaveUC(aeronaves);
     }
 
     @Bean
-    public CriarPlanoUC criarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioPilotos pilotos,
-                                     RepositorioAeronaves aeronaves, RepositorioAeroportos aeroportos) {
+    public CriarPlanoUC criarPlanoUC(PlanoDeVooRepository planos, PilotoRepository pilotos,
+                                     AeronaveRepository aeronaves, AeroportoRepository aeroportos) {
         return new CriarPlanoUC(planos, pilotos, aeronaves, aeroportos);
     }
 
     @Bean
-    public ConsultarPlanoUC consultarPlanoUC(RepositorioPlanosDeVoo planos) {
+    public ConsultarPlanoUC consultarPlanoUC(PlanoDeVooRepository planos) {
         return new ConsultarPlanoUC(planos);
     }
 
     @Bean
-    public ListarPlanosUC listarPlanosUC(RepositorioPlanosDeVoo planos) {
+    public ListarPlanosUC listarPlanosUC(PlanoDeVooRepository planos) {
         return new ListarPlanosUC(planos);
     }
 
     @Bean
-    public DefinirPercursoUC definirPercursoUC(RepositorioPlanosDeVoo planos, RepositorioAerovias aerovias) {
+    public DefinirPercursoUC definirPercursoUC(PlanoDeVooRepository planos, AeroviaRepository aerovias) {
         return new DefinirPercursoUC(planos, aerovias);
     }
 
     @Bean
-    public ValidarPlanoUC validarPlanoUC(RepositorioPlanosDeVoo planos, VerificadorDeConflitos verificador) {
+    public ValidarPlanoUC validarPlanoUC(PlanoDeVooRepository planos, VerificadorDeConflitos verificador) {
         return new ValidarPlanoUC(planos, verificador);
     }
 
     @Bean
-    public AbandonarPlanoUC abandonarPlanoUC(RepositorioPlanosDeVoo planos) {
+    public AbandonarPlanoUC abandonarPlanoUC(PlanoDeVooRepository planos) {
         return new AbandonarPlanoUC(planos);
     }
 
     @Bean
-    public VerificadorDeConflitos verificadorDeConflitos(RepositorioReservas reservas) {
+    public VerificadorDeConflitos verificadorDeConflitos(ReservaRepository reservas) {
         return new VerificadorDeConflitos(reservas);
     }
 
     @Bean
-    public ConsultarAltitudesDisponiveisUC consultarAltitudesDisponiveisUC(RepositorioAerovias aerovias,
-                                                                           RepositorioReservas reservas) {
+    public ConsultarAltitudesDisponiveisUC consultarAltitudesDisponiveisUC(AeroviaRepository aerovias,
+                                                                           ReservaRepository reservas) {
         return new ConsultarAltitudesDisponiveisUC(aerovias, reservas);
     }
 
     @Bean
-    public ConsultarVagasDisponiveisUC consultarVagasDisponiveisUC(RepositorioAeroportos aeroportos,
-                                                                   RepositorioReservas reservas) {
+    public ConsultarVagasDisponiveisUC consultarVagasDisponiveisUC(AeroportoRepository aeroportos,
+                                                                   ReservaRepository reservas) {
         return new ConsultarVagasDisponiveisUC(aeroportos, reservas);
     }
 
     @Bean
-    public AprovarPlanoUC aprovarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
+    public AprovarPlanoUC aprovarPlanoUC(PlanoDeVooRepository planos, ReservaRepository reservas,
                                          VerificadorDeConflitos verificador, Transacao transacao,
                                          Clock relogio) {
         return new AprovarPlanoUC(planos, reservas, verificador, transacao, relogio);
     }
 
     @Bean
-    public CancelarPlanoUC cancelarPlanoUC(RepositorioPlanosDeVoo planos, RepositorioReservas reservas,
+    public CancelarPlanoUC cancelarPlanoUC(PlanoDeVooRepository planos, ReservaRepository reservas,
                                            Transacao transacao, Clock relogio) {
         return new CancelarPlanoUC(planos, reservas, transacao, relogio);
     }

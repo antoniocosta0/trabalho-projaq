@@ -2,15 +2,15 @@ package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
+import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
 
 // Não é caso de uso numerado (ADR 0009): a malha vem da carga inicial, mas o
 // enunciado (§2 e §8.1) pede que dê para cadastrar aeroporto novo sem mexer no código.
 public class CadastrarAeroportoUC {
 
-    private final RepositorioAeroportos aeroportos;
+    private final AeroportoRepository aeroportos;
 
-    public CadastrarAeroportoUC(RepositorioAeroportos aeroportos) {
+    public CadastrarAeroportoUC(AeroportoRepository aeroportos) {
         this.aeroportos = aeroportos;
     }
 

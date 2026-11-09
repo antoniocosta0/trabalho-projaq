@@ -4,13 +4,13 @@ import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.DadosAeronave;
 import com.pucrs.planosdevoo.domain.model.FabricaDeAeronaves;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
-import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
+import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
 
 public class CadastrarAeronaveUC {
 
-    private final RepositorioAeronaves aeronaves;
+    private final AeronaveRepository aeronaves;
 
-    public CadastrarAeronaveUC(RepositorioAeronaves aeronaves) {
+    public CadastrarAeronaveUC(AeronaveRepository aeronaves) {
         this.aeronaves = aeronaves;
     }
 
