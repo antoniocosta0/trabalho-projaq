@@ -3,8 +3,10 @@ package com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PilotoEntity;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeronaveEntity;
 import com.pucrs.planosdevoo.domain.model.Aeronave;
-import com.pucrs.planosdevoo.domain.model.DadosAeronave;
-import com.pucrs.planosdevoo.domain.model.FabricaDeAeronaves;
+import com.pucrs.planosdevoo.domain.model.AeronaveCarga;
+import com.pucrs.planosdevoo.domain.model.AeronaveFactory;
+import com.pucrs.planosdevoo.domain.model.AeronaveParticular;
+import com.pucrs.planosdevoo.domain.model.AeronavePassageiros;
 import com.pucrs.planosdevoo.domain.model.Piloto;
 
 public final class FrotaMapper {
@@ -19,16 +21,23 @@ public final class FrotaMapper {
         return new PilotoEntity(p.getId(), p.getNome());
     }
 
-    // Quem escolhe a subclasse pela coluna "categoria" é a FabricaDeAeronaves,
-    // a mesma do cadastro: o switch por categoria existe num lugar só.
     public static Aeronave paraDominio(AeronaveEntity e) {
-        return FabricaDeAeronaves.criar(new DadosAeronave(e.getPrefixo(), e.getCategoria(),
-                e.getVelocidadeCruzeiroKmh(), e.getAutonomiaKm(), e.getEmpresaManutencao(), e.getCompanhiaAerea(),
-                e.getCapacidadePassageiros(), e.getCapacidadeToneladas()));
+        return AeronaveFactory.criar(e.getCategoria(), e.getPrefixo(), e.getVelocidadeCruzeiroKmh(), e.getAutonomiaKm(),
+                e.getEmpresaManutencao(), e.getCompanhiaAerea(), e.getCapacidadePassageiros(),
+                e.getCapacidadeToneladas());
     }
 
-    public static AeronaveEntity paraEntidade(DadosAeronave d) {
-        return new AeronaveEntity(d.prefixo(), d.categoria(), d.velocidadeCruzeiroKmh(), d.autonomiaKm(),
-                d.empresaManutencao(), d.companhiaAerea(), d.capacidadePassageiros(), d.capacidadeToneladas());
+    public static AeronaveEntity paraEntidade(Aeronave a) {
+        return switch (a) {
+            case AeronaveParticular p -> entidade(p, p.getEmpresaManutencao(), null, null, null);
+            case AeronavePassageiros p -> entidade(p, null, p.getCompanhiaAerea(), p.getCapacidadePassageiros(), null);
+            case AeronaveCarga c -> entidade(c, null, c.getCompanhiaAerea(), null, c.getCapacidadeToneladas());
+        };
+    }
+
+    private static AeronaveEntity entidade(Aeronave a, String empresaManutencao, String companhiaAerea,
+                                           Integer capacidadePassageiros, Double capacidadeToneladas) {
+        return new AeronaveEntity(a.getPrefixo(), a.getCategoria(), a.getVelocidadeCruzeiroKmh(), a.getAutonomiaKm(),
+                empresaManutencao, companhiaAerea, capacidadePassageiros, capacidadeToneladas);
     }
 }

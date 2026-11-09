@@ -1,7 +1,6 @@
 package com.pucrs.planosdevoo.domain.ports.in;
 
 import com.pucrs.planosdevoo.domain.model.Aeronave;
-import com.pucrs.planosdevoo.domain.model.DadosAeronave;
 import com.pucrs.planosdevoo.domain.model.Piloto;
 import java.util.List;
 
@@ -13,5 +12,5 @@ public interface FrotaUseCase {
 
     Piloto cadastrarPiloto(String nome);
 
-    Aeronave cadastrarAeronave(DadosAeronave dados);
+    Aeronave cadastrarAeronave(CadastrarAeronaveCommand comando);
 }

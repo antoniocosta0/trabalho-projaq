@@ -3,7 +3,7 @@ package com.pucrs.planosdevoo.domain.model;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class AeronaveCarga extends Aeronave {
+public final class AeronaveCarga extends Aeronave {
 
     private static final LocalTime FIM_DA_JANELA = LocalTime.of(6, 0);
 
@@ -23,9 +23,7 @@ public class AeronaveCarga extends Aeronave {
         this.capacidadeToneladas = capacidadeToneladas;
     }
 
-    // Todo o uso da aerovia precisa caber entre 00:00 (inclusive) e 06:00
-    // (exclusive) do mesmo dia, como o §3 do enunciado: a saída às 06:00
-    // exatamente já está fora da janela.
+    // §3: todo o uso da aerovia dentro de [00:00, 06:00)
     @Override
     public boolean podeOperar(int altitude, LocalDateTime entrada, LocalDateTime saida) {
         boolean mesmoDia = entrada.toLocalDate().equals(saida.toLocalDate());
@@ -35,11 +33,6 @@ public class AeronaveCarga extends Aeronave {
 
     @Override
     public String getCategoria() { return "CARGA"; }
-
-    @Override
-    public DadosAeronave dados() {
-        return dadosComuns(null, companhiaAerea, null, capacidadeToneladas);
-    }
 
     public String getCompanhiaAerea() { return companhiaAerea; }
     public double getCapacidadeToneladas() { return capacidadeToneladas; }

@@ -78,7 +78,7 @@ public class FrotaController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
     @PostMapping("/aeronaves")
     public ResponseEntity<AeronaveResponseDTO> cadastrarAeronave(@Valid @RequestBody AeronaveRequestDTO req) {
-        Aeronave aeronave = frota.cadastrarAeronave(req.paraDados());
+        Aeronave aeronave = frota.cadastrarAeronave(req.paraComando());
         return ResponseEntity.created(URI.create("/aeronaves/" + aeronave.getPrefixo()))
                 .body(AeronaveResponseDTO.de(aeronave));
     }

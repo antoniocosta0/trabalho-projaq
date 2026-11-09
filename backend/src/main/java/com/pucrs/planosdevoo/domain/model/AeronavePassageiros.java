@@ -2,7 +2,7 @@ package com.pucrs.planosdevoo.domain.model;
 
 import java.time.LocalDateTime;
 
-public class AeronavePassageiros extends Aeronave {
+public final class AeronavePassageiros extends Aeronave {
 
     private static final int ALTITUDE_MINIMA = 28_000;
 
@@ -29,11 +29,6 @@ public class AeronavePassageiros extends Aeronave {
 
     @Override
     public String getCategoria() { return "PASSAGEIROS"; }
-
-    @Override
-    public DadosAeronave dados() {
-        return dadosComuns(null, companhiaAerea, capacidadePassageiros, null);
-    }
 
     public String getCompanhiaAerea() { return companhiaAerea; }
     public int getCapacidadePassageiros() { return capacidadePassageiros; }
