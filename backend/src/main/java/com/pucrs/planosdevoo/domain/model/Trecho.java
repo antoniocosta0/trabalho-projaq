@@ -47,7 +47,6 @@ public class Trecho {
         return horarioEntrada.plus(aerovia.duracao(velocidadeCruzeiroKmh));
     }
 
-    // As 11 altitudes em que se pode voar: de 25.000 a 35.000 pés, de 1.000 em 1.000.
     public static List<Integer> altitudesPermitidas() {
         return IntStream.rangeClosed(ALTITUDE_MINIMA / INCREMENTO_ALTITUDE, ALTITUDE_MAXIMA / INCREMENTO_ALTITUDE)
                 .map(milhares -> milhares * INCREMENTO_ALTITUDE)
@@ -59,14 +58,24 @@ public class Trecho {
         return Slot.entre(horarioEntrada, horarioChegada());
     }
 
-    // Slots da vaga no aeroporto de destino, da chegada até o fim da permanência.
-    // Sobrevoo não ocupa vaga nenhuma.
     public List<Slot> slotsDaVaga() {
         if (pouso == null) {
             return List.of();
         }
         LocalDateTime chegada = horarioChegada();
         return Slot.entre(chegada, pouso.saida(chegada));
+    }
+
+    public List<ReservaAerovia> reservasDeAerovia(Long planoId) {
+        return slotsOcupados().stream()
+                .map(slot -> new ReservaAerovia(planoId, aerovia, altitude, slot))
+                .toList();
+    }
+
+    public List<ReservaVaga> reservasDeVaga(Long planoId) {
+        return slotsDaVaga().stream()
+                .map(slot -> new ReservaVaga(planoId, aerovia.getDestino(), pouso.getNumeroVaga(), slot))
+                .toList();
     }
 
     public int getOrdem() { return ordem; }

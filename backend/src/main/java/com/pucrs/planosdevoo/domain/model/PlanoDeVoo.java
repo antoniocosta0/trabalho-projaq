@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-// Raiz do agregado: o percurso (trechos) só muda por aqui, e só em edição.
 public class PlanoDeVoo {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("dd/MM HH:mm");
@@ -37,24 +36,18 @@ public class PlanoDeVoo {
         this.trechos = new ArrayList<>(trechos);
     }
 
-    // Todo plano novo nasce em edição, sem identificador e sem percurso.
     public static PlanoDeVoo novo(Piloto piloto, Aeronave aeronave, Aeroporto origem,
                                   Aeroporto destino, LocalDateTime partida) {
         return new PlanoDeVoo(null, piloto, aeronave, origem, destino, partida,
                 SituacaoPlano.EM_EDICAO, List.of());
     }
 
-    // Usado ao ler um plano já salvo.
     public static PlanoDeVoo reconstituir(Long id, Piloto piloto, Aeronave aeronave, Aeroporto origem,
                                           Aeroporto destino, LocalDateTime partida, SituacaoPlano situacao,
                                           List<Trecho> trechos) {
         return new PlanoDeVoo(id, piloto, aeronave, origem, destino, partida, situacao, trechos);
     }
 
-    // ---------- percurso (UC06) ----------
-
-    // O trecho entra no fim do percurso. A velocidade vem sempre da aeronave
-    // do plano, para o horário de chegada nunca ficar inconsistente.
     public Trecho adicionarTrecho(Aerovia aerovia, int altitude, LocalDateTime entrada, Pouso pouso) {
         garantirEmEdicao("alterar o percurso");
         Trecho trecho = criarTrecho(trechos.size() + 1, aerovia, altitude, entrada, pouso);
@@ -70,7 +63,6 @@ public class PlanoDeVoo {
         return novo;
     }
 
-    // Remove o trecho e renumera os seguintes, para a ordem continuar 1, 2, 3...
     public void removerTrecho(int ordem) {
         garantirEmEdicao("alterar o percurso");
         trechos.remove(indiceDo(ordem));
@@ -82,19 +74,11 @@ public class PlanoDeVoo {
         }
     }
 
-    // ---------- abandono (UC11) ----------
-
     public void abandonar() {
         garantirEmEdicao("abandonar o plano");
         situacao = SituacaoPlano.ABANDONADO;
     }
 
-    // ---------- aprovação e cancelamento (UC10, UC12) ----------
-
-    // Aprova se o próprio plano está válido, não há conflito de reserva e o voo
-    // ainda não partiu. Os conflitos chegam de fora (VerificadorDeConflitos)
-    // porque dependem das reservas de outros planos; gravar as reservas é com o
-    // caso de uso. "agora" chega de fora pelo mesmo motivo que em cancelar().
     public void aprovar(List<String> conflitosDeReserva, LocalDateTime agora) {
         garantirEmEdicao("aprovar o plano");
         List<String> problemas = new ArrayList<>(validar());
@@ -109,8 +93,6 @@ public class PlanoDeVoo {
         situacao = SituacaoPlano.APROVADO;
     }
 
-    // Só plano aprovado e com partida ainda no futuro. Voo que já partiu foi
-    // executado: continua consultável, mas não se cancela.
     public void cancelar(LocalDateTime agora) {
         if (situacao != SituacaoPlano.APROVADO) {
             throw new OperacaoNaoPermitidaException("Não é possível cancelar o plano: ele está " + situacao
@@ -123,34 +105,14 @@ public class PlanoDeVoo {
         situacao = SituacaoPlano.CANCELADO;
     }
 
-    // Uma reserva por trecho × slot, na altitude do trecho. O plano precisa já ter id.
     public List<ReservaAerovia> reservasDeAerovia() {
-        List<ReservaAerovia> reservas = new ArrayList<>();
-        for (Trecho t : trechos) {
-            for (Slot slot : t.slotsOcupados()) {
-                reservas.add(new ReservaAerovia(id, t.getAerovia(), t.getAltitude(), slot));
-            }
-        }
-        return reservas;
+        return trechos.stream().flatMap(t -> t.reservasDeAerovia(id).stream()).toList();
     }
 
-    // Uma reserva por pouso × slot, na vaga pretendida do aeroporto de destino do trecho.
     public List<ReservaVaga> reservasDeVaga() {
-        List<ReservaVaga> reservas = new ArrayList<>();
-        for (Trecho t : trechos) {
-            for (Slot slot : t.slotsDaVaga()) {
-                reservas.add(new ReservaVaga(id, t.getAerovia().getDestino(), t.getPouso().getNumeroVaga(), slot));
-            }
-        }
-        return reservas;
+        return trechos.stream().flatMap(t -> t.reservasDeVaga(id).stream()).toList();
     }
 
-    // ---------- validação (UC09) ----------
-
-    // Confere tudo o que depende só do próprio plano e devolve a lista de
-    // problemas (vazia se estiver tudo certo). Não muda a situação e não
-    // reserva nada. A disponibilidade de altitudes e vagas depende das reservas
-    // de OUTROS planos, então fica no caso de uso ValidarPlanoUC, não aqui.
     public List<String> validar() {
         garantirEmEdicao("validar o plano");
         List<String> problemas = new ArrayList<>();
@@ -159,6 +121,7 @@ public class PlanoDeVoo {
             return problemas;
         }
         verificarPercurso(problemas);
+        verificarPousos(problemas);
         verificarHorarios(problemas);
         verificarMesmoDia(problemas);
         verificarAeronave(problemas);
@@ -166,7 +129,6 @@ public class PlanoDeVoo {
         return problemas;
     }
 
-    // 1. As aerovias se encaixam, e o voo termina com pouso no destino.
     private void verificarPercurso(List<String> problemas) {
         Trecho primeiro = trechos.get(0);
         if (!mesmoAeroporto(primeiro.getAerovia().getOrigem(), origem)) {
@@ -186,21 +148,21 @@ public class PlanoDeVoo {
             problemas.add("O último trecho termina em " + ultimo.getAerovia().getDestino().getCodigo()
                     + ", mas o destino do plano é " + destino.getCodigo());
         }
-        if (ultimo.getPouso() == null) {
+    }
+
+    private void verificarPousos(List<String> problemas) {
+        if (ultimoTrecho().getPouso() == null) {
             problemas.add("O voo precisa terminar com pouso no destino final");
         }
         for (Trecho t : trechos) {
             Aeroporto aeroporto = t.getAerovia().getDestino();
             if (t.getPouso() != null && !aeroporto.possuiVaga(t.getPouso().getNumeroVaga())) {
                 problemas.add("Trecho " + t.getOrdem() + ": a vaga " + t.getPouso().getNumeroVaga()
-                        + " não existe em " + aeroporto.getCodigo() + " (vagas de 1 a "
-                        + aeroporto.getQuantidadeVagas() + ")");
+                        + " não existe em " + aeroporto.getCodigo());
             }
         }
     }
 
-    // 2. Cada entrada bate com a chegada calculada do trecho anterior
-    //    (mais a permanência, se houve pouso). A primeira bate com a partida.
     private void verificarHorarios(List<String> problemas) {
         LocalDateTime esperado = partida;
         for (Trecho t : trechos) {
@@ -212,7 +174,6 @@ public class PlanoDeVoo {
         }
     }
 
-    // 3. A chegada ao destino final acontece no mesmo dia da partida.
     private void verificarMesmoDia(List<String> problemas) {
         LocalDateTime chegadaFinal = ultimoTrecho().horarioChegada();
         if (!chegadaFinal.toLocalDate().equals(partida.toLocalDate())) {
@@ -221,8 +182,6 @@ public class PlanoDeVoo {
         }
     }
 
-    // 4. A categoria da aeronave permite voar naquela altitude e horário.
-    //    Cada categoria decide sozinha (polimorfismo), sem instanceof aqui.
     private void verificarAeronave(List<String> problemas) {
         for (Trecho t : trechos) {
             if (!aeronave.podeOperar(t.getAltitude(), t.getHorarioEntrada(), t.horarioChegada())) {
@@ -233,8 +192,6 @@ public class PlanoDeVoo {
         }
     }
 
-    // 5. Desde o último abastecimento, no máximo 85% da autonomia.
-    //    Sobrevoo continua somando; pouso abastece e zera a conta.
     private void verificarAutonomia(List<String> problemas) {
         double limite = aeronave.distanciaMaxSemAbastecer();
         double acumulado = 0;
@@ -250,8 +207,6 @@ public class PlanoDeVoo {
             }
         }
     }
-
-    // ---------- auxiliares ----------
 
     private void garantirEmEdicao(String acao) {
         if (situacao != SituacaoPlano.EM_EDICAO) {
