@@ -47,7 +47,7 @@ class AprovacaoAtomicaTest {
                 3, slot);
 
         assertThrows(ConflitoDeReservaException.class, () -> transacao.executar(() -> {
-            disputa.aprovar(List.of(), PARTIDA.minusDays(1));
+            disputa.aprovar(List.of());
             planos.salvar(disputa);
             reservas.reservar(List.of(altitudeLivre), List.of(vagaOcupada));
             return null;

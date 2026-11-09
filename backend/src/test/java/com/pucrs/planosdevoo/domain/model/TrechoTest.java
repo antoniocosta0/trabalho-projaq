@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TrechoTest {
 
@@ -38,20 +38,20 @@ class TrechoTest {
     }
 
     @Test
-    void guardaPousoQuandoInformado() {
-        Pouso pouso = new Pouso(2, 30);
-        Trecho trecho = trecho(200, 200, LocalDateTime.of(2026, 10, 19, 15, 0), pouso);
+    void pousoReservaAVagaDaChegadaAteOFimDaPermanencia() {
+        Trecho trecho = trecho(200, 200, LocalDateTime.of(2026, 10, 19, 14, 50), new Pouso(2, 20));
 
-        assertEquals(pouso, trecho.getPouso());
-        assertEquals(LocalDateTime.of(2026, 10, 19, 16, 30),
-                trecho.getPouso().saida(trecho.horarioChegada()));
+        assertEquals(List.of(
+                new Slot(LocalDateTime.of(2026, 10, 19, 15, 0)),
+                new Slot(LocalDateTime.of(2026, 10, 19, 16, 0))
+        ), trecho.reservasDeVaga(7L).stream().map(ReservaVaga::getSlot).toList());
     }
 
     @Test
-    void sobrevooNaoTemPouso() {
+    void sobrevooNaoReservaVaga() {
         Trecho trecho = trecho(200, 200, LocalDateTime.of(2026, 10, 19, 15, 0), null);
 
-        assertNull(trecho.getPouso());
+        assertTrue(trecho.reservasDeVaga(7L).isEmpty());
     }
 
     @Test

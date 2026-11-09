@@ -111,7 +111,7 @@ class PlanoDeVooTest {
     @Test
     void planoAprovadoNaoPodeTerOsDadosAlterados() {
         PlanoDeVoo p = planoValido();
-        p.aprovar(List.of(), em(8, 0));
+        p.aprovar(List.of());
 
         assertThrows(OperacaoNaoPermitidaException.class, () -> p.alterarDados(PILOTO, CARGA, POA, CWB, em(10, 0)));
     }

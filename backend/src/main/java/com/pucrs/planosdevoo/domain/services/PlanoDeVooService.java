@@ -111,7 +111,7 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     public PlanoDeVoo aprovar(Long planoId) {
         return transacao.executar(() -> {
             PlanoDeVoo plano = buscar(planoId);
-            plano.aprovar(disponibilidade.conflitos(plano), agora());
+            plano.aprovar(disponibilidade.conflitos(plano));
             PlanoDeVoo aprovado = planos.salvar(plano);
             reservas.reservar(aprovado.reservasDeAerovia(), aprovado.reservasDeVaga());
             return aprovado;

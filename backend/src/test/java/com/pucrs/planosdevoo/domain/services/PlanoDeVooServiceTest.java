@@ -73,6 +73,15 @@ class PlanoDeVooServiceTest {
     }
 
     @Test
+    void aprovaPlanoComPartidaJaOcorrida() {
+        planoValido(1L, em(10, 0));
+
+        servicoEm(em(12, 0)).aprovar(1L);
+
+        assertEquals(SituacaoPlano.APROVADO, situacaoDo(1L));
+    }
+
+    @Test
     void aprovacaoRecusadaNaoDeixaReservaParcial() {
         planoValido(1L, em(10, 0));
         servicoEm(VESPERA).aprovar(1L);

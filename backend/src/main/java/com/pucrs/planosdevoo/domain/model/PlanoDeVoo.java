@@ -91,14 +91,10 @@ public class PlanoDeVoo {
         situacao = SituacaoPlano.ABANDONADO;
     }
 
-    public void aprovar(List<String> conflitosDeReserva, LocalDateTime agora) {
+    public void aprovar(List<String> conflitosDeReserva) {
         garantirEmEdicao("aprovar o plano");
         List<String> problemas = new ArrayList<>(validar());
         problemas.addAll(conflitosDeReserva);
-        if (!partida.isAfter(agora)) {
-            problemas.add("A partida (" + HORA.format(partida) + ") já ocorreu: um voo que já partiu"
-                    + " não pode ser aprovado");
-        }
         if (!problemas.isEmpty()) {
             throw new PlanoInvalidoException(problemas);
         }
