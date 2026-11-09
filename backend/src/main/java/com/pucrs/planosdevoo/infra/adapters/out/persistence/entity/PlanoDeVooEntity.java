@@ -1,16 +1,16 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.entity;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PilotoEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroportoEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeronaveEntity;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeronaveEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroportoEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PilotoEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,8 +53,6 @@ public class PlanoDeVooEntity {
     @Column(nullable = false)
     private SituacaoPlano situacao;
 
-    // Os trechos ficam na tabela "trecho" e são salvos e carregados junto com o
-    // plano (ao salvar, o Hibernate apaga os antigos e grava a lista atual).
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "trecho", joinColumns = @JoinColumn(name = "plano_id"))
     @OrderBy("ordem")

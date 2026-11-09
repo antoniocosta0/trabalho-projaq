@@ -1,6 +1,5 @@
 package com.pucrs.planosdevoo.domain.model;
 
-// Uma vaga de um aeroporto ocupada em um slot, em nome de um plano aprovado.
 public class ReservaVaga {
 
     private final Long planoId;

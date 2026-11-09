@@ -1,17 +1,17 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.repository;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.ReservaMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.ReservaVagaJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.ReservaAeroviaJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroviaJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroportoJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaVagaEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaAeroviaEntity;
 import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaAeroviaEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaVagaEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.ReservaMapper;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroportoJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroviaJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.ReservaAeroviaJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.ReservaVagaJpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -48,8 +48,7 @@ public class ReservaRepositoryAdapter implements ReservaRepository {
                 .toList();
     }
 
-    // O flush força o banco a conferir os UNIQUE agora, dentro da transação do
-    // chamador, e não só no commit. Se der conflito, a exceção desfaz tudo.
+    // flush para o UNIQUE falhar aqui, dentro da transação, e não só no commit
     @Override
     public void reservar(List<ReservaAerovia> aerovia, List<ReservaVaga> vagas) {
         try {

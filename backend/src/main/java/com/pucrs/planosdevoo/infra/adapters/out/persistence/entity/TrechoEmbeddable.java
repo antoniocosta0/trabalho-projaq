@@ -1,16 +1,13 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.entity;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PlanoDeVooEntity;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroviaEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PlanoDeVooEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
-// Uma linha da tabela "trecho". Não tem identidade própria: pertence ao plano
-// (é o PlanoDeVooEntity que salva e carrega os trechos junto com ele).
-// numero_vaga e permanencia_minutos nulos = sobrevoo.
 @Embeddable
 public class TrechoEmbeddable {
 

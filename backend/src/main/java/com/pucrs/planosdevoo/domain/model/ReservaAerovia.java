@@ -1,6 +1,5 @@
 package com.pucrs.planosdevoo.domain.model;
 
-// Uma altitude de uma aerovia ocupada em um slot, em nome de um plano aprovado.
 public class ReservaAerovia {
 
     private final Long planoId;

@@ -1,11 +1,11 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.MalhaAereaMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaVagaEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaAeroviaEntity;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaAeroviaEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.ReservaVagaEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.MalhaAereaMapper;
 
 public final class ReservaMapper {
 

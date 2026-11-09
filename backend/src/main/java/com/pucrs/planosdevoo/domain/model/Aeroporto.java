@@ -18,7 +18,6 @@ public class Aeroporto {
         this.quantidadeVagas = quantidadeVagas;
     }
 
-    // As vagas são numeradas de 1 até a quantidade cadastrada.
     public boolean possuiVaga(int numero) {
         return numero >= 1 && numero <= quantidadeVagas;
     }

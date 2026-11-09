@@ -7,14 +7,10 @@ import java.util.List;
 
 public interface ReservaRepository {
 
-    // Reservas da aerovia que ocupam pelo menos um dos slots, em qualquer altitude.
     List<ReservaAerovia> buscarReservasAerovia(String aeroviaId, List<Slot> slots);
 
-    // Reservas do aeroporto que ocupam pelo menos um dos slots, em qualquer vaga.
     List<ReservaVaga> buscarReservasVaga(String aeroportoCodigo, List<Slot> slots);
 
-    // Grava as duas listas. Lança ConflitoDeReservaException se algum slot já
-    // tiver dono; quem chama decide o que desfazer (ver Transacao).
     void reservar(List<ReservaAerovia> aerovias, List<ReservaVaga> vagas);
 
     void liberarReservasDoPlano(Long planoId);

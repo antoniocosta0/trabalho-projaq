@@ -1,13 +1,13 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PilotoEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeronaveEntity;
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.AeronaveCarga;
 import com.pucrs.planosdevoo.domain.model.AeronaveFactory;
 import com.pucrs.planosdevoo.domain.model.AeronaveParticular;
 import com.pucrs.planosdevoo.domain.model.AeronavePassageiros;
 import com.pucrs.planosdevoo.domain.model.Piloto;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeronaveEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PilotoEntity;
 
 public final class FrotaMapper {
 

@@ -1,20 +1,16 @@
 package com.pucrs.planosdevoo.domain.model;
 
-import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
-import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Testes de regra pura: nenhum sobe o Spring nem toca no banco.
-class PlanoDeVooTest {
+import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
+import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
-    // ---------- dados de apoio (mesma malha do enunciado) ----------
+class PlanoDeVooTest {
 
     private static final Aeroporto POA = new Aeroporto("POA", "Porto Alegre", 41);
     private static final Aeroporto FLN = new Aeroporto("FLN", "Florianópolis", 16);
@@ -27,11 +23,8 @@ class PlanoDeVooTest {
 
     private static final Piloto PILOTO = new Piloto(1L, "Ana Souza");
 
-    // 830 km/h: R1 leva 26 min (363/830*60 = 26,2) e R4 leva 18 min (17,7).
     private static final Aeronave PASSAGEIROS = new AeronavePassageiros("PR-PAX", 830, 5000, "Sul", 180);
-    // 500 km/h e autonomia 1000 km: limite de 850 km, menos que os 865 km da R2.
     private static final Aeronave PARTICULAR_CURTO = new AeronaveParticular("PP-CUR", 500, 1000, "Hangar");
-    // 780 km/h: R1 leva 28 min.
     private static final Aeronave CARGA = new AeronaveCarga("PR-CRG", 780, 4500, "Sul Cargas", 20);
 
     private static LocalDateTime em(int hora, int minuto) {
@@ -42,7 +35,6 @@ class PlanoDeVooTest {
         return PlanoDeVoo.novo(PILOTO, aeronave, POA, destino, partida);
     }
 
-    // POA -> FLN (sobrevoo) -> CWB (pouso), partindo às 10:00. Tudo certo.
     private static PlanoDeVoo planoValido() {
         PlanoDeVoo p = plano(PASSAGEIROS, CWB, em(10, 0));
         p.adicionarTrecho(R1, 30_000, em(10, 0), null);
@@ -54,8 +46,6 @@ class PlanoDeVooTest {
         assertTrue(problemas.stream().anyMatch(p -> p.contains(trecho)),
                 "esperava um problema contendo \"" + trecho + "\", mas veio: " + problemas);
     }
-
-    // ---------- percurso (UC06) ----------
 
     @Test
     void trechosRecebemOrdemSequencialEVelocidadeDaAeronave() {
@@ -97,8 +87,6 @@ class PlanoDeVooTest {
         assertThrows(RecursoNaoEncontradoException.class, () -> p.removerTrecho(5));
     }
 
-    // ---------- só EM_EDICAO pode ser modificado ----------
-
     @Test
     void alterarAeronaveRecalculaAsChegadas() {
         PlanoDeVoo p = planoValido();
@@ -135,8 +123,6 @@ class PlanoDeVooTest {
         assertThrows(OperacaoNaoPermitidaException.class, p::validar);
         assertThrows(OperacaoNaoPermitidaException.class, p::abandonar);
     }
-
-    // ---------- validação (UC09) ----------
 
     @Test
     void planoValidoNaoTemProblemasENaoMudaDeSituacao() {
@@ -217,7 +203,6 @@ class PlanoDeVooTest {
         p.adicionarTrecho(R1, 30_000, em(10, 0), new Pouso(1, 30));
         p.adicionarTrecho(R4, 30_000, em(10, 26), new Pouso(1, 30));
 
-        // chegou 10:26 + 30 min de permanência = 10:56
         assertTemProblemaCom(p.validar(), "deveria ser às 19/10 10:56");
     }
 
@@ -263,14 +248,12 @@ class PlanoDeVooTest {
 
     @Test
     void sobrevooAcumulaDistanciaEPousoZera() {
-        // 363 + 245 = 608 km em sobrevoo: passa do limite de uma aeronave de 700 km (595 km).
         Aeronave pequena = new AeronavePassageiros("PR-PEQ", 830, 700, "Sul", 50);
         PlanoDeVoo sobrevoo = plano(pequena, CWB, em(10, 0));
         sobrevoo.adicionarTrecho(R1, 30_000, em(10, 0), null);
         sobrevoo.adicionarTrecho(R4, 30_000, em(10, 26), new Pouso(1, 30));
         assertTemProblemaCom(sobrevoo.validar(), "608 km sem abastecer");
 
-        // Com pouso em FLN, a conta zera: 363 e depois 245, os dois abaixo de 595.
         PlanoDeVoo comPouso = plano(pequena, CWB, em(10, 0));
         comPouso.adicionarTrecho(R1, 30_000, em(10, 0), new Pouso(1, 30));
         comPouso.adicionarTrecho(R4, 30_000, em(10, 56), new Pouso(1, 30));

@@ -1,9 +1,9 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroviaEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroportoEntity;
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.model.Aerovia;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroportoEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroviaEntity;
 
 public final class MalhaAereaMapper {
 

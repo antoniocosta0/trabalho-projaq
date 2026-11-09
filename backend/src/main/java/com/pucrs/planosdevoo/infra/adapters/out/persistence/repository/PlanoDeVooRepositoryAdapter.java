@@ -1,18 +1,18 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.repository;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.PlanoDeVooMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.PlanoDeVooJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.PilotoJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroviaJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroportoJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeronaveJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.TrechoEmbeddable;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PlanoDeVooEntity;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
-import com.pucrs.planosdevoo.domain.model.Trecho;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
+import com.pucrs.planosdevoo.domain.model.Trecho;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PlanoDeVooEntity;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.TrechoEmbeddable;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.PlanoDeVooMapper;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeronaveJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroportoJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroviaJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.PilotoJpaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.PlanoDeVooJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
@@ -49,8 +49,6 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
                 plano.getTrechos().stream().map(this::trechoParaEntidade).toList());
         PlanoDeVooEntity salvo = planos.save(entity);
 
-        // O domínio já tem piloto, aeronave e aeroportos completos;
-        // do banco só falta o identificador gerado.
         return PlanoDeVoo.reconstituir(salvo.getId(), plano.getPiloto(), plano.getAeronave(),
                 plano.getOrigem(), plano.getDestino(), plano.getPartida(), plano.getSituacao(),
                 plano.getTrechos());

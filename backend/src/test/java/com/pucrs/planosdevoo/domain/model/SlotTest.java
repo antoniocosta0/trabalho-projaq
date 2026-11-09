@@ -1,12 +1,11 @@
 package com.pucrs.planosdevoo.domain.model;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class SlotTest {
 

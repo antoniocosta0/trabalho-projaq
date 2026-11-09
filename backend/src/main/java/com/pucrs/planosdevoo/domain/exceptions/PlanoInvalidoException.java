@@ -2,8 +2,6 @@ package com.pucrs.planosdevoo.domain.exceptions;
 
 import java.util.List;
 
-// Plano que não pode ser aprovado. Carrega a lista completa de problemas, para
-// a API dizer tudo o que está errado de uma vez.
 public class PlanoInvalidoException extends RuntimeException {
 
     private final List<String> problemas;

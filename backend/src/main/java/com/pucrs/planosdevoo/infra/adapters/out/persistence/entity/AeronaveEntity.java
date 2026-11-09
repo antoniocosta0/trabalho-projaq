@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-// Tabela única para todas as categorias: a coluna "categoria" diz qual é,
-// e as colunas que não se aplicam à categoria ficam nulas.
 @Entity
 @Table(name = "aeronave")
 public class AeronaveEntity {

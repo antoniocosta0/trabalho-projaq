@@ -1,7 +1,6 @@
 package com.pucrs.planosdevoo.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class Pouso {
 
@@ -28,21 +27,4 @@ public class Pouso {
 
     public int getNumeroVaga() { return numeroVaga; }
     public int getPermanenciaMinutos() { return permanenciaMinutos; }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (!(other instanceof Pouso pouso)) {
-            return false;
-        }
-        return numeroVaga == pouso.numeroVaga
-                && permanenciaMinutos == pouso.permanenciaMinutos;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(numeroVaga, permanenciaMinutos);
-    }
 }

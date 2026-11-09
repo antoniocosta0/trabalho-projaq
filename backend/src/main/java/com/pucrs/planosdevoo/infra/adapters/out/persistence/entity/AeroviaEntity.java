@@ -28,7 +28,6 @@ public class AeroviaEntity {
 
     protected AeroviaEntity() { }
 
-    // Só construtor, sem setter: aerovia não muda depois de cadastrada.
     public AeroviaEntity(String id, AeroportoEntity origem, AeroportoEntity destino, double distanciaKm) {
         this.id = id;
         this.origem = origem;

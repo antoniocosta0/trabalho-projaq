@@ -2,7 +2,6 @@ package com.pucrs.planosdevoo.domain.model;
 
 import java.time.Duration;
 
-// Imutável: o enunciado proíbe alterar ou excluir uma aerovia depois do cadastro.
 public class Aerovia {
 
     private final String id;
@@ -17,8 +16,6 @@ public class Aerovia {
         if (origem == null || destino == null) {
             throw new IllegalArgumentException("Aerovia precisa de origem e destino");
         }
-        // Aerovia e orientada e liga DOIS aeroportos: um trecho que sai e chega
-        // no mesmo lugar nao e percurso, e passaria por toda a validacao.
         if (origem.getCodigo().equals(destino.getCodigo())) {
             throw new IllegalArgumentException("Aerovia precisa ligar dois aeroportos diferentes: "
                     + origem.getCodigo() + " foi informado como origem e destino");
@@ -32,9 +29,7 @@ public class Aerovia {
         this.distanciaKm = distanciaKm;
     }
 
-    // duração = distância / velocidade de cruzeiro, arredondada ao minuto.
-    // Os horários do plano são informados em minutos; com segundos, o usuário
-    // nunca conseguiria digitar uma entrada que batesse com a chegada calculada.
+    // arredondada ao minuto para a entrada informada poder bater com a chegada calculada
     public Duration duracao(double velocidadeKmh) {
         long minutos = Math.round(distanciaKm / velocidadeKmh * 60);
         return Duration.ofMinutes(minutos);
