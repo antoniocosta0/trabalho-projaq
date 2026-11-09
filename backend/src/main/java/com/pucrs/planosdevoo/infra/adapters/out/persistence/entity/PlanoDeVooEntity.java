@@ -1,9 +1,6 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.entity;
 
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeronaveEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroportoEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PilotoEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;

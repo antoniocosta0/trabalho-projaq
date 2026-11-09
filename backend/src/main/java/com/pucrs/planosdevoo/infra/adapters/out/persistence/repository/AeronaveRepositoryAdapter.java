@@ -3,7 +3,6 @@ package com.pucrs.planosdevoo.infra.adapters.out.persistence.repository;
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.FrotaMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeronaveJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;

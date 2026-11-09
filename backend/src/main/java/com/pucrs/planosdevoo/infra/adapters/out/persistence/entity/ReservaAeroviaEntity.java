@@ -1,6 +1,5 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.entity;
 
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroviaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

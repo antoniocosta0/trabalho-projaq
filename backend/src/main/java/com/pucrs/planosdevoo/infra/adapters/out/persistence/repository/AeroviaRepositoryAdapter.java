@@ -4,8 +4,6 @@ import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroviaEntity;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.MalhaAereaMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroportoJpaRepository;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroviaJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;

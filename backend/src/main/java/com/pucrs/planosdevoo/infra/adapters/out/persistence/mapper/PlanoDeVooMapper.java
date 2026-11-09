@@ -6,8 +6,6 @@ import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.model.Trecho;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PlanoDeVooEntity;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.TrechoEmbeddable;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.FrotaMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.MalhaAereaMapper;
 import java.util.List;
 
 public final class PlanoDeVooMapper {

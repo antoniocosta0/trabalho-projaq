@@ -3,7 +3,6 @@ package com.pucrs.planosdevoo.infra.adapters.out.persistence.repository;
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.mapper.MalhaAereaMapper;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.AeroportoJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
