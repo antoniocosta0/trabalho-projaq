@@ -1,9 +1,9 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
-import com.pucrs.planosdevoo.domain.model.ConflitoDeReservaException;
-import com.pucrs.planosdevoo.domain.model.OperacaoNaoPermitidaException;
-import com.pucrs.planosdevoo.domain.model.PlanoInvalidoException;
-import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
+import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
+import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
+import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
+import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

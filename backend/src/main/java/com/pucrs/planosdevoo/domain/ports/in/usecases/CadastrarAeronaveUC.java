@@ -3,7 +3,7 @@ package com.pucrs.planosdevoo.domain.ports.in.usecases;
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.DadosAeronave;
 import com.pucrs.planosdevoo.domain.model.FabricaDeAeronaves;
-import com.pucrs.planosdevoo.domain.model.OperacaoNaoPermitidaException;
+import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
 
 public class CadastrarAeronaveUC {

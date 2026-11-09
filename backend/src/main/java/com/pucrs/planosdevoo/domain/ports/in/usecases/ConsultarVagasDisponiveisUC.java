@@ -1,7 +1,7 @@
 package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
-import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
+import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;

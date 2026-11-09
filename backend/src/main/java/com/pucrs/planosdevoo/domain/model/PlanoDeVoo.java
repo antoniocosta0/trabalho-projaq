@@ -1,5 +1,8 @@
 package com.pucrs.planosdevoo.domain.model;
 
+import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
+import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
+import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

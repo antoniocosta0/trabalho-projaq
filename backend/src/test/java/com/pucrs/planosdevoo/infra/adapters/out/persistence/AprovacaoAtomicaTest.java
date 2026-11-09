@@ -2,9 +2,9 @@ package com.pucrs.planosdevoo.infra.adapters.out.persistence;
 
 import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
-import com.pucrs.planosdevoo.domain.model.ConflitoDeReservaException;
+import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
-import com.pucrs.planosdevoo.domain.model.PlanoInvalidoException;
+import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;

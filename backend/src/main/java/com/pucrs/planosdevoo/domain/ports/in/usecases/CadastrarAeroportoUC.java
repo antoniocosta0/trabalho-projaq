@@ -1,7 +1,7 @@
 package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
-import com.pucrs.planosdevoo.domain.model.OperacaoNaoPermitidaException;
+import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
 
 // Não é caso de uso numerado (ADR 0009): a malha vem da carga inicial, mas o

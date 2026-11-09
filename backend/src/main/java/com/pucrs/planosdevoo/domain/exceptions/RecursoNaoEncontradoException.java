@@ -1,4 +1,4 @@
-package com.pucrs.planosdevoo.domain.model;
+package com.pucrs.planosdevoo.domain.exceptions;
 
 public class RecursoNaoEncontradoException extends RuntimeException {
 

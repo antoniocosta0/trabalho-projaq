@@ -1,7 +1,7 @@
 package com.pucrs.planosdevoo.domain.ports.in.usecases;
 
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
-import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
+import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.VerificadorDeConflitos;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPlanosDeVoo;
 import java.util.ArrayList;

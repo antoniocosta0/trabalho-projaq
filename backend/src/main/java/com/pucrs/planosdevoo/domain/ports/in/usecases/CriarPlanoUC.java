@@ -4,7 +4,7 @@ import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.model.Piloto;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
-import com.pucrs.planosdevoo.domain.model.RecursoNaoEncontradoException;
+import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeronaves;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioAeroportos;
 import com.pucrs.planosdevoo.domain.ports.out.repositories.RepositorioPilotos;

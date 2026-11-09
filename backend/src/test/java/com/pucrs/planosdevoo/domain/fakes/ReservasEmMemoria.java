@@ -1,6 +1,6 @@
 package com.pucrs.planosdevoo.domain.fakes;
 
-import com.pucrs.planosdevoo.domain.model.ConflitoDeReservaException;
+import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
