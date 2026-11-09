@@ -183,3 +183,12 @@ $RECYCLE.BIN/
 .directory
 .Trash-*
 .nfs*
+
+# Guias locais e notas internas
+CLAUDE.md
+CLAUDE_OLD.md
+CONTEXT_NEW.md
+PAS_TF_2026_2_PlanosDeVoo (1).md
+docs/plano-de-trabalho.md
+docs/padroes-desenvolvimento.md
+logs/
