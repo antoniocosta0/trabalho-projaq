@@ -1,20 +1,5 @@
--- Carga inicial.
---
--- Exigencias do enunciado (secao 8.2):
---   - malha aerea inicial: 4 aeroportos (POA 41, FLN 16, CWB 26, GRU 115) e
---     8 aerovias (R1..R8);
---   - pilotos;
---   - aeronaves das TRES categorias (particular, passageiros, carga);
---   - planos APROVADOS com suas reservas;
---   - na DATA DE REFERENCIA, pelo menos 5 das 8 aerovias com alguma ocupacao;
---   - a ocupacao e consequencia dos planos aprovados, nunca reserva solta;
---   - os dados permitem tanto sucesso quanto conflito: nao deixar todos os
---     recursos indisponiveis durante todo o dia.
---
--- DATA DE REFERENCIA: 19/10/2026 (declarada tambem no README.md).
---
--- O script roda a cada inicializacao. MERGE (em vez de INSERT) evita duplicar
--- os dados quando a aplicacao e reiniciada com o banco ja preenchido.
+-- Carga inicial (§8.2). Data de referência: 19/10/2026.
+-- MERGE evita duplicar os dados quando a aplicação reinicia com o banco preenchido.
 
 MERGE INTO aeroporto (codigo, nome, quantidade_vagas) KEY (codigo) VALUES
     ('POA', 'Aeroporto Internacional Salgado Filho - Porto Alegre', 41),
@@ -38,8 +23,7 @@ MERGE INTO piloto (id, nome) KEY (id) VALUES
     (3, 'Carla Mendes'),
     (4, 'Diego Rocha');
 
--- PP-CUR tem autonomia curta de proposito: 85% de 1000 km = 850 km, menos que
--- os 865 km da R2. Serve para demonstrar a falha de autonomia.
+-- PP-CUR: 85% de 1000 km = 850 km, menos que os 865 km da R2 (autonomia insuficiente).
 MERGE INTO aeronave (prefixo, categoria, velocidade_cruzeiro_kmh, autonomia_km,
                      empresa_manutencao, companhia_aerea, capacidade_passageiros, capacidade_toneladas)
     KEY (prefixo) VALUES
@@ -48,35 +32,11 @@ MERGE INTO aeronave (prefixo, categoria, velocidade_cruzeiro_kmh, autonomia_km,
     ('PR-PAX', 'PASSAGEIROS', 830, 5000, NULL, 'Linhas Aéreas do Sul', 180, NULL),
     ('PR-CRG', 'CARGA',       780, 4500, NULL, 'Sul Cargas',          NULL, 20);
 
--- Planos aprovados na data de referencia, com as reservas que a aprovacao
--- teria gravado. Cada reserva e UMA linha por slot de 1 hora, calculada como
--- o codigo calcula (Aerovia.duracao arredonda ao minuto; Slot.entre e
--- semiaberto). SeedConsistenciaTest confere isso a cada build.
---
--- Ids a partir de 1001: o roteiro docs/api/requests.http espera que os planos
--- criados pela API recebam 1, 2, 3... e a identidade do H2 nao avanca quando o
--- id e informado.
---
--- Escolhas para nao atrapalhar o roteiro: a R1 fica livre o dia inteiro e
--- nenhum pouso e em FLN. Ocupadas: R2, R4, R5, R6, R7, R8 (6 de 8).
---
---   1001 PR-CRG POA -R2-> GRU (pouso) -R7-> CWB   01:00  carga na janela 00-06
---   1002 PR-PAX CWB -R5-> FLN (sobrevoo) -R8-> POA 06:30
---   1003 PR-PAX POA -R2-> GRU                      21:00  permanencia vira o dia
---   1004 PP-PAR FLN -R4-> CWB (pouso) -R6-> GRU    20:00
---   1005 PR-PAX POA -R1-> FLN (pouso)             17/10 08:00  JA PARTIU
---
--- 1001 e 1002 partem de madrugada/manha: durante a apresentacao ja partiram e
--- nao podem ser cancelados. 1003 e 1004 sao a noite e podem.
---
--- O 1005 parte em 17/10, ANTES da data de referencia: ele ja partiu em qualquer
--- dia em que a demonstracao for feita, entao a recusa de cancelamento (demo 14)
--- nao depende do relogio. Usa a R1 e a vaga 3 de FLN, mas em 17/10, portanto
--- nao conflita com o roteiro, que trabalha em 19/10.
---
--- Aqui NAO se usa MERGE ... KEY como acima: ele reescreveria a linha a cada
--- inicializacao e desfaria um cancelamento feito pela API. MERGE ... USING com
--- WHEN NOT MATCHED so insere o que falta.
+-- Planos aprovados e as reservas que a aprovação gravaria (uma linha por slot).
+-- Ocupam R2, R4, R5, R6, R7 e R8 em 19/10; a R1 fica livre para a demonstração.
+-- 1005 partiu em 17/10 e serve para mostrar o cancelamento recusado.
+-- Ids a partir de 1001 para os planos criados pela API começarem em 1.
+-- WHEN NOT MATCHED só insere o que falta, sem desfazer cancelamentos feitos pela API.
 
 MERGE INTO plano_de_voo t USING (VALUES
     (1001, 3, 'PR-CRG', 'POA', 'CWB', TIMESTAMP '2026-10-19 01:00:00', 'APROVADO'),
@@ -89,8 +49,6 @@ ON t.id = s.id
 WHEN NOT MATCHED THEN INSERT (id, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
     VALUES (s.id, s.piloto_id, s.aeronave_prefixo, s.origem_codigo, s.destino_codigo, s.partida, s.situacao);
 
--- Duracoes: PR-CRG (780 km/h) R2 67 min, R7 28 min; PR-PAX (830 km/h) R5 18,
--- R8 26, R2 63; PP-PAR (650 km/h) R4 23, R6 33.
 MERGE INTO trecho t USING (VALUES
     -- 1001: R2 01:00-02:07, GRU ate 03:07; R7 03:07-03:35, CWB ate 05:05
     (1001, 1, 'R2', 30000, TIMESTAMP '2026-10-19 01:00:00', 10, 60),
@@ -110,8 +68,7 @@ ON t.plano_id = s.plano_id AND t.ordem = s.ordem
 WHEN NOT MATCHED THEN INSERT (plano_id, ordem, aerovia_id, altitude, horario_entrada, numero_vaga, permanencia_minutos)
     VALUES (s.plano_id, s.ordem, s.aerovia_id, s.altitude, s.horario_entrada, s.numero_vaga, s.permanencia_minutos);
 
--- Reserva so entra se o plano dono continua APROVADO: plano do seed cancelado
--- pela API teve as reservas liberadas, e reinserir aqui as ressuscitaria.
+-- Só insere reserva de plano ainda APROVADO, para não recriar reserva já liberada.
 MERGE INTO reserva_aerovia t USING (SELECT v.* FROM (VALUES
     (1001, 'R2', 30000, TIMESTAMP '2026-10-19 01:00:00'),
     (1001, 'R2', 30000, TIMESTAMP '2026-10-19 02:00:00'),

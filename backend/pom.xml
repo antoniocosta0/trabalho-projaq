@@ -35,7 +35,6 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- No Spring Boot 4 o console do H2 virou dependencia separada. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-h2console</artifactId>
@@ -49,16 +48,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- OpenAPI / Swagger UI (exigido pelo enunciado, secao 8.5). -->
-		<!-- MockMvc: no Spring Boot 4 o suporte saiu do starter-test e virou
-		     modulo proprio. Usado pelos testes de API em
-		     infra/adapters/in/rest. -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
