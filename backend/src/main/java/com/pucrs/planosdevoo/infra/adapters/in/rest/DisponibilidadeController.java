@@ -1,7 +1,7 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
-import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAltitudesDisponiveisUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarVagasDisponiveisUC;
+import com.pucrs.planosdevoo.domain.ports.in.DisponibilidadeUseCase;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,13 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
         + "aparece como livre se estiver livre em TODOS os slots de uma hora que o período cobre.")
 public class DisponibilidadeController {
 
-    private final ConsultarAltitudesDisponiveisUC consultarAltitudesUC;
-    private final ConsultarVagasDisponiveisUC consultarVagasUC;
+    private final DisponibilidadeUseCase disponibilidade;
 
-    public DisponibilidadeController(ConsultarAltitudesDisponiveisUC consultarAltitudesUC,
-                                     ConsultarVagasDisponiveisUC consultarVagasUC) {
-        this.consultarAltitudesUC = consultarAltitudesUC;
-        this.consultarVagasUC = consultarVagasUC;
+    public DisponibilidadeController(DisponibilidadeUseCase disponibilidade) {
+        this.disponibilidade = disponibilidade;
     }
 
     @Operation(summary = "Consultar altitudes disponíveis numa aerovia (UC07)",
@@ -51,7 +48,7 @@ public class DisponibilidadeController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @Parameter(description = "Fim do período, exclusivo", example = "2026-10-19T23:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
-        return new AltitudesDisponiveisResponseDTO(id, inicio, fim, consultarAltitudesUC.executar(id, inicio, fim));
+        return new AltitudesDisponiveisResponseDTO(id, inicio, fim, disponibilidade.altitudesDisponiveis(id, inicio, fim));
     }
 
     @Operation(summary = "Consultar vagas disponíveis num aeroporto (UC08)",
@@ -69,6 +66,6 @@ public class DisponibilidadeController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @Parameter(description = "Fim do período, exclusivo", example = "2026-10-19T10:00:00")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
-        return new VagasDisponiveisResponseDTO(codigo, inicio, fim, consultarVagasUC.executar(codigo, inicio, fim));
+        return new VagasDisponiveisResponseDTO(codigo, inicio, fim, disponibilidade.vagasDisponiveis(codigo, inicio, fim));
     }
 }

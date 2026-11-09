@@ -6,8 +6,8 @@ import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.model.Slot;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoCommand;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.CriarPlanoUC;
+import com.pucrs.planosdevoo.domain.ports.in.CriarPlanoCommand;
+import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
@@ -41,7 +41,7 @@ class SeedConsistenciaTest {
     @Autowired ReservaRepository reservas;
     @Autowired AeroviaRepository aerovias;
     @Autowired AeroportoRepository aeroportos;
-    @Autowired CriarPlanoUC criarPlano;
+    @Autowired PlanoDeVooUseCase planoDeVoo;
 
     // Dois dias antes da data de referência até o fim do dia seguinte a ela. A
     // margem para trás cobre o plano 1005, que parte em 17/10 e existe para a
@@ -137,7 +137,7 @@ class SeedConsistenciaTest {
     // API do 1; os do seed (1001+) não podem empurrar essa numeração.
     @Test
     void planoCriadoPelaApiNaoColideComOsIdsDoSeed() {
-        PlanoDeVoo novo = criarPlano.executar(new CriarPlanoCommand(1L, "PR-PAX", "POA", "FLN",
+        PlanoDeVoo novo = planoDeVoo.criar(new CriarPlanoCommand(1L, "PR-PAX", "POA", "FLN",
                 LocalDateTime.of(2031, 4, 1, 10, 0)));
 
         assertTrue(novo.getId() < 1001, "id gerado: " + novo.getId());

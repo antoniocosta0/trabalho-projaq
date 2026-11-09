@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// Repositório de teste: o plano guarda o que foi salvo, sem banco. O id vem
-// de quem monta o teste (PlanoDeVoo.reconstituir).
-public class PlanosEmMemoria implements PlanoDeVooRepository {
+public class PlanoDeVooRepositoryEmMemoria implements PlanoDeVooRepository {
 
     private final List<PlanoDeVoo> planos = new ArrayList<>();
 

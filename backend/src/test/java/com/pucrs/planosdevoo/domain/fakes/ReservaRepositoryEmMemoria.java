@@ -8,9 +8,7 @@ import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-// Repositório de teste: guarda as reservas numa lista, sem banco. Recusa
-// reserva repetida como o UNIQUE do banco faria.
-public class ReservasEmMemoria implements ReservaRepository {
+public class ReservaRepositoryEmMemoria implements ReservaRepository {
 
     public final List<ReservaAerovia> aerovias = new ArrayList<>();
     public final List<ReservaVaga> vagas = new ArrayList<>();

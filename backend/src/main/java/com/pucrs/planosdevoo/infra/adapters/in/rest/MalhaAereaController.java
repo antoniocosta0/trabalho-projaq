@@ -1,11 +1,9 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
+import com.pucrs.planosdevoo.domain.ports.in.MalhaAereaUseCase;
+
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.model.Aerovia;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarAeroportoUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarAeroviaUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAeroportosUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAeroviasUC;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,17 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
         + "POA->FLN (R1) e FLN->POA (R8) são registros distintos, e não existe alteração nem exclusão.")
 public class MalhaAereaController {
 
-    private final ConsultarAeroportosUC consultarAeroportosUC;
-    private final ConsultarAeroviasUC consultarAeroviasUC;
-    private final CadastrarAeroportoUC cadastrarAeroportoUC;
-    private final CadastrarAeroviaUC cadastrarAeroviaUC;
+    private final MalhaAereaUseCase malhaAerea;
 
-    public MalhaAereaController(ConsultarAeroportosUC consultarAeroportosUC, ConsultarAeroviasUC consultarAeroviasUC,
-                                CadastrarAeroportoUC cadastrarAeroportoUC, CadastrarAeroviaUC cadastrarAeroviaUC) {
-        this.consultarAeroportosUC = consultarAeroportosUC;
-        this.consultarAeroviasUC = consultarAeroviasUC;
-        this.cadastrarAeroportoUC = cadastrarAeroportoUC;
-        this.cadastrarAeroviaUC = cadastrarAeroviaUC;
+    public MalhaAereaController(MalhaAereaUseCase malhaAerea) {
+        this.malhaAerea = malhaAerea;
     }
 
     @Operation(summary = "Consultar aeroportos (UC01)",
@@ -47,7 +38,7 @@ public class MalhaAereaController {
     @ApiResponse(responseCode = "200", description = "Lista de aeroportos")
     @GetMapping("/aeroportos")
     public List<AeroportoResponseDTO> listarAeroportos() {
-        return consultarAeroportosUC.executar().stream().map(AeroportoResponseDTO::de).toList();
+        return malhaAerea.listarAeroportos().stream().map(AeroportoResponseDTO::de).toList();
     }
 
     @Operation(summary = "Consultar aerovias (UC02)",
@@ -56,7 +47,7 @@ public class MalhaAereaController {
     @ApiResponse(responseCode = "200", description = "Lista de aerovias")
     @GetMapping("/aerovias")
     public List<AeroviaResponseDTO> listarAerovias() {
-        return consultarAeroviasUC.executar().stream().map(AeroviaResponseDTO::de).toList();
+        return malhaAerea.listarAerovias().stream().map(AeroviaResponseDTO::de).toList();
     }
 
     @Operation(summary = "Cadastrar aeroporto",
@@ -71,7 +62,7 @@ public class MalhaAereaController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
     @PostMapping("/aeroportos")
     public ResponseEntity<AeroportoResponseDTO> cadastrarAeroporto(@Valid @RequestBody AeroportoRequestDTO req) {
-        Aeroporto aeroporto = cadastrarAeroportoUC.executar(req.codigo(), req.nome(), req.quantidadeVagas());
+        Aeroporto aeroporto = malhaAerea.cadastrarAeroporto(req.codigo(), req.nome(), req.quantidadeVagas());
         return ResponseEntity.created(URI.create("/aeroportos/" + aeroporto.getCodigo()))
                 .body(AeroportoResponseDTO.de(aeroporto));
     }
@@ -91,7 +82,7 @@ public class MalhaAereaController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
     @PostMapping("/aerovias")
     public ResponseEntity<AeroviaResponseDTO> cadastrarAerovia(@Valid @RequestBody AeroviaRequestDTO req) {
-        Aerovia aerovia = cadastrarAeroviaUC.executar(req.id(), req.origem(), req.destino(), req.distanciaKm());
+        Aerovia aerovia = malhaAerea.cadastrarAerovia(req.id(), req.origem(), req.destino(), req.distanciaKm());
         return ResponseEntity.created(URI.create("/aerovias/" + aerovia.getId()))
                 .body(AeroviaResponseDTO.de(aerovia));
     }

@@ -1,11 +1,9 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
+import com.pucrs.planosdevoo.domain.ports.in.FrotaUseCase;
+
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.Piloto;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarAeronaveUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.CadastrarPilotoUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarAeronavesUC;
-import com.pucrs.planosdevoo.domain.ports.in.usecases.ConsultarPilotosUC;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,24 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
         + "carga em qualquer altitude, mas só entre 00:00 e 06:00.")
 public class FrotaController {
 
-    private final ConsultarPilotosUC consultarPilotosUC;
-    private final ConsultarAeronavesUC consultarAeronavesUC;
-    private final CadastrarPilotoUC cadastrarPilotoUC;
-    private final CadastrarAeronaveUC cadastrarAeronaveUC;
+    private final FrotaUseCase frota;
 
-    public FrotaController(ConsultarPilotosUC consultarPilotosUC, ConsultarAeronavesUC consultarAeronavesUC,
-                           CadastrarPilotoUC cadastrarPilotoUC, CadastrarAeronaveUC cadastrarAeronaveUC) {
-        this.consultarPilotosUC = consultarPilotosUC;
-        this.consultarAeronavesUC = consultarAeronavesUC;
-        this.cadastrarPilotoUC = cadastrarPilotoUC;
-        this.cadastrarAeronaveUC = cadastrarAeronaveUC;
+    public FrotaController(FrotaUseCase frota) {
+        this.frota = frota;
     }
 
     @Operation(summary = "Consultar pilotos (UC03)")
     @ApiResponse(responseCode = "200", description = "Lista de pilotos")
     @GetMapping("/pilotos")
     public List<PilotoResponseDTO> listarPilotos() {
-        return consultarPilotosUC.executar().stream().map(PilotoResponseDTO::de).toList();
+        return frota.listarPilotos().stream().map(PilotoResponseDTO::de).toList();
     }
 
     @Operation(summary = "Consultar aeronaves (UC04)",
@@ -54,7 +45,7 @@ public class FrotaController {
     @ApiResponse(responseCode = "200", description = "Lista de aeronaves")
     @GetMapping("/aeronaves")
     public List<AeronaveResponseDTO> listarAeronaves() {
-        return consultarAeronavesUC.executar().stream().map(AeronaveResponseDTO::de).toList();
+        return frota.listarAeronaves().stream().map(AeronaveResponseDTO::de).toList();
     }
 
     @Operation(summary = "Cadastrar piloto",
@@ -65,7 +56,7 @@ public class FrotaController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
     @PostMapping("/pilotos")
     public ResponseEntity<PilotoResponseDTO> cadastrarPiloto(@Valid @RequestBody PilotoRequestDTO req) {
-        Piloto piloto = cadastrarPilotoUC.executar(req.nome());
+        Piloto piloto = frota.cadastrarPiloto(req.nome());
         return ResponseEntity.created(URI.create("/pilotos/" + piloto.getId())).body(PilotoResponseDTO.de(piloto));
     }
 
@@ -87,7 +78,7 @@ public class FrotaController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))})
     @PostMapping("/aeronaves")
     public ResponseEntity<AeronaveResponseDTO> cadastrarAeronave(@Valid @RequestBody AeronaveRequestDTO req) {
-        Aeronave aeronave = cadastrarAeronaveUC.executar(req.paraDados());
+        Aeronave aeronave = frota.cadastrarAeronave(req.paraDados());
         return ResponseEntity.created(URI.create("/aeronaves/" + aeronave.getPrefixo()))
                 .body(AeronaveResponseDTO.de(aeronave));
     }
