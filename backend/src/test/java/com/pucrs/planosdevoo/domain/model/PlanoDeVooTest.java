@@ -100,6 +100,23 @@ class PlanoDeVooTest {
     // ---------- só EM_EDICAO pode ser modificado ----------
 
     @Test
+    void alterarAeronaveRecalculaAsChegadas() {
+        PlanoDeVoo p = planoValido();
+
+        p.alterarDados(PILOTO, CARGA, POA, CWB, em(10, 0));
+
+        assertEquals(em(10, 28), p.getTrechos().get(0).horarioChegada());
+    }
+
+    @Test
+    void planoAprovadoNaoPodeTerOsDadosAlterados() {
+        PlanoDeVoo p = planoValido();
+        p.aprovar(List.of(), em(8, 0));
+
+        assertThrows(OperacaoNaoPermitidaException.class, () -> p.alterarDados(PILOTO, CARGA, POA, CWB, em(10, 0)));
+    }
+
+    @Test
     void abandonarMudaSituacao() {
         PlanoDeVoo p = planoValido();
 

@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface PlanoDeVooUseCase {
 
-    PlanoDeVoo criar(CriarPlanoCommand comando);
+    PlanoDeVoo criar(PlanoCommand comando);
+
+    PlanoDeVoo alterar(Long id, PlanoCommand comando);
 
     PlanoDeVoo buscar(Long id);
 

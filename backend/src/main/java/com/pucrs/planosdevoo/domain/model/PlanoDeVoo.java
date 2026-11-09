@@ -13,11 +13,11 @@ public class PlanoDeVoo {
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
     private final Long id;
-    private final Piloto piloto;
-    private final Aeronave aeronave;
-    private final Aeroporto origem;
-    private final Aeroporto destino;
-    private final LocalDateTime partida;
+    private Piloto piloto;
+    private Aeronave aeronave;
+    private Aeroporto origem;
+    private Aeroporto destino;
+    private LocalDateTime partida;
     private SituacaoPlano situacao;
     private final List<Trecho> trechos;
 
@@ -46,6 +46,18 @@ public class PlanoDeVoo {
                                           Aeroporto destino, LocalDateTime partida, SituacaoPlano situacao,
                                           List<Trecho> trechos) {
         return new PlanoDeVoo(id, piloto, aeronave, origem, destino, partida, situacao, trechos);
+    }
+
+    public void alterarDados(Piloto piloto, Aeronave aeronave, Aeroporto origem, Aeroporto destino,
+                             LocalDateTime partida) {
+        garantirEmEdicao("alterar o plano");
+        this.piloto = piloto;
+        this.aeronave = aeronave;
+        this.origem = origem;
+        this.destino = destino;
+        this.partida = partida;
+        trechos.replaceAll(t -> criarTrecho(t.getOrdem(), t.getAerovia(), t.getAltitude(), t.getHorarioEntrada(),
+                t.getPouso()));
     }
 
     public Trecho adicionarTrecho(Aerovia aerovia, int altitude, LocalDateTime entrada, Pouso pouso) {

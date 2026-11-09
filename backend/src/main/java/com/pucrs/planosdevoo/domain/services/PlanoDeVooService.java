@@ -8,7 +8,7 @@ import com.pucrs.planosdevoo.domain.model.Piloto;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.domain.ports.in.CriarPlanoCommand;
+import com.pucrs.planosdevoo.domain.ports.in.PlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.in.TrechoCommand;
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
@@ -50,8 +50,16 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     }
 
     @Override
-    public PlanoDeVoo criar(CriarPlanoCommand comando) {
+    public PlanoDeVoo criar(PlanoCommand comando) {
         PlanoDeVoo plano = PlanoDeVoo.novo(buscarPiloto(comando.pilotoId()), buscarAeronave(comando.prefixoAeronave()),
+                buscarAeroporto(comando.codigoOrigem()), buscarAeroporto(comando.codigoDestino()), comando.partida());
+        return planos.salvar(plano);
+    }
+
+    @Override
+    public PlanoDeVoo alterar(Long id, PlanoCommand comando) {
+        PlanoDeVoo plano = buscar(id);
+        plano.alterarDados(buscarPiloto(comando.pilotoId()), buscarAeronave(comando.prefixoAeronave()),
                 buscarAeroporto(comando.codigoOrigem()), buscarAeroporto(comando.codigoDestino()), comando.partida());
         return planos.salvar(plano);
     }

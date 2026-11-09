@@ -3,7 +3,7 @@ package com.pucrs.planosdevoo.infra.adapters.in.rest;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
-import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.CriarPlanoRequest;
+import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.PlanoRequest;
 import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.PlanoResponse;
 import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.TrechoRequest;
 import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.ValidacaoResponse;
@@ -37,9 +37,16 @@ public class PlanoDeVooController {
 
     @Operation(summary = "Criar plano", description = "O plano nasce EM_EDICAO e sem trechos.")
     @PostMapping
-    public ResponseEntity<PlanoResponse> criar(@Valid @RequestBody CriarPlanoRequest req) {
+    public ResponseEntity<PlanoResponse> criar(@Valid @RequestBody PlanoRequest req) {
         PlanoDeVoo plano = planos.criar(req.paraComando());
         return ResponseEntity.created(URI.create("/planos/" + plano.getId())).body(PlanoResponse.de(plano));
+    }
+
+    @Operation(summary = "Alterar piloto, aeronave, origem, destino ou partida",
+            description = "Os trechos continuam; trocar a aeronave recalcula as chegadas.")
+    @PutMapping("/{id}")
+    public PlanoResponse alterar(@PathVariable Long id, @Valid @RequestBody PlanoRequest req) {
+        return PlanoResponse.de(planos.alterar(id, req.paraComando()));
     }
 
     @Operation(summary = "Consultar plano")

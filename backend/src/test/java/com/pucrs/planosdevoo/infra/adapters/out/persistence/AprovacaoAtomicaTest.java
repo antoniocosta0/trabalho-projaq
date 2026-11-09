@@ -10,7 +10,7 @@ import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.model.Slot;
-import com.pucrs.planosdevoo.domain.ports.in.CriarPlanoCommand;
+import com.pucrs.planosdevoo.domain.ports.in.PlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.in.TrechoCommand;
 import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
@@ -59,7 +59,7 @@ class AprovacaoAtomicaTest {
     }
 
     private PlanoDeVoo planoPoaFln(int altitude, int vaga) {
-        PlanoDeVoo plano = planoDeVoo.criar(new CriarPlanoCommand(1L, "PR-PAX", "POA", "FLN", PARTIDA));
+        PlanoDeVoo plano = planoDeVoo.criar(new PlanoCommand(1L, "PR-PAX", "POA", "FLN", PARTIDA));
         return planoDeVoo.adicionarTrecho(plano.getId(), new TrechoCommand("R1", altitude, PARTIDA, vaga, 20));
     }
 }

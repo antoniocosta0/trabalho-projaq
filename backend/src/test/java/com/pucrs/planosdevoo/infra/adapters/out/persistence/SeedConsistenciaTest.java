@@ -6,7 +6,7 @@ import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
 import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.model.Slot;
-import com.pucrs.planosdevoo.domain.ports.in.CriarPlanoCommand;
+import com.pucrs.planosdevoo.domain.ports.in.PlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
@@ -137,7 +137,7 @@ class SeedConsistenciaTest {
     // API do 1; os do seed (1001+) não podem empurrar essa numeração.
     @Test
     void planoCriadoPelaApiNaoColideComOsIdsDoSeed() {
-        PlanoDeVoo novo = planoDeVoo.criar(new CriarPlanoCommand(1L, "PR-PAX", "POA", "FLN",
+        PlanoDeVoo novo = planoDeVoo.criar(new PlanoCommand(1L, "PR-PAX", "POA", "FLN",
                 LocalDateTime.of(2031, 4, 1, 10, 0)));
 
         assertTrue(novo.getId() < 1001, "id gerado: " + novo.getId());
