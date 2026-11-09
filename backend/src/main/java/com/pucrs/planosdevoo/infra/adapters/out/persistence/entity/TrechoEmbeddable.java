@@ -1,7 +1,6 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.entity;
 
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.AeroviaEntity;
-import com.pucrs.planosdevoo.infra.adapters.out.persistence.entity.PlanoDeVooEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
