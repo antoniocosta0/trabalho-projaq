@@ -1,12 +1,7 @@
 @startuml
-' C4 nível 2 - Containers
-' PUCRS - Projeto e Arquitetura de Software - 2026/2 - turma 340
 !include <C4/C4_Container>
 
-title
-  Nível 2 - Containers
-  <size:11>Exportado em 2026-10-18</size>
-end title
+title Nível 2 - Containers
 
 Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
 System_Ext(cliente, "Cliente HTTP", "Postman, VS Code REST Client, curl")

@@ -1,46 +1,28 @@
 @startuml
-' C4 nível 3 - Componentes do backend
-' PUCRS - Projeto e Arquitetura de Software - 2026/2 - turma 340
-' A decomposição segue a arquitetura hexagonal (ports & adapters), que é a
-' efetivamente implementada em backend/src/main/java/com/pucrs/planosdevoo/.
 !include <C4/C4_Component>
 
-title
-  Nível 3 - Componentes do Backend (arquitetura hexagonal)
-  <size:11>Exportado em 2026-10-18</size>
-end title
+title Nível 3 - Componentes do Backend (hexagonal)
 
-System_Ext(cliente, "Cliente HTTP", "Postman, VS Code REST Client, curl. O Swagger UI nao entra aqui: e servido pelo proprio backend")
-ContainerDb(banco, "Banco de dados", "H2 em arquivo", "Rede aérea, pilotos, aeronaves, planos, trechos e reservas")
+System_Ext(cliente, "Cliente HTTP", "curl, Swagger UI, REST Client")
+ContainerDb(banco, "Banco de dados", "H2 em arquivo", "Malha aérea, frota, planos e reservas")
 
 Container_Boundary(api, "Backend (Spring Boot)") {
-
-  Component(adaptadores_entrada, "Adaptadores de entrada (REST)", "Spring Web MVC", "Quatro controllers, por assunto: MalhaAerea, Frota, Disponibilidade e PlanoDeVoo. Mais os DTOs de requisição e resposta e o RestExceptionHandler, que traduz exceção de domínio em Problem Detail. Nenhuma regra de negócio mora aqui")
-
-  Component(portas_entrada, "Portas de entrada (casos de uso)", "Java puro, publicados como beans", "Um caso de uso por operação: consultar malha e frota, criar plano, definir percurso, consultar disponibilidade, validar, aprovar, abandonar, cancelar e consultar planos. Orquestram o modelo e as portas de saída")
-
-  Component(modelo, "Modelo de domínio", "Java puro, sem framework", "PlanoDeVoo (raiz de agregado), Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e suas categorias, ReservaAerovia, ReservaVaga, o serviço VerificadorDeConflitos e a fábrica FabricaDeAeronaves. Concentra as regras: percurso, horários, autonomia, altitudes e ocupação")
-
-  Component(portas_saida, "Portas de saída (repositórios)", "Interfaces Java", "RepositorioPlanosDeVoo, RepositorioAerovias, RepositorioAeroportos, RepositorioAeronaves, RepositorioPilotos, RepositorioReservas e Transacao (o bloco que grava tudo ou nada). Abstraem o acesso à persistência")
-
-  Component(adaptadores_saida, "Adaptadores de persistência", "Spring Data JPA", "Implementam as portas de saída. Entidades de banco separadas das entidades de domínio, com mapeadores entre as duas")
-
-  Component(config, "Configuração", "Spring @Configuration", "UseCaseConfig monta os casos de uso injetando os adaptadores por construtor, e publica o Clock usado por aprovação e cancelamento. OpenApiConfig descreve o documento OpenAPI")
+  Component(rest, "Adaptadores REST", "Spring Web MVC", "MalhaAereaController, FrotaController, DisponibilidadeController, PlanoDeVooController, DTOs e RestExceptionHandler")
+  Component(portas_in, "Portas de entrada", "Interfaces Java", "MalhaAereaUseCase, FrotaUseCase, DisponibilidadeUseCase, PlanoDeVooUseCase e os commands")
+  Component(servicos, "Serviços", "Java puro", "MalhaAereaService, FrotaService, DisponibilidadeService, PlanoDeVooService")
+  Component(modelo, "Modelo de domínio", "Java puro", "PlanoDeVoo, Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e categorias, reservas")
+  Component(portas_out, "Portas de saída", "Interfaces Java", "AeroportoRepository, AeroviaRepository, PilotoRepository, AeronaveRepository, PlanoDeVooRepository, ReservaRepository, TransacaoPort")
+  Component(persistencia, "Adaptadores de persistência", "Spring Data JPA", "RepositoryAdapters, JpaRepositories, entidades JPA, mappers e TransacaoSpringAdapter")
+  Component(config, "Configuração", "Spring @Configuration", "ServiceConfig cria os serviços; OpenApiConfig")
 }
 
-Rel(cliente, adaptadores_entrada, "Requisições", "HTTP/JSON")
-Rel(adaptadores_entrada, portas_entrada, "Aciona")
-Rel(portas_entrada, modelo, "Usa")
-Rel(portas_entrada, portas_saida, "Usa")
-Rel(modelo, portas_saida, "Usa")
-Rel_U(adaptadores_saida, portas_saida, "Implementa")
-Rel(config, portas_entrada, "Instancia e injeta")
-Rel(adaptadores_saida, banco, "Lê e grava", "JDBC/SQL")
-
-note as regra_dependencia
-  **Regra de dependência:** todas as setas internas apontam
-  para dentro. O modelo e as portas não conhecem Spring,
-  JPA nem HTTP; quem depende é sempre a infraestrutura.
-end note
+Rel(cliente, rest, "Requisições", "HTTP/JSON")
+Rel(rest, portas_in, "Chama")
+Rel_U(servicos, portas_in, "Implementa")
+Rel(servicos, modelo, "Usa")
+Rel(servicos, portas_out, "Usa")
+Rel_U(persistencia, portas_out, "Implementa")
+Rel(persistencia, banco, "Lê e grava", "JDBC")
+Rel(config, servicos, "Instancia")
 
 @enduml

@@ -1,18 +1,9 @@
 @startuml
-' Modelo de domínio - Sistema de Gestão de Planos de Voo
-' PUCRS - Projeto e Arquitetura de Software - 2026/2 - turma 340
-' Entrega de 05/10. Fonte versionada; o .png é exportado deste arquivo.
-
-title
-  Modelo de Domínio - Planos de Voo
-  <size:11>Exportado em 2026-10-18</size>
-end title
+title Modelo de Domínio - Planos de Voo
 hide circle
 hide empty members
 skinparam classAttributeIconSize 0
 skinparam shadowing false
-skinparam nodesep 70
-skinparam ranksep 70
 
 class Aeroporto {
   codigo
@@ -26,14 +17,11 @@ class Aerovia {
   id
   distanciaKm
   --
-  duracao(velocidadeCruzeiro) : Duration
+  duracao(velocidade) : Duration
 }
 
 note right of Aerovia
-  Imutável após o cadastro: não há
-  alteração nem exclusão.
-  Orientada: POA->FLN (R1) e
-  FLN->POA (R8) são aerovias distintas.
+  Orientada e imutável após o cadastro.
 end note
 
 class Piloto {
@@ -41,39 +29,14 @@ class Piloto {
   nome
 }
 
-abstract class Aeronave {
+abstract class Aeronave <<sealed>> {
   prefixo
-  velocidadeCruzeiro
-  autonomia
+  velocidadeCruzeiroKmh
+  autonomiaKm
   --
   distanciaMaxSemAbastecer() : double
   {abstract} podeOperar(altitude, entrada, saida) : boolean
-  {abstract} dados() : DadosAeronave
 }
-
-class FabricaDeAeronaves <<fábrica>> {
-  {static} criar(dados) : Aeronave
-}
-
-note left of Aeronave
-  podeOperar() é polimórfico: cada
-  categoria traz a sua regra de altitude
-  e de janela de horário. Categoria nova
-  entra como subclasse nova, sem alterar
-  a validação do plano.
-  dados() faz o caminho inverso: cada
-  categoria responde pelos próprios
-  campos de cadastro.
-end note
-
-note right of FabricaDeAeronaves
-  Único ponto que conhece as subclasses.
-  Usada no cadastro (POST /aeronaves) e
-  ao ler do banco. Categoria nova = um
-  case novo aqui. Ver ADR 0006.
-end note
-
-FabricaDeAeronaves ..> Aeronave : cria
 
 class AeronaveParticular {
   empresaManutencao
@@ -89,29 +52,26 @@ class AeronaveCarga {
   capacidadeToneladas
 }
 
+class AeronaveFactory {
+  {static} criar(categoria, ...) : Aeronave
+}
+
 class PlanoDeVoo <<raiz de agregado>> {
   id
   partida
   situacao
   --
+  alterarDados(piloto, aeronave, origem, destino, partida)
   adicionarTrecho(aerovia, altitude, entrada, pouso)
-  alterarTrecho(ordem, aerovia, altitude, entrada, pouso)
+  alterarTrecho(ordem, ...)
   removerTrecho(ordem)
   validar() : List<String>
-  aprovar(conflitosDeReserva, agora)
-  abandonar()
+  aprovar(conflitos)
   cancelar(agora)
+  abandonar()
   reservasDeAerovia() : List<ReservaAerovia>
   reservasDeVaga() : List<ReservaVaga>
 }
-
-note top of PlanoDeVoo
-  Raiz do agregado: Trecho e Pouso só
-  existem dentro do plano e toda alteração
-  passa por ele. validar() devolve a lista
-  de problemas (não boolean, não exceção)
-  e não altera estado nem reserva nada.
-end note
 
 class Trecho {
   ordem
@@ -121,7 +81,8 @@ class Trecho {
   horarioChegada() : LocalDateTime
   slotsOcupados() : List<Slot>
   slotsDaVaga() : List<Slot>
-  {static} altitudesPermitidas() : List<Integer>
+  reservasDeAerovia(planoId)
+  reservasDeVaga(planoId)
 }
 
 class Pouso <<value object>> {
@@ -138,11 +99,8 @@ class Slot <<value object>> {
 }
 
 note bottom of Slot
-  Slot de 1 hora alinhado à hora cheia.
-  Qualquer uso parcial ocupa o slot inteiro:
-  15:52 -> 17:07 são 3 slots.
-  Intervalo [inicio, fim): 15:00 -> 16:00
-  ocupa 1 slot.
+  1 hora alinhada à hora cheia, intervalo [inicio, fim).
+  15:52 -> 17:07 ocupa 3 slots.
 end note
 
 class ReservaAerovia {
@@ -155,16 +113,6 @@ class ReservaVaga {
   numeroVaga
 }
 
-class VerificadorDeConflitos <<serviço de domínio>> {
-  verificar(plano) : List<String>
-}
-
-note bottom of VerificadorDeConflitos
-  Consulta as reservas dos outros planos
-  (porta de saída) e devolve os conflitos de
-  altitude e de vaga. Só consulta: nunca reserva.
-end note
-
 enum SituacaoPlano {
   EM_EDICAO
   APROVADO
@@ -172,17 +120,18 @@ enum SituacaoPlano {
   ABANDONADO
 }
 
-Aerovia "*" --> "1" Aeroporto : origem >
-Aerovia "*" --> "1" Aeroporto : destino >
+Aerovia "*" --> "1" Aeroporto : origem
+Aerovia "*" --> "1" Aeroporto : destino
 
 Aeronave <|-- AeronaveParticular
 Aeronave <|-- AeronavePassageiros
 Aeronave <|-- AeronaveCarga
+AeronaveFactory ..> Aeronave : cria
 
 PlanoDeVoo "*" --> "1" Piloto
 PlanoDeVoo "*" --> "1" Aeronave
-PlanoDeVoo "*" --> "1" Aeroporto : origem >
-PlanoDeVoo "*" --> "1" Aeroporto : destino >
+PlanoDeVoo "*" --> "1" Aeroporto : origem
+PlanoDeVoo "*" --> "1" Aeroporto : destino
 PlanoDeVoo --> SituacaoPlano
 PlanoDeVoo "1" *-- "0..*" Trecho : percurso
 Trecho "*" --> "1" Aerovia
@@ -194,6 +143,5 @@ ReservaAerovia "*" --> "1" Aerovia
 ReservaAerovia "*" --> "1" Slot
 ReservaVaga "*" --> "1" Aeroporto
 ReservaVaga "*" --> "1" Slot
-VerificadorDeConflitos ..> PlanoDeVoo : confere
 
 @enduml
