@@ -12,8 +12,7 @@ import com.pucrs.planosdevoo.domain.ports.in.PlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.in.TrechoCommand;
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
-import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
-import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
@@ -28,21 +27,19 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     private final PlanoDeVooRepository planos;
     private final PilotoRepository pilotos;
     private final AeronaveRepository aeronaves;
-    private final AeroportoRepository aeroportos;
-    private final AeroviaRepository aerovias;
+    private final MalhaAereaPort malhaAerea;
     private final ReservaRepository reservas;
     private final DisponibilidadeService disponibilidade;
     private final TransacaoPort transacao;
     private final Clock relogio;
 
     public PlanoDeVooService(PlanoDeVooRepository planos, PilotoRepository pilotos, AeronaveRepository aeronaves,
-                             AeroportoRepository aeroportos, AeroviaRepository aerovias, ReservaRepository reservas,
+                             MalhaAereaPort malhaAerea, ReservaRepository reservas,
                              DisponibilidadeService disponibilidade, TransacaoPort transacao, Clock relogio) {
         this.planos = planos;
         this.pilotos = pilotos;
         this.aeronaves = aeronaves;
-        this.aeroportos = aeroportos;
-        this.aerovias = aerovias;
+        this.malhaAerea = malhaAerea;
         this.reservas = reservas;
         this.disponibilidade = disponibilidade;
         this.transacao = transacao;
@@ -150,12 +147,12 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     }
 
     private Aeroporto buscarAeroporto(String codigo) {
-        return aeroportos.buscarPorCodigo(codigo)
+        return malhaAerea.buscarAeroporto(codigo)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aeroporto " + codigo + " não encontrado"));
     }
 
     private Aerovia buscarAerovia(String id) {
-        return aerovias.buscarPorId(id)
+        return malhaAerea.buscarAerovia(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aerovia " + id + " não encontrada"));
     }
 

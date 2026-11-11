@@ -18,12 +18,13 @@ import com.pucrs.planosdevoo.domain.model.Piloto;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ class PlanoDeVooServiceTest {
     void preparar() {
         planos = new PlanoDeVooRepositoryEmMemoria();
         reservas = new ReservaRepositoryEmMemoria();
-        disponibilidade = new DisponibilidadeService(aeroviaRepository(), null, reservas);
+        disponibilidade = new DisponibilidadeService(malhaAerea(), reservas);
     }
 
     @Test
@@ -136,7 +137,7 @@ class PlanoDeVooServiceTest {
     private PlanoDeVooService servicoEm(LocalDateTime agora) {
         ZoneId zona = ZoneId.of("America/Sao_Paulo");
         Clock relogio = Clock.fixed(agora.atZone(zona).toInstant(), zona);
-        return new PlanoDeVooService(planos, null, null, null, null, reservas, disponibilidade,
+        return new PlanoDeVooService(planos, null, null, malhaAerea(), reservas, disponibilidade,
                 new TransacaoEmMemoria(), relogio);
     }
 
@@ -160,13 +161,14 @@ class PlanoDeVooServiceTest {
         return LocalDateTime.of(2026, 10, 19, hora, minuto);
     }
 
-    private static AeroviaRepository aeroviaRepository() {
-        return new AeroviaRepository() {
-            public List<Aerovia> listarTodas() { return List.of(R1, R4); }
-            public Optional<Aerovia> buscarPorId(String id) {
-                return listarTodas().stream().filter(a -> a.getId().equals(id)).findFirst();
+    private static MalhaAereaPort malhaAerea() {
+        return new MalhaAereaPort() {
+            public Optional<Aeroporto> buscarAeroporto(String codigo) {
+                return Stream.of(POA, FLN, CWB).filter(a -> a.getCodigo().equals(codigo)).findFirst();
             }
-            public Aerovia salvar(Aerovia aerovia) { return aerovia; }
+            public Optional<Aerovia> buscarAerovia(String id) {
+                return Stream.of(R1, R4).filter(a -> a.getId().equals(id)).findFirst();
+            }
         };
     }
 }

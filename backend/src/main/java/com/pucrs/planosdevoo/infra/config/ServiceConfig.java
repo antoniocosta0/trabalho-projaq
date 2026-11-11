@@ -3,6 +3,7 @@ package com.pucrs.planosdevoo.infra.config;
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
 import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
@@ -32,18 +33,17 @@ public class ServiceConfig {
     }
 
     @Bean
-    public DisponibilidadeService disponibilidadeService(AeroviaRepository aerovias, AeroportoRepository aeroportos,
-                                                         ReservaRepository reservas) {
-        return new DisponibilidadeService(aerovias, aeroportos, reservas);
+    public DisponibilidadeService disponibilidadeService(MalhaAereaPort malhaAerea, ReservaRepository reservas) {
+        return new DisponibilidadeService(malhaAerea, reservas);
     }
 
     @Bean
     public PlanoDeVooService planoDeVooService(PlanoDeVooRepository planos, PilotoRepository pilotos,
-                                               AeronaveRepository aeronaves, AeroportoRepository aeroportos,
-                                               AeroviaRepository aerovias, ReservaRepository reservas,
+                                               AeronaveRepository aeronaves, MalhaAereaPort malhaAerea,
+                                               ReservaRepository reservas,
                                                DisponibilidadeService disponibilidade, TransacaoPort transacao,
                                                Clock relogio) {
-        return new PlanoDeVooService(planos, pilotos, aeronaves, aeroportos, aerovias, reservas, disponibilidade,
+        return new PlanoDeVooService(planos, pilotos, aeronaves, malhaAerea, reservas, disponibilidade,
                 transacao, relogio);
     }
 

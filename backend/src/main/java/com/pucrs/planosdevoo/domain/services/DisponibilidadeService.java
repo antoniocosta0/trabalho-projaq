@@ -10,8 +10,7 @@ import com.pucrs.planosdevoo.domain.model.ReservaVaga;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.model.Trecho;
 import com.pucrs.planosdevoo.domain.ports.in.DisponibilidadeUseCase;
-import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
-import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
+import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,20 +24,17 @@ public class DisponibilidadeService implements DisponibilidadeUseCase {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
-    private final AeroviaRepository aerovias;
-    private final AeroportoRepository aeroportos;
+    private final MalhaAereaPort malhaAerea;
     private final ReservaRepository reservas;
 
-    public DisponibilidadeService(AeroviaRepository aerovias, AeroportoRepository aeroportos,
-                                  ReservaRepository reservas) {
-        this.aerovias = aerovias;
-        this.aeroportos = aeroportos;
+    public DisponibilidadeService(MalhaAereaPort malhaAerea, ReservaRepository reservas) {
+        this.malhaAerea = malhaAerea;
         this.reservas = reservas;
     }
 
     @Override
     public List<Integer> altitudesDisponiveis(String aeroviaId, LocalDateTime inicio, LocalDateTime fim) {
-        aerovias.buscarPorId(aeroviaId)
+        malhaAerea.buscarAerovia(aeroviaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aerovia " + aeroviaId + " não encontrada"));
         Set<Integer> ocupadas = reservas.buscarReservasAerovia(aeroviaId, Slot.entre(inicio, fim)).stream()
                 .map(ReservaAerovia::getAltitude)
@@ -48,7 +44,7 @@ public class DisponibilidadeService implements DisponibilidadeUseCase {
 
     @Override
     public List<Integer> vagasDisponiveis(String codigoAeroporto, LocalDateTime inicio, LocalDateTime fim) {
-        Aeroporto aeroporto = aeroportos.buscarPorCodigo(codigoAeroporto)
+        Aeroporto aeroporto = malhaAerea.buscarAeroporto(codigoAeroporto)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aeroporto " + codigoAeroporto + " não encontrado"));
         Set<Integer> ocupadas = reservas.buscarReservasVaga(codigoAeroporto, Slot.entre(inicio, fim)).stream()
                 .map(ReservaVaga::getNumeroVaga)
