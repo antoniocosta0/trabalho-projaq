@@ -44,6 +44,24 @@ services:
     deploy: *limites
     restart: unless-stopped
 
+  cadastro:
+    build: ./cadastro
+    image: pas/cadastro:${TAG:-p2}
+    environment:
+      EUREKA_URL: http://eureka:8761/eureka
+    volumes:
+      - cadastro-data:/app/data
+    networks:
+      - planos-net
+    depends_on:
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/actuator/health"]
+      <<: *saude
+    deploy: *limites
+    restart: unless-stopped
+
   planos:
     build: ./backend
     image: pas/planos-de-voo:${TAG:-p2}
@@ -70,3 +88,4 @@ networks:
 
 volumes:
   planos-data:
+  cadastro-data:
