@@ -1,31 +1,67 @@
 name: planos-de-voo
 
+x-saude: &saude
+  interval: 10s
+  timeout: 3s
+  retries: 5
+  start_period: 40s
+
+x-limites: &limites
+  resources:
+    limits:
+      cpus: "1.0"
+      memory: 512M
+
 services:
-  planos:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: pas/planos-de-voo:${PLANOS_TAG:-p2-etapa0}
+  eureka:
+    build: ./eureka
+    image: pas/eureka:${TAG:-p2}
+    ports:
+      - "127.0.0.1:8761:8761"
+    networks:
+      - planos-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
+      <<: *saude
+    deploy: *limites
+    restart: unless-stopped
+
+  gateway:
+    build: ./gateway
+    image: pas/gateway:${TAG:-p2}
     environment:
+      EUREKA_URL: http://eureka:8761/eureka
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks:
+      - planos-net
+    depends_on:
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      <<: *saude
+    deploy: *limites
+    restart: unless-stopped
+
+  planos:
+    build: ./backend
+    image: pas/planos-de-voo:${TAG:-p2}
+    environment:
+      EUREKA_URL: http://eureka:8761/eureka
       APP_RELOGIO_ZONA: ${APP_RELOGIO_ZONA:-America/Sao_Paulo}
       APP_RELOGIO_INSTANTE_FIXO: ${APP_RELOGIO_INSTANTE_FIXO:-}
     volumes:
       - planos-data:/app/data
-    ports:
-      - "127.0.0.1:${PLANOS_PORT:-8080}:8080"
     networks:
       - planos-net
+    depends_on:
+      eureka:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 40s
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
+      <<: *saude
+    deploy: *limites
     restart: unless-stopped
 
 networks:
