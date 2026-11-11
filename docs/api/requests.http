@@ -6,14 +6,24 @@
 ### Tudo passa pelo gateway (prefixo /gestao).
 
 @host = http://localhost:8080/gestao
+@cadastro = http://localhost:8080/cadastro
 
 ### ── 1. Malha aérea e frota ──────────────────────────────────────
 
-### 1.1 Aeroportos: POA, FLN, CWB, GRU
-GET {{host}}/aeroportos
+### 1.1 Aeroportos (serviço de cadastro): POA, FLN, CWB, GRU
+GET {{cadastro}}/aeroportos
 
-### 1.2 Aerovias: R1..R8, orientadas
-GET {{host}}/aerovias
+### 1.2 Aerovias (serviço de cadastro): R1..R8, orientadas
+GET {{cadastro}}/aerovias
+
+### 1.2.a Vagas cadastradas de FLN: 1 a 16
+GET {{cadastro}}/aeroportos/FLN/vagas
+
+### 1.2.b Aerovias que saem de POA: R1 e R2
+GET {{cadastro}}/aerovias?origem=POA
+
+### 1.2.c Uma aerovia
+GET {{cadastro}}/aerovias/R1
 
 ### 1.3 Pilotos
 GET {{host}}/pilotos
@@ -394,14 +404,14 @@ GET {{host}}/esta-rota-nao-existe
 
 ### ── 8. Cadastros e extensibilidade (§2) ─────────────────────────
 
-### 8.1 Aeroporto novo
-POST {{host}}/aeroportos
+### 8.1 Aeroporto novo (cadastro)
+POST {{cadastro}}/aeroportos
 Content-Type: application/json
 
 { "codigo": "SDU", "nome": "Santos Dumont - Rio de Janeiro", "quantidadeVagas": 12 }
 
-### 8.2 Aerovia nova GRU -> SDU
-POST {{host}}/aerovias
+### 8.2 Aerovia nova GRU -> SDU (cadastro)
+POST {{cadastro}}/aerovias
 Content-Type: application/json
 
 { "id": "R9", "origem": "GRU", "destino": "SDU", "distanciaKm": 365 }
@@ -440,13 +450,13 @@ POST {{host}}/planos/11/aprovacao
 X-Usuario: ana
 
 ### 8.6 Aerovia com id repetido: 409
-POST {{host}}/aerovias
+POST {{cadastro}}/aerovias
 Content-Type: application/json
 
 { "id": "R1", "origem": "POA", "destino": "FLN", "distanciaKm": 363 }
 
 ### 8.7 Aerovia não tem alteração: 405
-PUT {{host}}/aerovias
+PUT {{cadastro}}/aerovias
 
 ### 8.8 Categoria desconhecida: 422
 POST {{host}}/aeronaves

@@ -101,3 +101,37 @@ Decisão: ADR 0013.
 - Destino indisponível: `docker compose stop planos` → o gateway responde 503 (500 nos primeiros
   segundos, até a lista de instâncias ser renovada). `docker compose start planos` → volta a
   responder assim que se registra de novo.
+
+## Etapa 3 — Extração do cadastro de aeroportos e aerovias
+
+### O que mudou
+
+| Mudança | Onde |
+|---|---|
+| serviço novo com aeroportos, vagas (`vaga(aeroporto_codigo, numero)`) e aerovias, banco próprio e carga inicial | `cadastro/` |
+| `MalhaAereaHttpAdapter` substitui `MalhaAereaLocalAdapter` | `backend/.../infra/adapters/out/http` |
+| `Aeroporto` da gestão passa a ter a lista de vagas recebida do cadastro | `backend/.../domain/model/Aeroporto.java` |
+| sai da gestão: `MalhaAereaService`, rotas `/aeroportos` e `/aerovias`, tabelas `aeroporto` e `aerovia` | `backend/` |
+| rota `/cadastro/**` no gateway e serviço `cadastro` no Compose | `gateway/`, `compose.yaml` |
+
+Decisão: ADR 0014. Contrato: `docs/api/cadastro.md`.
+
+### Separação dos dados
+
+- A existência e a numeração das vagas pertencem ao cadastro; as reservas por plano e slot
+  continuam na gestão.
+- A gestão guarda só códigos (plano, reservas) e a cópia da aerovia em cada trecho (ADR 0010).
+  Nenhuma tabela, entidade ou chave estrangeira é compartilhada entre os bancos.
+- Os planos e reservas da carga inicial foram preservados sem alteração: já usavam os códigos
+  POA, FLN, CWB, GRU e R1 a R8, que o cadastro carrega com os mesmos dados.
+- A carga do cadastro usa `MERGE ... WHEN NOT MATCHED`: reiniciar não duplica nem sobrescreve o
+  que foi cadastrado pela API.
+
+### Como demonstrar
+
+- `docs/api/requests.http`: seções 1 e 8 usam `/cadastro`; o resto, `/gestao`. Mesmos resultados
+  das etapas anteriores.
+- Cliente independente: `curl http://localhost:8080/cadastro/aerovias?origem=POA`.
+- Cadastro fora: `docker compose stop cadastro`. Consultar um plano continua funcionando; validar
+  e aprovar respondem 503 e o plano continua em edição. `docker compose start cadastro` → volta.
+- Novos recursos: cadastrar SDU e R9 (seção 8) e aprovar um plano por eles, sem alterar a gestão.

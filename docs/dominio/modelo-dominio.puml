@@ -1,14 +1,13 @@
 @startuml
-title Modelo de Domínio - Planos de Voo
+title Modelo de Domínio - Gestão de planos de voo
 hide circle
 hide empty members
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 
-class Aeroporto {
+class Aeroporto <<recebido do cadastro>> {
   codigo
-  nome
-  quantidadeVagas
+  vagas : List<Integer>
   --
   possuiVaga(numero) : boolean
 }

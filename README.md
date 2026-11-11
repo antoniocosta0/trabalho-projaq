@@ -26,7 +26,8 @@ Com o `docker compose up`, o acesso é pelo gateway, em `http://localhost:8080/g
 | | |
 |---|---|
 | API (gestão de planos) | http://localhost:8080/gestao |
-| Swagger UI | http://localhost:8080/gestao/swagger-ui.html |
+| API do cadastro (aeroportos e aerovias) | http://localhost:8080/cadastro ([contrato](docs/api/cadastro.md)) |
+| Swagger UI | http://localhost:8080/gestao/swagger-ui.html e http://localhost:8080/cadastro/swagger-ui.html |
 | Eureka | http://localhost:8761 |
 | Roteiro de requisições | [`docs/api/requests.http`](docs/api/requests.http) |
 | Roteiro da apresentação | [`docs/roteiro-apresentacao.md`](docs/roteiro-apresentacao.md) |

@@ -1,0 +1,30 @@
+@startuml
+title Modelo de Domínio - Cadastro da rede aérea
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class Aeroporto {
+  codigo
+  nome
+  vagas : List<Integer>
+  --
+  {static} comVagas(codigo, nome, quantidade) : Aeroporto
+}
+
+class Aerovia {
+  id
+  origem (código)
+  destino (código)
+  distanciaKm
+}
+
+Aerovia "*" --> "1" Aeroporto : origem
+Aerovia "*" --> "1" Aeroporto : destino
+
+note bottom of Aerovia
+  Imutável: id repetido é recusado.
+end note
+
+@enduml

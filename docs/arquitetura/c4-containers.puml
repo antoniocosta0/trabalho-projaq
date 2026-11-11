@@ -7,10 +7,12 @@ Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
 System_Ext(cliente, "Cliente HTTP", "curl, REST Client, Swagger UI")
 
 System_Boundary(sistema, "Sistema de Gestão de Planos de Voo") {
-  Container(gateway, "API Gateway", "Spring Cloud Gateway", "Único ponto de entrada (porta 8080). /gestao/** vai para a gestão de planos, sem o prefixo")
+  Container(gateway, "API Gateway", "Spring Cloud Gateway", "Único ponto de entrada (porta 8080). /gestao/** e /cadastro/** vão para os serviços, sem o prefixo")
   Container(eureka, "Eureka", "Spring Cloud Netflix Eureka", "Catálogo das instâncias em execução (painel na porta 8761)")
-  Container(api, "Gestão de planos", "Java 25, Spring Boot 4.1.1", "Planos, reservas, disponibilidade, pilotos e aeronaves. Ainda contém a malha aérea até a etapa 3")
-  ContainerDb(banco, "Banco da gestão", "H2 em arquivo", "Planos, trechos, reservas, outbox, pilotos, aeronaves e, até a etapa 3, a malha")
+  Container(api, "Gestão de planos", "Java 25, Spring Boot 4.1.1", "Planos, reservas, disponibilidade, pilotos e aeronaves")
+  Container(cadastro, "Cadastro da rede aérea", "Java 25, Spring Boot 4.1.1", "Aeroportos, vagas e aerovias")
+  ContainerDb(banco, "Banco da gestão", "H2 em arquivo", "Planos, trechos, reservas, outbox, pilotos e aeronaves")
+  ContainerDb(bancoCadastro, "Banco do cadastro", "H2 em arquivo", "Aeroportos, vagas e aerovias")
 }
 
 Rel(usuario, cliente, "Usa")
@@ -19,5 +21,9 @@ Rel(gateway, api, "Encaminha", "HTTP, lb://planos-de-voo")
 Rel(gateway, eureka, "Descobre instâncias", "HTTP")
 Rel(api, eureka, "Registra-se", "HTTP")
 Rel(api, banco, "Lê e grava", "JDBC")
+Rel(gateway, cadastro, "Encaminha", "HTTP, lb://cadastro")
+Rel(api, cadastro, "Consulta aeroportos e aerovias", "HTTP/JSON síncrono, lb://cadastro")
+Rel(cadastro, eureka, "Registra-se", "HTTP")
+Rel(cadastro, bancoCadastro, "Lê e grava", "JDBC")
 
 @enduml
