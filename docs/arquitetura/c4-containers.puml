@@ -4,23 +4,20 @@
 title Nível 2 - Containers
 
 Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
-System_Ext(cliente, "Cliente HTTP", "Postman, VS Code REST Client, curl")
+System_Ext(cliente, "Cliente HTTP", "curl, REST Client, Swagger UI")
 
 System_Boundary(sistema, "Sistema de Gestão de Planos de Voo") {
-  Container(api, "Backend", "Java 25, Spring Boot 4.1.1", "Expõe a API REST, aplica as regras de negócio dos planos de voo e controla a ocupação de aerovias e vagas. Serve também o Swagger UI (/swagger-ui.html), o documento OpenAPI (/v3/api-docs) e o console do H2 (/h2-console)")
-  ContainerDb(banco, "Banco de dados", "H2 2.4.240, modo arquivo (./data/planosdevoo)", "Guarda rede aérea, pilotos, aeronaves, planos, trechos e reservas. O estado sobrevive à reinicialização da aplicação")
+  Container(gateway, "API Gateway", "Spring Cloud Gateway", "Único ponto de entrada (porta 8080). /gestao/** vai para a gestão de planos, sem o prefixo")
+  Container(eureka, "Eureka", "Spring Cloud Netflix Eureka", "Catálogo das instâncias em execução (painel na porta 8761)")
+  Container(api, "Gestão de planos", "Java 25, Spring Boot 4.1.1", "Planos, reservas, disponibilidade, pilotos e aeronaves. Ainda contém a malha aérea até a etapa 3")
+  ContainerDb(banco, "Banco da gestão", "H2 em arquivo", "Planos, trechos, reservas, outbox, pilotos, aeronaves e, até a etapa 3, a malha")
 }
 
 Rel(usuario, cliente, "Usa")
-Rel(cliente, api, "Envia requisições", "HTTP/JSON")
-Rel(api, banco, "Lê e grava dados", "JPA/Hibernate sobre JDBC")
-
-note right of banco
-  Schema criado por src/main/resources/db/schema.sql
-  e carga inicial aplicada por db/data.sql, na
-  inicializacao. Reproduzivel a partir do repositorio.
-  O console do H2 e servido pelo backend, e nao e um
-  container a parte: e so uma tela sobre este banco.
-end note
+Rel(cliente, gateway, "Requisições", "HTTP/JSON")
+Rel(gateway, api, "Encaminha", "HTTP, lb://planos-de-voo")
+Rel(gateway, eureka, "Descobre instâncias", "HTTP")
+Rel(api, eureka, "Registra-se", "HTTP")
+Rel(api, banco, "Lê e grava", "JDBC")
 
 @enduml

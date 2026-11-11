@@ -21,15 +21,18 @@ cd backend
 ./mvnw clean test
 ```
 
-A API sobe em `http://localhost:8080`:
+Com o `docker compose up`, o acesso é pelo gateway, em `http://localhost:8080/gestao`:
 
 | | |
 |---|---|
-| Swagger UI | http://localhost:8080/swagger-ui.html |
-| OpenAPI | http://localhost:8080/v3/api-docs |
-| Console H2 | http://localhost:8080/h2-console (`jdbc:h2:file:./data/planosdevoo`, usuário `sa`, sem senha) |
+| API (gestão de planos) | http://localhost:8080/gestao |
+| Swagger UI | http://localhost:8080/gestao/swagger-ui.html |
+| Eureka | http://localhost:8761 |
 | Roteiro de requisições | [`docs/api/requests.http`](docs/api/requests.http) |
 | Roteiro da apresentação | [`docs/roteiro-apresentacao.md`](docs/roteiro-apresentacao.md) |
+
+Rodando só o `backend/` com `./mvnw spring-boot:run`, a API fica direto em `http://localhost:8080`
+(sem o prefixo) e o console H2 em `/h2-console` (`jdbc:h2:file:./data/planosdevoo`, usuário `sa`).
 
 Para ensaiar a apresentação em outro dia, fixe o relógio:
 

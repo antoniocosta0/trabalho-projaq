@@ -30,4 +30,4 @@ cd backend && rm -rf ./data && ./mvnw spring-boot:run \
 
 Fora do roteiro: a seção 8 cadastra aeroporto, aerovia, piloto e aeronave e aprova um plano
 com eles sem reiniciar a aplicação (§2). O Swagger UI fica em
-`http://localhost:8080/swagger-ui.html`.
+`http://localhost:8080/gestao/swagger-ui.html` (pelo gateway).

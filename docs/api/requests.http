@@ -2,9 +2,10 @@
 ### Data de referência: 19/10/2026. Supõe banco limpo e os blocos executados na ordem
 ### (os planos criados aqui recebem id 1, 2, 3...). Rotas /planos exigem o cabeçalho X-Usuario.
 ### Para recomeçar:
-###   cd backend && rm -rf ./data && ./mvnw spring-boot:run
+###   docker compose down -v && docker compose up -d --build --wait
+### Tudo passa pelo gateway (prefixo /gestao).
 
-@host = http://localhost:8080
+@host = http://localhost:8080/gestao
 
 ### ── 1. Malha aérea e frota ──────────────────────────────────────
 

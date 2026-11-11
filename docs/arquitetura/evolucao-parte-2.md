@@ -69,3 +69,35 @@ etapa 3; é o bloco que será extraído inteiro.
   da parte 1 e os novos 401 e 403.
 - O schema mudou: para usar um banco criado antes desta etapa, apague `backend/data/`
   (ou `docker compose down -v`).
+
+## Etapa 2 — Gateway e Eureka ao redor do monólito
+
+### O que mudou
+
+| Mudança | Onde |
+|---|---|
+| servidor Eureka | `eureka/` (porta 8761) |
+| gateway com a rota `/gestao/**` → `lb://planos-de-voo`, sem o prefixo | `gateway/` (porta 8080) |
+| gestão registrada no Eureka; aceita `X-Forwarded-*` do gateway | `backend/pom.xml`, `application.properties` |
+| `Location` das respostas 201 montado a partir da URL da requisição | `infra/adapters/in/rest/Localizacao.java` |
+| três serviços no `compose.yaml`; só gateway e Eureka publicam porta | `compose.yaml` |
+
+Decisão: ADR 0013.
+
+### Portas publicadas
+
+| Serviço | Porta no host | Para quê |
+|---|---|---|
+| gateway | `127.0.0.1:8080` | toda requisição de negócio |
+| eureka | `127.0.0.1:8761` | painel de instâncias (demonstração) |
+| planos | nenhuma | só é alcançado pela rede interna do Compose |
+
+### Como demonstrar
+
+- `http://localhost:8761`: a aplicação `PLANOS-DE-VOO` aparece registrada.
+- `docs/api/requests.http`, agora com `@host = http://localhost:8080/gestao`: todas as respostas
+  (inclusive erros, 401 e 403) iguais às do acesso direto.
+- Swagger pelo gateway: `http://localhost:8080/gestao/swagger-ui.html`.
+- Destino indisponível: `docker compose stop planos` → o gateway responde 503 (500 nos primeiros
+  segundos, até a lista de instâncias ser renovada). `docker compose start planos` → volta a
+  responder assim que se registra de novo.
