@@ -72,11 +72,45 @@ aplicação roda por padrão.
 17/10, antes da data de referência, então ele já partiu em qualquer dia. É por
 isso que a demonstração de cancelamento recusado funciona sem ajuste nenhum.
 
-## Preparação do ambiente
+## Execução em contêineres (Docker Compose)
+
+A partir da parte 2, a forma recomendada de subir o sistema é pelo Docker: não
+é preciso ter Java instalado, só **Docker** com o **Compose v2**. A decisão e as
+alternativas estão no [ADR 0011](docs/arquitetura/decisoes/0011-implantacao-em-conteineres.md).
+
+```sh
+docker compose config --quiet                          # valida o compose.yaml
+docker compose up -d --build --wait --wait-timeout 300 # constrói, testa e sobe
+docker compose ps                                      # deve mostrar (healthy)
+```
+
+O build da imagem (`backend/Dockerfile`) roda a suíte de testes: se algum teste
+falhar, a imagem não é gerada. O primeiro build leva alguns minutos.
+
+Com o contêiner `healthy`, a API fica em **http://localhost:8080**, igual à
+execução local (só no loopback, `127.0.0.1`). Saúde em
+`http://localhost:8080/actuator/health`.
+
+| Comando | O que faz com os dados |
+|---|---|
+| `docker compose stop` / `start` | pausa e retoma o mesmo contêiner |
+| `docker compose down` | remove o contêiner e a rede; **o volume `planos-data` fica**, e o que foi criado pela API continua lá |
+| `docker compose down -v` | remove também o volume: a próxima subida recria o banco a partir do `data.sql` |
+| `docker compose logs --tail 50 planos` | últimas linhas do log da aplicação |
+
+Para ensaiar com o relógio fixo, copie `.env.example` para `.env` e preencha
+`APP_RELOGIO_INSTANTE_FIXO` (por exemplo `2026-10-19T10:00:00`); depois
+`docker compose up -d --wait`. A porta e a tag da imagem também se ajustam ali.
+
+Estado desta etapa: há **um** serviço no compose (`planos`, o backend atual).
+Gateway, Eureka, cadastro da rede aérea, registro de aprovações e RabbitMQ
+entram nas próximas etapas da parte 2, como novos serviços no mesmo arquivo.
+
+## Preparação do ambiente (execução local, sem Docker)
 
 Só é preciso ter **Java 25** instalado. O Maven vem junto, pelo wrapper
-(`mvnw`), e o banco é embutido — não há Docker, serviço externo nem credencial
-a configurar.
+(`mvnw`), e o banco é embutido — não há serviço externo nem credencial a
+configurar.
 
 ```sh
 java -version   # precisa ser 25 ou superior

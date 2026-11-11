@@ -1,0 +1,63 @@
+# Composicao do Sistema de Gestao de Planos de Voo.
+#
+# Modelo de implantacao: um servico por conteiner (MS_P4). Hoje ha um unico
+# servico de negocio, o backend de gestao de planos, ainda monolitico. Os
+# proximos servicos da parte 2 (naming-server/Eureka, api-gateway, cadastro da
+# rede aerea, registro de aprovacoes, RabbitMQ) entram aqui como novos blocos
+# em `services`, na mesma rede, cada um com sua imagem e seu volume.
+#
+# Uso:
+#   docker compose config --quiet
+#   docker compose up -d --build --wait --wait-timeout 300
+#   docker compose ps
+#   docker compose logs --tail 50 planos
+#   docker compose down          # preserva o volume (dados continuam)
+#   docker compose down -v       # APAGA o volume: proxima subida recarrega o seed
+
+name: planos-de-voo
+
+services:
+  planos:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: pas/planos-de-voo:${PLANOS_TAG:-p2-etapa0}
+    # Sem container_name fixo: permite --scale no futuro, quando houver gateway.
+    environment:
+      # Relogio da aplicacao (ver README, "Ensaiar com o relogio fixo").
+      # Vazio = relogio real no fuso de Sao Paulo.
+      APP_RELOGIO_ZONA: ${APP_RELOGIO_ZONA:-America/Sao_Paulo}
+      APP_RELOGIO_INSTANTE_FIXO: ${APP_RELOGIO_INSTANTE_FIXO:-}
+    volumes:
+      # H2 em ARQUIVO dentro de /app/data. O volume nomeado e o que faz o
+      # estado sobreviver a down/up; montar volume sobre H2 em memoria nao
+      # adiantaria nada.
+      - planos-data:/app/data
+    ports:
+      # Enquanto nao existe gateway, o backend e o ponto de entrada e publica
+      # a porta no host - so no loopback. Quando o gateway entrar, esta
+      # publicacao sai daqui e passa a ser so dele.
+      - "127.0.0.1:${PLANOS_PORT:-8080}:8080"
+    networks:
+      - planos-net
+    healthcheck:
+      # Processo ativo nao e aplicacao pronta: o health so fica UP depois que
+      # o Spring subiu e o banco respondeu.
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+
+networks:
+  planos-net:
+    driver: bridge
+
+volumes:
+  planos-data:
