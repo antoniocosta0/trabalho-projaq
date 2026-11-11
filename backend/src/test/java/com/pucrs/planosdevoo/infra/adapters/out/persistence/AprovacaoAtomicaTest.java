@@ -22,7 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:atomicidade;DB_CLOSE_DELAY=-1")
+@SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:atomicidade;DB_CLOSE_DELAY=-1",
+        "eureka.client.enabled=false"})
 class AprovacaoAtomicaTest {
 
     private static final LocalDateTime PARTIDA = LocalDateTime.of(2031, 3, 12, 10, 0);
