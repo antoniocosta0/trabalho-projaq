@@ -13,6 +13,7 @@ import com.pucrs.planosdevoo.domain.ports.in.PlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.in.TrechoCommand;
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AprovacaoPublisherPort;
 import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
@@ -31,18 +32,21 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     private final MalhaAereaPort malhaAerea;
     private final ReservaRepository reservas;
     private final DisponibilidadeService disponibilidade;
+    private final AprovacaoPublisherPort aprovacoes;
     private final TransacaoPort transacao;
     private final Clock relogio;
 
     public PlanoDeVooService(PlanoDeVooRepository planos, PilotoRepository pilotos, AeronaveRepository aeronaves,
                              MalhaAereaPort malhaAerea, ReservaRepository reservas,
-                             DisponibilidadeService disponibilidade, TransacaoPort transacao, Clock relogio) {
+                             DisponibilidadeService disponibilidade, AprovacaoPublisherPort aprovacoes,
+                             TransacaoPort transacao, Clock relogio) {
         this.planos = planos;
         this.pilotos = pilotos;
         this.aeronaves = aeronaves;
         this.malhaAerea = malhaAerea;
         this.reservas = reservas;
         this.disponibilidade = disponibilidade;
+        this.aprovacoes = aprovacoes;
         this.transacao = transacao;
         this.relogio = relogio;
     }
@@ -121,6 +125,7 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
             plano.aprovar(disponibilidade.verificarRecursos(plano));
             PlanoDeVoo aprovado = planos.salvar(plano);
             reservas.reservar(aprovado.reservasDeAerovia(), aprovado.reservasDeVaga());
+            aprovacoes.publicar(aprovado, agora());
             return aprovado;
         });
     }

@@ -109,3 +109,11 @@ JOIN plano_de_voo p ON p.id = v.plano_id AND p.situacao = 'APROVADO') s
 ON t.aeroporto_codigo = s.aeroporto_codigo AND t.numero_vaga = s.numero_vaga AND t.slot_inicio = s.slot_inicio
 WHEN NOT MATCHED THEN INSERT (plano_id, aeroporto_codigo, numero_vaga, slot_inicio)
     VALUES (s.plano_id, s.aeroporto_codigo, s.numero_vaga, s.slot_inicio);
+
+-- Os planos aprovados da carga também chegam ao registro pela fila; o evento_id fixo evita duplicatas.
+MERGE INTO outbox_evento (evento_id, plano_id, aprovado_em) KEY (evento_id) VALUES
+    ('00000000-0000-0000-0000-000000001001', 1001, TIMESTAMP '2026-10-16 12:00:00'),
+    ('00000000-0000-0000-0000-000000001002', 1002, TIMESTAMP '2026-10-16 12:00:00'),
+    ('00000000-0000-0000-0000-000000001003', 1003, TIMESTAMP '2026-10-16 12:00:00'),
+    ('00000000-0000-0000-0000-000000001004', 1004, TIMESTAMP '2026-10-16 12:00:00'),
+    ('00000000-0000-0000-0000-000000001005', 1005, TIMESTAMP '2026-10-16 12:00:00');

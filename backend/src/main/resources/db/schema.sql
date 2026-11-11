@@ -74,3 +74,11 @@ CREATE TABLE IF NOT EXISTS reserva_vaga (
     CONSTRAINT uq_reserva_vaga UNIQUE (aeroporto_codigo, numero_vaga, slot_inicio)
 );
 CREATE INDEX IF NOT EXISTS ix_reserva_vaga_plano ON reserva_vaga (plano_id);
+
+-- Aprovação a comunicar ao registro; gravada na mesma transação da aprovação.
+CREATE TABLE IF NOT EXISTS outbox_evento (
+    evento_id     VARCHAR(36) PRIMARY KEY,
+    plano_id      BIGINT      NOT NULL UNIQUE,
+    aprovado_em   TIMESTAMP   NOT NULL,
+    publicado_em  TIMESTAMP
+);

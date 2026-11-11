@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.pucrs.planosdevoo.domain.exceptions.AcessoNegadoException;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
+import com.pucrs.planosdevoo.domain.fakes.AprovacaoPublisherEmMemoria;
 import com.pucrs.planosdevoo.domain.fakes.PlanoDeVooRepositoryEmMemoria;
 import com.pucrs.planosdevoo.domain.fakes.ReservaRepositoryEmMemoria;
 import com.pucrs.planosdevoo.domain.fakes.TransacaoEmMemoria;
@@ -43,11 +44,13 @@ class PlanoDeVooServiceTest {
     private PlanoDeVooRepositoryEmMemoria planos;
     private ReservaRepositoryEmMemoria reservas;
     private DisponibilidadeService disponibilidade;
+    private AprovacaoPublisherEmMemoria aprovacoes;
 
     @BeforeEach
     void preparar() {
         planos = new PlanoDeVooRepositoryEmMemoria();
         reservas = new ReservaRepositoryEmMemoria();
+        aprovacoes = new AprovacaoPublisherEmMemoria();
         disponibilidade = new DisponibilidadeService(malhaAerea(), reservas);
     }
 
@@ -77,6 +80,7 @@ class PlanoDeVooServiceTest {
         assertTrue(reservas.aerovias.isEmpty());
         assertTrue(reservas.vagas.isEmpty());
         assertEquals(SituacaoPlano.EM_EDICAO, situacaoDo(1L));
+        assertTrue(aprovacoes.publicados.isEmpty());
     }
 
     @Test
@@ -89,6 +93,7 @@ class PlanoDeVooServiceTest {
         assertEquals(2, reservas.aerovias.size());
         assertEquals(2, reservas.vagas.size());
         assertFalse(altitudesLivresEmR1().contains(30_000));
+        assertEquals(List.of(1L), aprovacoes.publicados);
     }
 
     @Test
@@ -117,6 +122,7 @@ class PlanoDeVooServiceTest {
         assertEquals(SituacaoPlano.EM_EDICAO, situacaoDo(2L));
         assertTrue(reservas.aerovias.stream().noneMatch(r -> r.getPlanoId().equals(2L)));
         assertTrue(reservas.vagas.stream().noneMatch(r -> r.getPlanoId().equals(2L)));
+        assertEquals(List.of(1L), aprovacoes.publicados);
     }
 
     @Test
@@ -166,7 +172,7 @@ class PlanoDeVooServiceTest {
         ZoneId zona = ZoneId.of("America/Sao_Paulo");
         Clock relogio = Clock.fixed(agora.atZone(zona).toInstant(), zona);
         return new PlanoDeVooService(planos, null, null, malhaAerea(), reservas, disponibilidade,
-                new TransacaoEmMemoria(), relogio);
+                aprovacoes, new TransacaoEmMemoria(), relogio);
     }
 
     private void planoValido(Long id, LocalDateTime partida) {

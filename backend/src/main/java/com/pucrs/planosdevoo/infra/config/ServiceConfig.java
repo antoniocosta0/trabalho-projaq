@@ -1,6 +1,7 @@
 package com.pucrs.planosdevoo.infra.config;
 
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
+import com.pucrs.planosdevoo.domain.ports.out.AprovacaoPublisherPort;
 import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
@@ -41,10 +42,11 @@ public class ServiceConfig {
     public PlanoDeVooService planoDeVooService(PlanoDeVooRepository planos, PilotoRepository pilotos,
                                                AeronaveRepository aeronaves, MalhaAereaPort malhaAerea,
                                                ReservaRepository reservas,
-                                               DisponibilidadeService disponibilidade, TransacaoPort transacao,
+                                               DisponibilidadeService disponibilidade,
+                                               AprovacaoPublisherPort aprovacoes, TransacaoPort transacao,
                                                Clock relogio) {
         return new PlanoDeVooService(planos, pilotos, aeronaves, malhaAerea, reservas, disponibilidade,
-                transacao, relogio);
+                aprovacoes, transacao, relogio);
     }
 
     // app.relogio.instante-fixo permite ensaiar a apresentação em outro dia

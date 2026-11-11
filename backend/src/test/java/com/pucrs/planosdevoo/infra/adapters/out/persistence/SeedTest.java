@@ -9,6 +9,7 @@ import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
+import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.OutboxEventoJpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -25,6 +26,7 @@ class SeedTest {
     @Autowired PlanoDeVooRepository planos;
     @Autowired ReservaRepository reservas;
     @Autowired AeroviaRepository aerovias;
+    @Autowired OutboxEventoJpaRepository outbox;
 
     @Test
     void peloMenos60PorCentoDasAeroviasTemOcupacaoNaDataDeReferencia() {
@@ -52,6 +54,11 @@ class SeedTest {
     @Test
     void existePlanoAprovadoJaPartidoParaDemonstrarOCancelamentoRecusado() {
         assertTrue(aprovados().stream().anyMatch(p -> p.getPartida().toLocalDate().isBefore(DATA_DE_REFERENCIA)));
+    }
+
+    @Test
+    void cadaPlanoAprovadoDaCargaTemSuaAprovacaoNoOutbox() {
+        assertEquals(aprovados().size(), outbox.count());
     }
 
     private List<PlanoDeVoo> aprovados() {
