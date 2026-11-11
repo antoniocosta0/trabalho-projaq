@@ -10,7 +10,6 @@ import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.ValidacaoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +41,7 @@ public class PlanoDeVooController {
     public ResponseEntity<PlanoResponse> criar(@RequestHeader("X-Usuario") String usuario,
                                                @Valid @RequestBody PlanoRequest req) {
         PlanoDeVoo plano = planos.criar(usuario, req.paraComando());
-        return ResponseEntity.created(URI.create("/planos/" + plano.getId())).body(PlanoResponse.de(plano));
+        return ResponseEntity.created(Localizacao.doCriado(plano.getId())).body(PlanoResponse.de(plano));
     }
 
     @Operation(summary = "Alterar piloto, aeronave, origem, destino ou partida",

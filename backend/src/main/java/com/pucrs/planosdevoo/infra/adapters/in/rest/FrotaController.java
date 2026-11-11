@@ -10,7 +10,6 @@ import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.PilotoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +43,7 @@ public class FrotaController {
     @PostMapping("/pilotos")
     public ResponseEntity<PilotoResponse> cadastrarPiloto(@Valid @RequestBody PilotoRequest req) {
         Piloto piloto = frota.cadastrarPiloto(req.nome());
-        return ResponseEntity.created(URI.create("/pilotos/" + piloto.getId())).body(PilotoResponse.de(piloto));
+        return ResponseEntity.created(Localizacao.doCriado(piloto.getId())).body(PilotoResponse.de(piloto));
     }
 
     @Operation(summary = "Cadastrar aeronave",
@@ -53,7 +52,7 @@ public class FrotaController {
     @PostMapping("/aeronaves")
     public ResponseEntity<AeronaveResponse> cadastrarAeronave(@Valid @RequestBody AeronaveRequest req) {
         Aeronave aeronave = frota.cadastrarAeronave(req.paraComando());
-        return ResponseEntity.created(URI.create("/aeronaves/" + aeronave.getPrefixo()))
+        return ResponseEntity.created(Localizacao.doCriado(aeronave.getPrefixo()))
                 .body(AeronaveResponse.de(aeronave));
     }
 }

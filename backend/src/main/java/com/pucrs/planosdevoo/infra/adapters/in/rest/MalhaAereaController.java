@@ -10,7 +10,6 @@ import com.pucrs.planosdevoo.infra.adapters.in.rest.dto.AeroviaResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +43,7 @@ public class MalhaAereaController {
     @PostMapping("/aeroportos")
     public ResponseEntity<AeroportoResponse> cadastrarAeroporto(@Valid @RequestBody AeroportoRequest req) {
         Aeroporto aeroporto = malhaAerea.cadastrarAeroporto(req.codigo(), req.nome(), req.quantidadeVagas());
-        return ResponseEntity.created(URI.create("/aeroportos/" + aeroporto.getCodigo()))
+        return ResponseEntity.created(Localizacao.doCriado(aeroporto.getCodigo()))
                 .body(AeroportoResponse.de(aeroporto));
     }
 
@@ -53,6 +52,6 @@ public class MalhaAereaController {
     @PostMapping("/aerovias")
     public ResponseEntity<AeroviaResponse> cadastrarAerovia(@Valid @RequestBody AeroviaRequest req) {
         Aerovia aerovia = malhaAerea.cadastrarAerovia(req.id(), req.origem(), req.destino(), req.distanciaKm());
-        return ResponseEntity.created(URI.create("/aerovias/" + aerovia.getId())).body(AeroviaResponse.de(aerovia));
+        return ResponseEntity.created(Localizacao.doCriado(aerovia.getId())).body(AeroviaResponse.de(aerovia));
     }
 }
