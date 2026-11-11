@@ -28,12 +28,12 @@ public class PlanoDeVooRepositoryEmMemoria implements PlanoDeVooRepository {
     }
 
     @Override
-    public List<PlanoDeVoo> listarTodos() {
-        return List.copyOf(planos);
+    public List<PlanoDeVoo> listarPorCriador(String criador) {
+        return planos.stream().filter(p -> p.pertenceA(criador)).toList();
     }
 
     @Override
-    public List<PlanoDeVoo> listarPorSituacao(SituacaoPlano situacao) {
-        return planos.stream().filter(p -> p.getSituacao() == situacao).toList();
+    public List<PlanoDeVoo> listarPorCriadorESituacao(String criador, SituacaoPlano situacao) {
+        return listarPorCriador(criador).stream().filter(p -> p.getSituacao() == situacao).toList();
     }
 }

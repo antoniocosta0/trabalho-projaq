@@ -1,6 +1,7 @@
 ### Roteiro de requisições — Planos de Voo
 ### Data de referência: 19/10/2026. Supõe banco limpo e os blocos executados na ordem
-### (os planos criados aqui recebem id 1, 2, 3...). Para recomeçar:
+### (os planos criados aqui recebem id 1, 2, 3...). Rotas /planos exigem o cabeçalho X-Usuario.
+### Para recomeçar:
 ###   cd backend && rm -rf ./data && ./mvnw spring-boot:run
 
 @host = http://localhost:8080
@@ -29,6 +30,7 @@ GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=202
 
 ### 2.3 Criar plano 1 (EM_EDICAO, sem trechos)
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
@@ -36,6 +38,7 @@ Content-Type: application/json
 
 ### 2.4 Trecho R1 com pouso: chegada calculada 23:26
 POST {{host}}/planos/1/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T23:00:00",
@@ -43,15 +46,18 @@ Content-Type: application/json
 
 ### 2.5 Validar: valido true
 POST {{host}}/planos/1/validacao
+X-Usuario: ana
 
 ### 2.6 Validar não reservou: ainda 11 altitudes
 GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
 
 ### 2.7 Validar não mudou a situação: EM_EDICAO
 GET {{host}}/planos/1
+X-Usuario: ana
 
 ### 2.8 Aprovar: APROVADO
 POST {{host}}/planos/1/aprovacao
+X-Usuario: ana
 
 ### 2.9 Aprovar reservou: 10 altitudes (sem 30000)
 GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
@@ -63,6 +69,7 @@ GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=202
 
 ### 3.1 Percurso inconsistente: plano 2
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "GRU",
@@ -70,12 +77,14 @@ Content-Type: application/json
 
 ### 3.1.a R1 (POA -> FLN)
 POST {{host}}/planos/2/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 32000, "horarioEntrada": "2026-10-19T08:00:00" }
 
 ### 3.1.b R6 (CWB -> GRU) não encaixa
 POST {{host}}/planos/2/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R6", "altitude": 32000, "horarioEntrada": "2026-10-19T08:26:00",
@@ -83,9 +92,11 @@ Content-Type: application/json
 
 ### 3.1.c Validar: "Trecho 2 sai de CWB, mas o trecho 1 termina em FLN"
 POST {{host}}/planos/2/validacao
+X-Usuario: ana
 
 ### 3.2 Particular acima de 27.000 pés: plano 3
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 2, "aeronavePrefixo": "PP-PAR", "origem": "POA", "destino": "FLN",
@@ -93,6 +104,7 @@ Content-Type: application/json
 
 ### 3.2.a Trecho a 30.000 pés
 POST {{host}}/planos/3/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T14:00:00",
@@ -100,9 +112,11 @@ Content-Type: application/json
 
 ### 3.2.b Validar: a aeronave PP-PAR não pode voar a 30000 pés
 POST {{host}}/planos/3/validacao
+X-Usuario: ana
 
 ### 3.3 Carga fora de 00:00–06:00: plano 4
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 3, "aeronavePrefixo": "PR-CRG", "origem": "POA", "destino": "FLN",
@@ -110,6 +124,7 @@ Content-Type: application/json
 
 ### 3.3.a Trecho às 09:00
 POST {{host}}/planos/4/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 33000, "horarioEntrada": "2026-10-19T09:00:00",
@@ -117,9 +132,11 @@ Content-Type: application/json
 
 ### 3.3.b Validar: a aeronave PR-CRG não pode voar entre 09:00 e 09:28
 POST {{host}}/planos/4/validacao
+X-Usuario: ana
 
 ### 3.4 Horário incompatível com a duração: plano 5
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "CWB",
@@ -127,12 +144,14 @@ Content-Type: application/json
 
 ### 3.4.a R1, chegada calculada 08:26
 POST {{host}}/planos/5/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 34000, "horarioEntrada": "2026-10-19T08:00:00" }
 
 ### 3.4.b R4 entrando às 11:00
 POST {{host}}/planos/5/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R4", "altitude": 34000, "horarioEntrada": "2026-10-19T11:00:00",
@@ -140,9 +159,11 @@ Content-Type: application/json
 
 ### 3.4.c Validar: "entrada às 19/10 11:00, mas deveria ser às 19/10 08:26"
 POST {{host}}/planos/5/validacao
+X-Usuario: ana
 
 ### 3.5 Autonomia insuficiente: plano 6 (PP-CUR, 850 km úteis)
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 4, "aeronavePrefixo": "PP-CUR", "origem": "POA", "destino": "GRU",
@@ -150,6 +171,7 @@ Content-Type: application/json
 
 ### 3.5.a R2, 865 km
 POST {{host}}/planos/6/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R2", "altitude": 26000, "horarioEntrada": "2026-10-19T10:00:00",
@@ -157,11 +179,13 @@ Content-Type: application/json
 
 ### 3.5.b Validar: "865 km sem abastecer, acima do limite de 850 km"
 POST {{host}}/planos/6/validacao
+X-Usuario: ana
 
 ### ── 4. Conflitos e atomicidade (dependem do plano 1 aprovado) ────
 
 ### 4.1 Conflito de altitude: plano 7
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 2, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
@@ -169,6 +193,7 @@ Content-Type: application/json
 
 ### 4.1.a Mesma altitude do plano 1, vaga livre
 POST {{host}}/planos/7/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T23:00:00",
@@ -176,18 +201,22 @@ Content-Type: application/json
 
 ### 4.1.b Validar: a altitude 30000 pés da aerovia R1 está ocupada
 POST {{host}}/planos/7/validacao
+X-Usuario: ana
 
 ### 4.2 Aprovar: 422 com a lista de problemas
 POST {{host}}/planos/7/aprovacao
+X-Usuario: ana
 
 ### 4.2.a Continua EM_EDICAO
 GET {{host}}/planos/7
+X-Usuario: ana
 
 ### 4.2.b Sem reserva parcial: a vaga 9 continua livre
 GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T01:00:00
 
 ### 4.3 Vaga indisponível: plano 8
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 3, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
@@ -195,6 +224,7 @@ Content-Type: application/json
 
 ### 4.3.a Altitude livre, vaga 3 ocupada
 POST {{host}}/planos/8/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 31000, "horarioEntrada": "2026-10-19T23:00:00",
@@ -202,9 +232,11 @@ Content-Type: application/json
 
 ### 4.3.b Validar: a vaga 3 de FLN está ocupada nos slots das 23:00 e 00:00
 POST {{host}}/planos/8/validacao
+X-Usuario: ana
 
 ### 4.4 Conflito com o plano 1003 da carga inicial: plano 9
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "GRU",
@@ -212,6 +244,7 @@ Content-Type: application/json
 
 ### 4.4.a R2 a 31.000 pés, como o 1003
 POST {{host}}/planos/9/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R2", "altitude": 31000, "horarioEntrada": "2026-10-19T21:00:00",
@@ -219,14 +252,17 @@ Content-Type: application/json
 
 ### 4.4.b Validar: altitude 31000 da R2 ocupada
 POST {{host}}/planos/9/validacao
+X-Usuario: ana
 
 ### 4.4.c O plano que ocupa
 GET {{host}}/planos/1003
+X-Usuario: bruno
 
 ### ── 5. Cancelamento ─────────────────────────────────────────────
 
 ### 5.1 Cancelar o plano 1 (futuro): CANCELADO
 POST {{host}}/planos/1/cancelamento
+X-Usuario: ana
 
 ### 5.1.a Reserva de aerovia liberada: 11 altitudes
 GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T23:00:00&fim=2026-10-20T00:00:00
@@ -236,14 +272,17 @@ GET {{host}}/aeroportos/FLN/vagas-disponiveis?inicio=2026-10-19T23:00:00&fim=202
 
 ### 5.2 Cancelar o 1005, que partiu em 17/10: 409
 POST {{host}}/planos/1005/cancelamento
+X-Usuario: bruno
 
 ### 5.2.a Continua consultável e APROVADO
 GET {{host}}/planos/1005
+X-Usuario: bruno
 
 ### ── 6. Edição, abandono e consultas ─────────────────────────────
 
 ### 6.1 Plano 10 com aeronave de carga às 20:00, fora da janela
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 4, "aeronavePrefixo": "PR-CRG", "origem": "POA", "destino": "FLN",
@@ -251,6 +290,7 @@ Content-Type: application/json
 
 ### 6.1.a Trecho R1: chegada 20:28 (780 km/h)
 POST {{host}}/planos/10/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 26000, "horarioEntrada": "2026-10-19T20:00:00",
@@ -258,6 +298,7 @@ Content-Type: application/json
 
 ### 6.1.b Trocar para PR-PAX: chegada recalculada para 20:26
 PUT {{host}}/planos/10
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 4, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
@@ -265,57 +306,77 @@ Content-Type: application/json
 
 ### 6.1.c Validar: PR-PAX não voa abaixo de 28.000 pés
 POST {{host}}/planos/10/validacao
+X-Usuario: ana
 
 ### 6.2 Abandonar o plano 10: ABANDONADO
 POST {{host}}/planos/10/abandono
+X-Usuario: ana
 
 ### 6.3 Modificar plano abandonado: 409
 POST {{host}}/planos/10/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 30000, "horarioEntrada": "2026-10-19T20:00:00" }
 
 ### 6.3.a Alterar dados de plano cancelado: 409
 PUT {{host}}/planos/1
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 1, "aeronavePrefixo": "PR-PAX", "origem": "POA", "destino": "FLN",
   "partida": "2026-10-19T23:00:00" }
 
+### 6.3.b Sem X-Usuario: 401
+GET {{host}}/planos/2
+
+### 6.3.c Plano de outro usuário: 403
+GET {{host}}/planos/2
+X-Usuario: bruno
+
 ### 6.4 Aprovados
 GET {{host}}/planos?situacao=APROVADO
+X-Usuario: ana
 
 ### 6.5 Cancelados
 GET {{host}}/planos?situacao=CANCELADO
+X-Usuario: ana
 
 ### 6.6 Abandonados
 GET {{host}}/planos?situacao=ABANDONADO
+X-Usuario: ana
 
 ### 6.7 Em edição
 GET {{host}}/planos?situacao=EM_EDICAO
+X-Usuario: ana
 
 ### 6.8 Todos
 GET {{host}}/planos
+X-Usuario: ana
 
 ### 6.9 Alterar trecho do plano 5: 29.000 pés
 PUT {{host}}/planos/5/trechos/1
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R1", "altitude": 29000, "horarioEntrada": "2026-10-19T08:00:00" }
 
 ### 6.10 Remover o trecho 2 do plano 5
 DELETE {{host}}/planos/5/trechos/2
+X-Usuario: ana
 
 ### ── 7. Erros de requisição ──────────────────────────────────────
 
 ### 7.1 Plano inexistente: 404
 GET {{host}}/planos/999
+X-Usuario: ana
 
 ### 7.2 Aerovia inexistente: 404
 GET {{host}}/aerovias/R99/altitudes-disponiveis?inicio=2026-10-19T08:00:00&fim=2026-10-19T09:00:00
 
 ### 7.3 Corpo incompleto: 400 com a lista de campos
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 1 }
@@ -325,6 +386,7 @@ GET {{host}}/aerovias/R1/altitudes-disponiveis?inicio=2026-10-19T10:00:00&fim=20
 
 ### 7.5 Situação inexistente: 400
 GET {{host}}/planos?situacao=VOANDO
+X-Usuario: ana
 
 ### 7.6 Rota inexistente: 404
 GET {{host}}/esta-rota-nao-existe
@@ -358,6 +420,7 @@ Content-Type: application/json
 
 ### 8.5 Plano 11 usando tudo o que foi cadastrado
 POST {{host}}/planos
+X-Usuario: ana
 Content-Type: application/json
 
 { "pilotoId": 101, "aeronavePrefixo": "PR-NEW", "origem": "GRU", "destino": "SDU",
@@ -365,6 +428,7 @@ Content-Type: application/json
 
 ### 8.5.a Trecho pela R9: chegada 22:27
 POST {{host}}/planos/11/trechos
+X-Usuario: ana
 Content-Type: application/json
 
 { "aeroviaId": "R9", "altitude": 29000, "horarioEntrada": "2026-10-19T22:00:00",
@@ -372,6 +436,7 @@ Content-Type: application/json
 
 ### 8.5.b Aprovar: APROVADO
 POST {{host}}/planos/11/aprovacao
+X-Usuario: ana
 
 ### 8.6 Aerovia com id repetido: 409
 POST {{host}}/aerovias

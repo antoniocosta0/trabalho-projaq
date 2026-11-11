@@ -31,6 +31,7 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
     public PlanoDeVoo salvar(PlanoDeVoo plano) {
         PlanoDeVooEntity entity = new PlanoDeVooEntity(
                 plano.getId(),
+                plano.getCriador(),
                 pilotos.getReferenceById(plano.getPiloto().getId()),
                 aeronaves.getReferenceById(plano.getAeronave().getPrefixo()),
                 plano.getOrigem(),
@@ -40,7 +41,7 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
                 plano.getTrechos().stream().map(this::trechoParaEntidade).toList());
         PlanoDeVooEntity salvo = planos.save(entity);
 
-        return PlanoDeVoo.reconstituir(salvo.getId(), plano.getPiloto(), plano.getAeronave(),
+        return PlanoDeVoo.reconstituir(salvo.getId(), plano.getCriador(), plano.getPiloto(), plano.getAeronave(),
                 plano.getOrigem(), plano.getDestino(), plano.getPartida(), plano.getSituacao(),
                 plano.getTrechos());
     }
@@ -60,12 +61,12 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
     }
 
     @Override
-    public List<PlanoDeVoo> listarTodos() {
-        return planos.findAll().stream().map(PlanoDeVooMapper::paraDominio).toList();
+    public List<PlanoDeVoo> listarPorCriador(String criador) {
+        return planos.findByCriador(criador).stream().map(PlanoDeVooMapper::paraDominio).toList();
     }
 
     @Override
-    public List<PlanoDeVoo> listarPorSituacao(SituacaoPlano situacao) {
-        return planos.findBySituacao(situacao).stream().map(PlanoDeVooMapper::paraDominio).toList();
+    public List<PlanoDeVoo> listarPorCriadorESituacao(String criador, SituacaoPlano situacao) {
+        return planos.findByCriadorAndSituacao(criador, situacao).stream().map(PlanoDeVooMapper::paraDominio).toList();
     }
 }

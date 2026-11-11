@@ -16,11 +16,12 @@ public final class PlanoDeVooMapper {
     public static PlanoDeVoo paraDominio(PlanoDeVooEntity e) {
         Aeronave aeronave = FrotaMapper.paraDominio(e.getAeronave());
         List<Trecho> trechos = e.getTrechos().stream()
-                .map(t -> new Trecho(t.getOrdem(), new Aerovia(t.getAeroviaId(), t.getOrigem(), t.getDestino(), t.getDistanciaKm()), t.getAltitude(),
-                        t.getHorarioEntrada(), aeronave.getVelocidadeCruzeiroKmh(), pousoDe(t)))
+                .map(t -> new Trecho(t.getOrdem(), aeroviaDe(t), t.getAltitude(), t.getHorarioEntrada(),
+                        aeronave.getVelocidadeCruzeiroKmh(), pousoDe(t)))
                 .toList();
         return PlanoDeVoo.reconstituir(
                 e.getId(),
+                e.getCriador(),
                 FrotaMapper.paraDominio(e.getPiloto()),
                 aeronave,
                 e.getOrigem(),
@@ -28,6 +29,10 @@ public final class PlanoDeVooMapper {
                 e.getPartida(),
                 e.getSituacao(),
                 trechos);
+    }
+
+    private static Aerovia aeroviaDe(TrechoEmbeddable t) {
+        return new Aerovia(t.getAeroviaId(), t.getOrigem(), t.getDestino(), t.getDistanciaKm());
     }
 
     private static Pouso pousoDe(TrechoEmbeddable t) {

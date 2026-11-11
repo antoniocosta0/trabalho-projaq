@@ -6,25 +6,25 @@ import java.util.List;
 
 public interface PlanoDeVooUseCase {
 
-    PlanoDeVoo criar(PlanoCommand comando);
+    PlanoDeVoo criar(String usuario, PlanoCommand comando);
 
-    PlanoDeVoo alterar(Long id, PlanoCommand comando);
+    PlanoDeVoo alterar(String usuario, Long id, PlanoCommand comando);
 
-    PlanoDeVoo buscar(Long id);
+    PlanoDeVoo buscar(String usuario, Long id);
 
-    List<PlanoDeVoo> listar(SituacaoPlano situacao);
+    List<PlanoDeVoo> listar(String usuario, SituacaoPlano situacao);
 
-    PlanoDeVoo adicionarTrecho(Long planoId, TrechoCommand comando);
+    PlanoDeVoo adicionarTrecho(String usuario, Long planoId, TrechoCommand comando);
 
-    PlanoDeVoo alterarTrecho(Long planoId, int ordem, TrechoCommand comando);
+    PlanoDeVoo alterarTrecho(String usuario, Long planoId, int ordem, TrechoCommand comando);
 
-    PlanoDeVoo removerTrecho(Long planoId, int ordem);
+    PlanoDeVoo removerTrecho(String usuario, Long planoId, int ordem);
 
-    List<String> validar(Long planoId);
+    List<String> validar(String usuario, Long planoId);
 
-    PlanoDeVoo aprovar(Long planoId);
+    PlanoDeVoo aprovar(String usuario, Long planoId);
 
-    PlanoDeVoo cancelar(Long planoId);
+    PlanoDeVoo cancelar(String usuario, Long planoId);
 
-    PlanoDeVoo abandonar(Long planoId);
+    PlanoDeVoo abandonar(String usuario, Long planoId);
 }

@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface PlanoDeVooRepository {
     PlanoDeVoo salvar(PlanoDeVoo plano);
     Optional<PlanoDeVoo> buscarPorId(Long id);
-    List<PlanoDeVoo> listarTodos();
-    List<PlanoDeVoo> listarPorSituacao(SituacaoPlano situacao);
+    List<PlanoDeVoo> listarPorCriador(String criador);
+    List<PlanoDeVoo> listarPorCriadorESituacao(String criador, SituacaoPlano situacao);
 }

@@ -1,5 +1,6 @@
 package com.pucrs.planosdevoo.domain.services;
 
+import com.pucrs.planosdevoo.domain.exceptions.AcessoNegadoException;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.Aeroporto;
@@ -47,57 +48,66 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     }
 
     @Override
-    public PlanoDeVoo criar(PlanoCommand comando) {
-        PlanoDeVoo plano = PlanoDeVoo.novo(buscarPiloto(comando.pilotoId()), buscarAeronave(comando.prefixoAeronave()),
-                buscarAeroporto(comando.codigoOrigem()).getCodigo(), buscarAeroporto(comando.codigoDestino()).getCodigo(), comando.partida());
+    public PlanoDeVoo criar(String usuario, PlanoCommand comando) {
+        PlanoDeVoo plano = PlanoDeVoo.novo(usuario, buscarPiloto(comando.pilotoId()),
+                buscarAeronave(comando.prefixoAeronave()), aeroportoExistente(comando.codigoOrigem()),
+                aeroportoExistente(comando.codigoDestino()), comando.partida());
         return planos.salvar(plano);
     }
 
     @Override
-    public PlanoDeVoo alterar(Long id, PlanoCommand comando) {
-        PlanoDeVoo plano = buscar(id);
+    public PlanoDeVoo alterar(String usuario, Long id, PlanoCommand comando) {
+        PlanoDeVoo plano = buscar(usuario, id);
         plano.alterarDados(buscarPiloto(comando.pilotoId()), buscarAeronave(comando.prefixoAeronave()),
-                buscarAeroporto(comando.codigoOrigem()).getCodigo(), buscarAeroporto(comando.codigoDestino()).getCodigo(), comando.partida());
+                aeroportoExistente(comando.codigoOrigem()), aeroportoExistente(comando.codigoDestino()),
+                comando.partida());
         return planos.salvar(plano);
     }
 
     @Override
-    public PlanoDeVoo buscar(Long id) {
-        return planos.buscarPorId(id)
+    public PlanoDeVoo buscar(String usuario, Long id) {
+        PlanoDeVoo plano = planos.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Plano " + id + " não encontrado"));
+        if (!plano.pertenceA(usuario)) {
+            throw new AcessoNegadoException("O plano " + id + " pertence a outro usuário");
+        }
+        return plano;
     }
 
     @Override
-    public List<PlanoDeVoo> listar(SituacaoPlano situacao) {
-        return situacao == null ? planos.listarTodos() : planos.listarPorSituacao(situacao);
+    public List<PlanoDeVoo> listar(String usuario, SituacaoPlano situacao) {
+        if (situacao == null) {
+            return planos.listarPorCriador(usuario);
+        }
+        return planos.listarPorCriadorESituacao(usuario, situacao);
     }
 
     @Override
-    public PlanoDeVoo adicionarTrecho(Long planoId, TrechoCommand comando) {
-        PlanoDeVoo plano = buscar(planoId);
+    public PlanoDeVoo adicionarTrecho(String usuario, Long planoId, TrechoCommand comando) {
+        PlanoDeVoo plano = buscar(usuario, planoId);
         plano.adicionarTrecho(buscarAerovia(comando.aeroviaId()), comando.altitude(), comando.horarioEntrada(),
                 pousoDe(comando));
         return planos.salvar(plano);
     }
 
     @Override
-    public PlanoDeVoo alterarTrecho(Long planoId, int ordem, TrechoCommand comando) {
-        PlanoDeVoo plano = buscar(planoId);
+    public PlanoDeVoo alterarTrecho(String usuario, Long planoId, int ordem, TrechoCommand comando) {
+        PlanoDeVoo plano = buscar(usuario, planoId);
         plano.alterarTrecho(ordem, buscarAerovia(comando.aeroviaId()), comando.altitude(), comando.horarioEntrada(),
                 pousoDe(comando));
         return planos.salvar(plano);
     }
 
     @Override
-    public PlanoDeVoo removerTrecho(Long planoId, int ordem) {
-        PlanoDeVoo plano = buscar(planoId);
+    public PlanoDeVoo removerTrecho(String usuario, Long planoId, int ordem) {
+        PlanoDeVoo plano = buscar(usuario, planoId);
         plano.removerTrecho(ordem);
         return planos.salvar(plano);
     }
 
     @Override
-    public List<String> validar(Long planoId) {
-        PlanoDeVoo plano = buscar(planoId);
+    public List<String> validar(String usuario, Long planoId) {
+        PlanoDeVoo plano = buscar(usuario, planoId);
         List<String> problemas = new ArrayList<>(plano.validar());
         problemas.addAll(disponibilidade.verificarRecursos(plano));
         return problemas;
@@ -105,9 +115,9 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
 
     // §6.5: a disponibilidade é conferida de novo e a reserva é tudo ou nada
     @Override
-    public PlanoDeVoo aprovar(Long planoId) {
+    public PlanoDeVoo aprovar(String usuario, Long planoId) {
         return transacao.executar(() -> {
-            PlanoDeVoo plano = buscar(planoId);
+            PlanoDeVoo plano = buscar(usuario, planoId);
             plano.aprovar(disponibilidade.verificarRecursos(plano));
             PlanoDeVoo aprovado = planos.salvar(plano);
             reservas.reservar(aprovado.reservasDeAerovia(), aprovado.reservasDeVaga());
@@ -116,9 +126,9 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     }
 
     @Override
-    public PlanoDeVoo cancelar(Long planoId) {
+    public PlanoDeVoo cancelar(String usuario, Long planoId) {
         return transacao.executar(() -> {
-            PlanoDeVoo plano = buscar(planoId);
+            PlanoDeVoo plano = buscar(usuario, planoId);
             plano.cancelar(agora());
             reservas.liberarReservasDoPlano(planoId);
             return planos.salvar(plano);
@@ -126,8 +136,8 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     }
 
     @Override
-    public PlanoDeVoo abandonar(Long planoId) {
-        PlanoDeVoo plano = buscar(planoId);
+    public PlanoDeVoo abandonar(String usuario, Long planoId) {
+        PlanoDeVoo plano = buscar(usuario, planoId);
         plano.abandonar();
         return planos.salvar(plano);
     }
@@ -146,8 +156,9 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aeronave " + prefixo + " não encontrada"));
     }
 
-    private Aeroporto buscarAeroporto(String codigo) {
+    private String aeroportoExistente(String codigo) {
         return malhaAerea.buscarAeroporto(codigo)
+                .map(Aeroporto::getCodigo)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aeroporto " + codigo + " não encontrado"));
     }
 

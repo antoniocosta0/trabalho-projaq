@@ -1,5 +1,6 @@
 package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
+import com.pucrs.planosdevoo.domain.exceptions.AcessoNegadoException;
 import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -20,6 +22,16 @@ public class RestExceptionHandler {
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ProblemDetail naoEncontrado(RecursoNaoEncontradoException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ProblemDetail semUsuario(MissingRequestHeaderException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Informe o usuário no cabeçalho X-Usuario");
+    }
+
+    @ExceptionHandler(AcessoNegadoException.class)
+    public ProblemDetail acessoNegado(AcessoNegadoException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -39,15 +39,15 @@ MERGE INTO aeronave (prefixo, categoria, velocidade_cruzeiro_kmh, autonomia_km,
 -- WHEN NOT MATCHED só insere o que falta, sem desfazer cancelamentos feitos pela API.
 
 MERGE INTO plano_de_voo t USING (VALUES
-    (1001, 3, 'PR-CRG', 'POA', 'CWB', TIMESTAMP '2026-10-19 01:00:00', 'APROVADO'),
-    (1002, 1, 'PR-PAX', 'CWB', 'POA', TIMESTAMP '2026-10-19 06:30:00', 'APROVADO'),
-    (1003, 2, 'PR-PAX', 'POA', 'GRU', TIMESTAMP '2026-10-19 21:00:00', 'APROVADO'),
-    (1004, 4, 'PP-PAR', 'FLN', 'GRU', TIMESTAMP '2026-10-19 20:00:00', 'APROVADO'),
-    (1005, 2, 'PR-PAX', 'POA', 'FLN', TIMESTAMP '2026-10-17 08:00:00', 'APROVADO')
-) AS s (id, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
+    (1001, 'carla', 3, 'PR-CRG', 'POA', 'CWB', TIMESTAMP '2026-10-19 01:00:00', 'APROVADO'),
+    (1002, 'ana', 1, 'PR-PAX', 'CWB', 'POA', TIMESTAMP '2026-10-19 06:30:00', 'APROVADO'),
+    (1003, 'bruno', 2, 'PR-PAX', 'POA', 'GRU', TIMESTAMP '2026-10-19 21:00:00', 'APROVADO'),
+    (1004, 'diego', 4, 'PP-PAR', 'FLN', 'GRU', TIMESTAMP '2026-10-19 20:00:00', 'APROVADO'),
+    (1005, 'bruno', 2, 'PR-PAX', 'POA', 'FLN', TIMESTAMP '2026-10-17 08:00:00', 'APROVADO')
+) AS s (id, criador, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
 ON t.id = s.id
-WHEN NOT MATCHED THEN INSERT (id, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
-    VALUES (s.id, s.piloto_id, s.aeronave_prefixo, s.origem_codigo, s.destino_codigo, s.partida, s.situacao);
+WHEN NOT MATCHED THEN INSERT (id, criador, piloto_id, aeronave_prefixo, origem_codigo, destino_codigo, partida, situacao)
+    VALUES (s.id, s.criador, s.piloto_id, s.aeronave_prefixo, s.origem_codigo, s.destino_codigo, s.partida, s.situacao);
 
 MERGE INTO trecho t USING (VALUES
     -- 1001: R2 01:00-02:07, GRU ate 03:07; R7 03:07-03:35, CWB ate 05:05

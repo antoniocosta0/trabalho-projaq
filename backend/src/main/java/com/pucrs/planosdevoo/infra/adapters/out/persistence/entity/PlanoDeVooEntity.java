@@ -27,6 +27,9 @@ public class PlanoDeVooEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String criador;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "piloto_id")
     private PilotoEntity piloto;
@@ -55,10 +58,11 @@ public class PlanoDeVooEntity {
 
     protected PlanoDeVooEntity() { }
 
-    public PlanoDeVooEntity(Long id, PilotoEntity piloto, AeronaveEntity aeronave, String origem,
+    public PlanoDeVooEntity(Long id, String criador, PilotoEntity piloto, AeronaveEntity aeronave, String origem,
                             String destino, LocalDateTime partida, SituacaoPlano situacao,
                             List<TrechoEmbeddable> trechos) {
         this.id = id;
+        this.criador = criador;
         this.piloto = piloto;
         this.aeronave = aeronave;
         this.origem = origem;
@@ -69,6 +73,7 @@ public class PlanoDeVooEntity {
     }
 
     public Long getId() { return id; }
+    public String getCriador() { return criador; }
     public PilotoEntity getPiloto() { return piloto; }
     public AeronaveEntity getAeronave() { return aeronave; }
     public String getOrigem() { return origem; }

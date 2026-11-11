@@ -6,5 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlanoDeVooJpaRepository extends JpaRepository<PlanoDeVooEntity, Long> {
-    List<PlanoDeVooEntity> findBySituacao(SituacaoPlano situacao);
+    List<PlanoDeVooEntity> findByCriador(String criador);
+
+    List<PlanoDeVooEntity> findByCriadorAndSituacao(String criador, SituacaoPlano situacao);
 }

@@ -13,6 +13,7 @@ public class PlanoDeVoo {
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
     private final Long id;
+    private final String criador;
     private Piloto piloto;
     private Aeronave aeronave;
     private String origem;
@@ -21,12 +22,16 @@ public class PlanoDeVoo {
     private SituacaoPlano situacao;
     private final List<Trecho> trechos;
 
-    private PlanoDeVoo(Long id, Piloto piloto, Aeronave aeronave, String origem, String destino,
+    private PlanoDeVoo(Long id, String criador, Piloto piloto, Aeronave aeronave, String origem, String destino,
                        LocalDateTime partida, SituacaoPlano situacao, List<Trecho> trechos) {
+        if (criador == null || criador.isBlank()) {
+            throw new IllegalArgumentException("O criador do plano é obrigatório");
+        }
         if (piloto == null || aeronave == null || origem == null || destino == null || partida == null) {
             throw new IllegalArgumentException("Piloto, aeronave, origem, destino e partida são obrigatórios");
         }
         this.id = id;
+        this.criador = criador;
         this.piloto = piloto;
         this.aeronave = aeronave;
         this.origem = origem;
@@ -36,16 +41,20 @@ public class PlanoDeVoo {
         this.trechos = new ArrayList<>(trechos);
     }
 
-    public static PlanoDeVoo novo(Piloto piloto, Aeronave aeronave, String origem,
+    public static PlanoDeVoo novo(String criador, Piloto piloto, Aeronave aeronave, String origem,
                                   String destino, LocalDateTime partida) {
-        return new PlanoDeVoo(null, piloto, aeronave, origem, destino, partida,
+        return new PlanoDeVoo(null, criador, piloto, aeronave, origem, destino, partida,
                 SituacaoPlano.EM_EDICAO, List.of());
     }
 
-    public static PlanoDeVoo reconstituir(Long id, Piloto piloto, Aeronave aeronave, String origem,
+    public static PlanoDeVoo reconstituir(Long id, String criador, Piloto piloto, Aeronave aeronave, String origem,
                                           String destino, LocalDateTime partida, SituacaoPlano situacao,
                                           List<Trecho> trechos) {
-        return new PlanoDeVoo(id, piloto, aeronave, origem, destino, partida, situacao, trechos);
+        return new PlanoDeVoo(id, criador, piloto, aeronave, origem, destino, partida, situacao, trechos);
+    }
+
+    public boolean pertenceA(String usuario) {
+        return criador.equals(usuario);
     }
 
     public void alterarDados(Piloto piloto, Aeronave aeronave, String origem, String destino,
@@ -230,6 +239,7 @@ public class PlanoDeVoo {
     }
 
     public Long getId() { return id; }
+    public String getCriador() { return criador; }
     public Piloto getPiloto() { return piloto; }
     public Aeronave getAeronave() { return aeronave; }
     public String getOrigem() { return origem; }

@@ -32,7 +32,7 @@ class PlanoDeVooTest {
     }
 
     private static PlanoDeVoo plano(Aeronave aeronave, String destino, LocalDateTime partida) {
-        return PlanoDeVoo.novo(PILOTO, aeronave, POA, destino, partida);
+        return PlanoDeVoo.novo("ana", PILOTO, aeronave, POA, destino, partida);
     }
 
     private static PlanoDeVoo planoValido() {

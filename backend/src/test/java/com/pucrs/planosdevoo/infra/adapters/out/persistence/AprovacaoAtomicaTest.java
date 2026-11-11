@@ -34,7 +34,7 @@ class AprovacaoAtomicaTest {
 
     @Test
     void falhaAoReservarDesfazASituacaoEAsReservasJaGravadas() {
-        planoDeVoo.aprovar(planoPoaFln(30_000, 3).getId());
+        planoDeVoo.aprovar("ana", planoPoaFln(30_000, 3).getId());
         PlanoDeVoo disputa = planoPoaFln(31_000, 3);
         Slot slot = new Slot(PARTIDA);
         ReservaAerovia altitudeLivre = new ReservaAerovia(disputa.getId(), "R1",
@@ -55,7 +55,7 @@ class AprovacaoAtomicaTest {
     }
 
     private PlanoDeVoo planoPoaFln(int altitude, int vaga) {
-        PlanoDeVoo plano = planoDeVoo.criar(new PlanoCommand(1L, "PR-PAX", "POA", "FLN", PARTIDA));
-        return planoDeVoo.adicionarTrecho(plano.getId(), new TrechoCommand("R1", altitude, PARTIDA, vaga, 20));
+        PlanoDeVoo plano = planoDeVoo.criar("ana", new PlanoCommand(1L, "PR-PAX", "POA", "FLN", PARTIDA));
+        return planoDeVoo.adicionarTrecho("ana", plano.getId(), new TrechoCommand("R1", altitude, PARTIDA, vaga, 20));
     }
 }

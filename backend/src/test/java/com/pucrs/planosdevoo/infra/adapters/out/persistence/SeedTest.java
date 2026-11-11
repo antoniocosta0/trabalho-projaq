@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
-import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
 import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
@@ -13,6 +12,7 @@ import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,7 +55,7 @@ class SeedTest {
     }
 
     private List<PlanoDeVoo> aprovados() {
-        return planos.listarPorSituacao(SituacaoPlano.APROVADO);
+        return LongStream.rangeClosed(1001, 1005).mapToObj(id -> planos.buscarPorId(id).orElseThrow()).toList();
     }
 
     private static List<Slot> slotsDaDataDeReferencia() {

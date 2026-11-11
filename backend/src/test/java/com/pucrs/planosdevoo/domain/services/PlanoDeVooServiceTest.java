@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.pucrs.planosdevoo.domain.exceptions.AcessoNegadoException;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
 import com.pucrs.planosdevoo.domain.fakes.PlanoDeVooRepositoryEmMemoria;
@@ -51,10 +52,27 @@ class PlanoDeVooServiceTest {
     }
 
     @Test
+    void outroUsuarioNaoConsultaNemAlteraOPlano() {
+        planoValido(1L, em(10, 0));
+
+        assertThrows(AcessoNegadoException.class, () -> servicoEm(VESPERA).buscar("bruno", 1L));
+        assertThrows(AcessoNegadoException.class, () -> servicoEm(VESPERA).aprovar("bruno", 1L));
+        assertEquals(SituacaoPlano.EM_EDICAO, situacaoDo(1L));
+    }
+
+    @Test
+    void cadaUsuarioListaSoOsProprios() {
+        planoValido(1L, em(10, 0));
+
+        assertEquals(1, servicoEm(VESPERA).listar("ana", null).size());
+        assertTrue(servicoEm(VESPERA).listar("bruno", null).isEmpty());
+    }
+
+    @Test
     void validarNaoReservaNemMudaASituacao() {
         planoValido(1L, em(10, 0));
 
-        assertTrue(servicoEm(VESPERA).validar(1L).isEmpty());
+        assertTrue(servicoEm(VESPERA).validar("ana", 1L).isEmpty());
 
         assertTrue(reservas.aerovias.isEmpty());
         assertTrue(reservas.vagas.isEmpty());
@@ -65,7 +83,7 @@ class PlanoDeVooServiceTest {
     void aprovarReservaTodosOsRecursos() {
         planoValido(1L, em(10, 0));
 
-        servicoEm(VESPERA).aprovar(1L);
+        servicoEm(VESPERA).aprovar("ana", 1L);
 
         assertEquals(SituacaoPlano.APROVADO, situacaoDo(1L));
         assertEquals(2, reservas.aerovias.size());
@@ -77,7 +95,7 @@ class PlanoDeVooServiceTest {
     void aprovaPlanoComPartidaJaOcorrida() {
         planoValido(1L, em(10, 0));
 
-        servicoEm(em(12, 0)).aprovar(1L);
+        servicoEm(em(12, 0)).aprovar("ana", 1L);
 
         assertEquals(SituacaoPlano.APROVADO, situacaoDo(1L));
     }
@@ -85,15 +103,15 @@ class PlanoDeVooServiceTest {
     @Test
     void aprovacaoRecusadaNaoDeixaReservaParcial() {
         planoValido(1L, em(10, 0));
-        servicoEm(VESPERA).aprovar(1L);
-        PlanoDeVoo outro = PlanoDeVoo.reconstituir(2L, PILOTO, PASSAGEIROS, POA, CWB, em(10, 5),
+        servicoEm(VESPERA).aprovar("ana", 1L);
+        PlanoDeVoo outro = PlanoDeVoo.reconstituir(2L, "ana", PILOTO, PASSAGEIROS, POA, CWB, em(10, 5),
                 SituacaoPlano.EM_EDICAO, List.of());
         outro.adicionarTrecho(R1, 31_000, em(10, 5), null);
         outro.adicionarTrecho(R4, 31_000, em(10, 31), new Pouso(1, 30));
         planos.adicionar(outro);
 
         PlanoInvalidoException erro = assertThrows(PlanoInvalidoException.class,
-                () -> servicoEm(VESPERA).aprovar(2L));
+                () -> servicoEm(VESPERA).aprovar("ana", 2L));
 
         assertTrue(erro.getProblemas().stream().anyMatch(p -> p.contains("vaga 1")), erro.getProblemas().toString());
         assertEquals(SituacaoPlano.EM_EDICAO, situacaoDo(2L));
@@ -103,29 +121,29 @@ class PlanoDeVooServiceTest {
 
     @Test
     void validarAcusaVagaQueNaoExisteNoCadastro() {
-        PlanoDeVoo plano = PlanoDeVoo.reconstituir(1L, PILOTO, PASSAGEIROS, POA, FLN, em(10, 0),
+        PlanoDeVoo plano = PlanoDeVoo.reconstituir(1L, "ana", PILOTO, PASSAGEIROS, POA, FLN, em(10, 0),
                 SituacaoPlano.EM_EDICAO, List.of());
         plano.adicionarTrecho(R1, 30_000, em(10, 0), new Pouso(99, 30));
         planos.adicionar(plano);
 
-        assertTrue(servicoEm(VESPERA).validar(1L).contains("Trecho 1: a vaga 99 não existe em FLN"));
+        assertTrue(servicoEm(VESPERA).validar("ana", 1L).contains("Trecho 1: a vaga 99 não existe em FLN"));
     }
 
     @Test
     void validarConsideraAsReservasAtuais() {
         planoValido(1L, em(10, 0));
         planoValido(2L, em(10, 0));
-        servicoEm(VESPERA).aprovar(1L);
+        servicoEm(VESPERA).aprovar("ana", 1L);
 
-        assertFalse(servicoEm(VESPERA).validar(2L).isEmpty());
+        assertFalse(servicoEm(VESPERA).validar("ana", 2L).isEmpty());
     }
 
     @Test
     void cancelarPlanoFuturoLiberaAsReservas() {
         planoValido(1L, em(10, 0));
-        servicoEm(VESPERA).aprovar(1L);
+        servicoEm(VESPERA).aprovar("ana", 1L);
 
-        servicoEm(VESPERA).cancelar(1L);
+        servicoEm(VESPERA).cancelar("ana", 1L);
 
         assertEquals(SituacaoPlano.CANCELADO, situacaoDo(1L));
         assertTrue(reservas.aerovias.isEmpty());
@@ -136,9 +154,9 @@ class PlanoDeVooServiceTest {
     @Test
     void naoCancelaPlanoQueJaPartiu() {
         planoValido(1L, em(10, 0));
-        servicoEm(VESPERA).aprovar(1L);
+        servicoEm(VESPERA).aprovar("ana", 1L);
 
-        assertThrows(OperacaoNaoPermitidaException.class, () -> servicoEm(em(11, 0)).cancelar(1L));
+        assertThrows(OperacaoNaoPermitidaException.class, () -> servicoEm(em(11, 0)).cancelar("ana", 1L));
 
         assertEquals(SituacaoPlano.APROVADO, situacaoDo(1L));
         assertEquals(2, reservas.aerovias.size());
@@ -152,7 +170,7 @@ class PlanoDeVooServiceTest {
     }
 
     private void planoValido(Long id, LocalDateTime partida) {
-        PlanoDeVoo plano = PlanoDeVoo.reconstituir(id, PILOTO, PASSAGEIROS, POA, CWB, partida,
+        PlanoDeVoo plano = PlanoDeVoo.reconstituir(id, "ana", PILOTO, PASSAGEIROS, POA, CWB, partida,
                 SituacaoPlano.EM_EDICAO, List.of());
         plano.adicionarTrecho(R1, 30_000, partida, null);
         plano.adicionarTrecho(R4, 30_000, partida.plusMinutes(26), new Pouso(1, 30));
