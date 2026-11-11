@@ -90,7 +90,8 @@ public class PlanoDeVoo {
         for (int i = 0; i < trechos.size(); i++) {
             Trecho t = trechos.get(i);
             if (t.getOrdem() != i + 1) {
-                trechos.set(i, criarTrecho(i + 1, t.getAerovia(), t.getAltitude(), t.getHorarioEntrada(), t.getPouso()));
+                trechos.set(i, criarTrecho(i + 1, t.getAerovia(), t.getAltitude(), t.getHorarioEntrada(),
+                        t.getPouso()));
             }
         }
     }
@@ -116,8 +117,8 @@ public class PlanoDeVoo {
                     + ", e só planos APROVADO podem ser cancelados");
         }
         if (!partida.isAfter(agora)) {
-            throw new OperacaoNaoPermitidaException("Não é possível cancelar o plano: a partida (" + HORA.format(partida)
-                    + ") já ocorreu");
+            throw new OperacaoNaoPermitidaException("Não é possível cancelar o plano: a partida ("
+                    + HORA.format(partida) + ") já ocorreu");
         }
         situacao = SituacaoPlano.CANCELADO;
     }
@@ -155,7 +156,8 @@ public class PlanoDeVoo {
             String chegouEm = trechos.get(i - 1).getAerovia().getDestino();
             String saiDe = trechos.get(i).getAerovia().getOrigem();
             if (!chegouEm.equals(saiDe)) {
-                problemas.add("Trecho " + (i + 1) + " sai de " + saiDe + ", mas o trecho " + i + " termina em " + chegouEm);
+                problemas.add("Trecho " + (i + 1) + " sai de " + saiDe + ", mas o trecho " + i
+                        + " termina em " + chegouEm);
             }
         }
         Trecho ultimo = ultimoTrecho();

@@ -2,6 +2,7 @@ package com.pucrs.planosdevoo.infra.adapters.in.rest;
 
 import com.pucrs.planosdevoo.domain.exceptions.AcessoNegadoException;
 import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
+import com.pucrs.planosdevoo.domain.exceptions.MalhaAereaIndisponivelException;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
 import com.pucrs.planosdevoo.domain.exceptions.RecursoNaoEncontradoException;
@@ -32,6 +33,11 @@ public class RestExceptionHandler {
     @ExceptionHandler(AcessoNegadoException.class)
     public ProblemDetail acessoNegado(AcessoNegadoException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+
+    @ExceptionHandler(MalhaAereaIndisponivelException.class)
+    public ProblemDetail malhaIndisponivel(MalhaAereaIndisponivelException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

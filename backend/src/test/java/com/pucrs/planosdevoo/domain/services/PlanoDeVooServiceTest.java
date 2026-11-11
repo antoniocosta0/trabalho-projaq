@@ -9,24 +9,21 @@ import com.pucrs.planosdevoo.domain.exceptions.AcessoNegadoException;
 import com.pucrs.planosdevoo.domain.exceptions.OperacaoNaoPermitidaException;
 import com.pucrs.planosdevoo.domain.exceptions.PlanoInvalidoException;
 import com.pucrs.planosdevoo.domain.fakes.AprovacaoPublisherEmMemoria;
+import com.pucrs.planosdevoo.domain.fakes.MalhaAereaEmMemoria;
 import com.pucrs.planosdevoo.domain.fakes.PlanoDeVooRepositoryEmMemoria;
 import com.pucrs.planosdevoo.domain.fakes.ReservaRepositoryEmMemoria;
 import com.pucrs.planosdevoo.domain.fakes.TransacaoEmMemoria;
 import com.pucrs.planosdevoo.domain.model.Aeronave;
 import com.pucrs.planosdevoo.domain.model.AeronavePassageiros;
-import com.pucrs.planosdevoo.domain.model.Aeroporto;
 import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.model.Piloto;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
-import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +48,7 @@ class PlanoDeVooServiceTest {
         planos = new PlanoDeVooRepositoryEmMemoria();
         reservas = new ReservaRepositoryEmMemoria();
         aprovacoes = new AprovacaoPublisherEmMemoria();
-        disponibilidade = new DisponibilidadeService(malhaAerea(), reservas);
+        disponibilidade = new DisponibilidadeService(new MalhaAereaEmMemoria(), reservas);
     }
 
     @Test
@@ -171,7 +168,7 @@ class PlanoDeVooServiceTest {
     private PlanoDeVooService servicoEm(LocalDateTime agora) {
         ZoneId zona = ZoneId.of("America/Sao_Paulo");
         Clock relogio = Clock.fixed(agora.atZone(zona).toInstant(), zona);
-        return new PlanoDeVooService(planos, null, null, malhaAerea(), reservas, disponibilidade,
+        return new PlanoDeVooService(planos, null, null, new MalhaAereaEmMemoria(), reservas, disponibilidade,
                 aprovacoes, new TransacaoEmMemoria(), relogio);
     }
 
@@ -193,16 +190,5 @@ class PlanoDeVooServiceTest {
 
     private static LocalDateTime em(int hora, int minuto) {
         return LocalDateTime.of(2026, 10, 19, hora, minuto);
-    }
-
-    private static MalhaAereaPort malhaAerea() {
-        return new MalhaAereaPort() {
-            public Optional<Aeroporto> buscarAeroporto(String codigo) {
-                return Stream.of(POA, FLN, CWB).filter(codigo::equals).map(c -> new Aeroporto(c, c, 16)).findFirst();
-            }
-            public Optional<Aerovia> buscarAerovia(String id) {
-                return Stream.of(R1, R4).filter(a -> a.getId().equals(id)).findFirst();
-            }
-        };
     }
 }

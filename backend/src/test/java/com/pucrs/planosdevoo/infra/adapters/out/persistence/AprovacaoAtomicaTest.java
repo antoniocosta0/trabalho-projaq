@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.pucrs.planosdevoo.domain.fakes.MalhaAereaEmMemoriaConfig;
 import com.pucrs.planosdevoo.domain.exceptions.ConflitoDeReservaException;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.ReservaAerovia;
@@ -21,7 +22,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
+@Import(MalhaAereaEmMemoriaConfig.class)
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:atomicidade;DB_CLOSE_DELAY=-1",
         "eureka.client.enabled=false"})
 class AprovacaoAtomicaTest {

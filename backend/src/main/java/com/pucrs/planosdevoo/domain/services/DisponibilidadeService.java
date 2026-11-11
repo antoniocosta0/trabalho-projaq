@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 public class DisponibilidadeService implements DisponibilidadeUseCase {
 
@@ -45,14 +44,12 @@ public class DisponibilidadeService implements DisponibilidadeUseCase {
     @Override
     public List<Integer> vagasDisponiveis(String codigoAeroporto, LocalDateTime inicio, LocalDateTime fim) {
         Aeroporto aeroporto = malhaAerea.buscarAeroporto(codigoAeroporto)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Aeroporto " + codigoAeroporto + " não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Aeroporto " + codigoAeroporto + " não encontrado"));
         Set<Integer> ocupadas = reservas.buscarReservasVaga(codigoAeroporto, Slot.entre(inicio, fim)).stream()
                 .map(ReservaVaga::getNumeroVaga)
                 .collect(toSet());
-        return IntStream.rangeClosed(1, aeroporto.getQuantidadeVagas())
-                .filter(vaga -> !ocupadas.contains(vaga))
-                .boxed()
-                .toList();
+        return aeroporto.getVagas().stream().filter(vaga -> !ocupadas.contains(vaga)).toList();
     }
 
     public List<String> verificarRecursos(PlanoDeVoo plano) {

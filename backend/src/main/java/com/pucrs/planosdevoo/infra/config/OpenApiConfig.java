@@ -13,6 +13,7 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("Sistema de Gestão de Planos de Voo")
                 .version("1.0.0")
-                .description("Data de referência da carga inicial: 19/10/2026. Erros seguem o formato Problem Detail."));
+                .description("Data de referência da carga inicial: 19/10/2026. "
+                        + "Erros seguem o formato Problem Detail."));
     }
 }

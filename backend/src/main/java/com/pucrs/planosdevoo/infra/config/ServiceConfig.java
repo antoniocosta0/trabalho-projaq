@@ -2,8 +2,6 @@ package com.pucrs.planosdevoo.infra.config;
 
 import com.pucrs.planosdevoo.domain.ports.out.AeronaveRepository;
 import com.pucrs.planosdevoo.domain.ports.out.AprovacaoPublisherPort;
-import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
-import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.MalhaAereaPort;
 import com.pucrs.planosdevoo.domain.ports.out.PilotoRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
@@ -11,7 +9,6 @@ import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.TransacaoPort;
 import com.pucrs.planosdevoo.domain.services.DisponibilidadeService;
 import com.pucrs.planosdevoo.domain.services.FrotaService;
-import com.pucrs.planosdevoo.domain.services.MalhaAereaService;
 import com.pucrs.planosdevoo.domain.services.PlanoDeVooService;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -22,11 +19,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ServiceConfig {
-
-    @Bean
-    public MalhaAereaService malhaAereaService(AeroportoRepository aeroportos, AeroviaRepository aerovias) {
-        return new MalhaAereaService(aeroportos, aerovias);
-    }
 
     @Bean
     public FrotaService frotaService(PilotoRepository pilotos, AeronaveRepository aeronaves) {

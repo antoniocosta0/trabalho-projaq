@@ -1,28 +1,24 @@
 package com.pucrs.planosdevoo.domain.model;
 
+import java.util.List;
+
 public class Aeroporto {
 
     private final String codigo;
-    private final String nome;
-    private final int quantidadeVagas;
+    private final List<Integer> vagas;
 
-    public Aeroporto(String codigo, String nome, int quantidadeVagas) {
+    public Aeroporto(String codigo, List<Integer> vagas) {
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("Código do aeroporto é obrigatório");
         }
-        if (quantidadeVagas < 0) {
-            throw new IllegalArgumentException("Quantidade de vagas não pode ser negativa");
-        }
         this.codigo = codigo;
-        this.nome = nome;
-        this.quantidadeVagas = quantidadeVagas;
+        this.vagas = List.copyOf(vagas);
     }
 
     public boolean possuiVaga(int numero) {
-        return numero >= 1 && numero <= quantidadeVagas;
+        return vagas.contains(numero);
     }
 
     public String getCodigo() { return codigo; }
-    public String getNome() { return nome; }
-    public int getQuantidadeVagas() { return quantidadeVagas; }
+    public List<Integer> getVagas() { return vagas; }
 }

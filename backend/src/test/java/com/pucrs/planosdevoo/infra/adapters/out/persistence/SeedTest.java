@@ -3,10 +3,10 @@ package com.pucrs.planosdevoo.infra.adapters.out.persistence;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.pucrs.planosdevoo.domain.model.Aerovia;
+import com.pucrs.planosdevoo.domain.fakes.MalhaAereaEmMemoria;
+import com.pucrs.planosdevoo.domain.fakes.MalhaAereaEmMemoriaConfig;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Slot;
-import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import com.pucrs.planosdevoo.infra.adapters.out.persistence.repository.OutboxEventoJpaRepository;
@@ -17,7 +17,9 @@ import java.util.stream.LongStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
+@Import(MalhaAereaEmMemoriaConfig.class)
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:seed;DB_CLOSE_DELAY=-1",
         "eureka.client.enabled=false"})
 class SeedTest {
@@ -26,14 +28,13 @@ class SeedTest {
 
     @Autowired PlanoDeVooRepository planos;
     @Autowired ReservaRepository reservas;
-    @Autowired AeroviaRepository aerovias;
     @Autowired OutboxEventoJpaRepository outbox;
 
     @Test
     void peloMenos60PorCentoDasAeroviasTemOcupacaoNaDataDeReferencia() {
-        List<Aerovia> todas = aerovias.listarTodas();
+        List<String> todas = MalhaAereaEmMemoria.aerovias();
         long ocupadas = todas.stream()
-                .filter(a -> !reservas.buscarReservasAerovia(a.getId(), slotsDaDataDeReferencia()).isEmpty())
+                .filter(a -> !reservas.buscarReservasAerovia(a, slotsDaDataDeReferencia()).isEmpty())
                 .count();
 
         assertTrue(ocupadas >= Math.ceil(todas.size() * 0.6), ocupadas + " de " + todas.size());
@@ -45,8 +46,8 @@ class SeedTest {
                 .flatMap(p -> p.reservasDeAerovia().stream())
                 .filter(r -> r.getSlot().getInicio().toLocalDate().equals(DATA_DE_REFERENCIA))
                 .count();
-        long noBanco = aerovias.listarTodas().stream()
-                .mapToLong(a -> reservas.buscarReservasAerovia(a.getId(), slotsDaDataDeReferencia()).size())
+        long noBanco = MalhaAereaEmMemoria.aerovias().stream()
+                .mapToLong(a -> reservas.buscarReservasAerovia(a, slotsDaDataDeReferencia()).size())
                 .sum();
 
         assertEquals(esperadas, noBanco);
