@@ -18,6 +18,6 @@ public final class MalhaAereaMapper {
     }
 
     public static Aerovia paraDominio(AeroviaEntity e) {
-        return new Aerovia(e.getId(), paraDominio(e.getOrigem()), paraDominio(e.getDestino()), e.getDistanciaKm());
+        return new Aerovia(e.getId(), e.getOrigem().getCodigo(), e.getDestino().getCodigo(), e.getDistanciaKm());
     }
 }

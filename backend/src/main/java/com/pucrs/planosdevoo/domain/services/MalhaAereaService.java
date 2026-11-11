@@ -44,7 +44,8 @@ public class MalhaAereaService implements MalhaAereaUseCase {
         if (aerovias.buscarPorId(id).isPresent()) {
             throw new OperacaoNaoPermitidaException("A aerovia " + id + " já está cadastrada e não pode ser alterada");
         }
-        Aerovia aerovia = new Aerovia(id, buscarAeroporto(codigoOrigem), buscarAeroporto(codigoDestino), distanciaKm);
+        Aerovia aerovia = new Aerovia(id, buscarAeroporto(codigoOrigem).getCodigo(), buscarAeroporto(codigoDestino).getCodigo(),
+                distanciaKm);
         return aerovias.salvar(aerovia);
     }
 

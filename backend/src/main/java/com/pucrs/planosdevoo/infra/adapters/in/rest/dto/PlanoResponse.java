@@ -10,7 +10,7 @@ public record PlanoResponse(Long id, Long pilotoId, String pilotoNome, String ae
 
     public static PlanoResponse de(PlanoDeVoo p) {
         return new PlanoResponse(p.getId(), p.getPiloto().getId(), p.getPiloto().getNome(),
-                p.getAeronave().getPrefixo(), p.getOrigem().getCodigo(), p.getDestino().getCodigo(),
+                p.getAeronave().getPrefixo(), p.getOrigem(), p.getDestino(),
                 p.getPartida(), p.getSituacao().name(),
                 p.getTrechos().stream().map(TrechoResponse::de).toList());
     }

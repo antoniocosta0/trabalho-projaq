@@ -16,21 +16,21 @@ public class ReservaRepositoryEmMemoria implements ReservaRepository {
     @Override
     public List<ReservaAerovia> buscarReservasAerovia(String aeroviaId, List<Slot> slots) {
         return aerovias.stream()
-                .filter(r -> r.getAerovia().getId().equals(aeroviaId) && slots.contains(r.getSlot()))
+                .filter(r -> r.getAeroviaId().equals(aeroviaId) && slots.contains(r.getSlot()))
                 .toList();
     }
 
     @Override
     public List<ReservaVaga> buscarReservasVaga(String aeroportoCodigo, List<Slot> slots) {
         return vagas.stream()
-                .filter(r -> r.getAeroporto().getCodigo().equals(aeroportoCodigo) && slots.contains(r.getSlot()))
+                .filter(r -> r.getAeroportoCodigo().equals(aeroportoCodigo) && slots.contains(r.getSlot()))
                 .toList();
     }
 
     @Override
     public void reservar(List<ReservaAerovia> novasAerovias, List<ReservaVaga> novasVagas) {
         for (ReservaAerovia nova : novasAerovias) {
-            boolean repetida = aerovias.stream().anyMatch(r -> r.getAerovia().getId().equals(nova.getAerovia().getId())
+            boolean repetida = aerovias.stream().anyMatch(r -> r.getAeroviaId().equals(nova.getAeroviaId())
                     && r.getAltitude() == nova.getAltitude() && r.getSlot().equals(nova.getSlot()));
             if (repetida) {
                 throw new ConflitoDeReservaException("altitude já reservada");
@@ -38,7 +38,7 @@ public class ReservaRepositoryEmMemoria implements ReservaRepository {
             aerovias.add(nova);
         }
         for (ReservaVaga nova : novasVagas) {
-            boolean repetida = vagas.stream().anyMatch(r -> r.getAeroporto().getCodigo().equals(nova.getAeroporto().getCodigo())
+            boolean repetida = vagas.stream().anyMatch(r -> r.getAeroportoCodigo().equals(nova.getAeroportoCodigo())
                     && r.getNumeroVaga() == nova.getNumeroVaga() && r.getSlot().equals(nova.getSlot()));
             if (repetida) {
                 throw new ConflitoDeReservaException("vaga já reservada");

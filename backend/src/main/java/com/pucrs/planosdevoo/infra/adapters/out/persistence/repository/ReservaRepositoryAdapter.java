@@ -18,28 +18,23 @@ public class ReservaRepositoryAdapter implements ReservaRepository {
 
     private final ReservaAeroviaJpaRepository reservasAerovia;
     private final ReservaVagaJpaRepository reservasVaga;
-    private final AeroviaJpaRepository aerovias;
-    private final AeroportoJpaRepository aeroportos;
 
     public ReservaRepositoryAdapter(ReservaAeroviaJpaRepository reservasAerovia,
-                                  ReservaVagaJpaRepository reservasVaga,
-                                  AeroviaJpaRepository aerovias, AeroportoJpaRepository aeroportos) {
+                                    ReservaVagaJpaRepository reservasVaga) {
         this.reservasAerovia = reservasAerovia;
         this.reservasVaga = reservasVaga;
-        this.aerovias = aerovias;
-        this.aeroportos = aeroportos;
     }
 
     @Override
     public List<ReservaAerovia> buscarReservasAerovia(String aeroviaId, List<Slot> slots) {
-        return reservasAerovia.findByAerovia_IdAndSlotInicioIn(aeroviaId, inicios(slots)).stream()
+        return reservasAerovia.findByAeroviaIdAndSlotInicioIn(aeroviaId, inicios(slots)).stream()
                 .map(ReservaMapper::paraDominio)
                 .toList();
     }
 
     @Override
     public List<ReservaVaga> buscarReservasVaga(String aeroportoCodigo, List<Slot> slots) {
-        return reservasVaga.findByAeroporto_CodigoAndSlotInicioIn(aeroportoCodigo, inicios(slots)).stream()
+        return reservasVaga.findByAeroportoCodigoAndSlotInicioIn(aeroportoCodigo, inicios(slots)).stream()
                 .map(ReservaMapper::paraDominio)
                 .toList();
     }
@@ -50,12 +45,12 @@ public class ReservaRepositoryAdapter implements ReservaRepository {
         try {
             reservasAerovia.saveAllAndFlush(aerovia.stream()
                     .map(r -> new ReservaAeroviaEntity(r.getPlanoId(),
-                            aerovias.getReferenceById(r.getAerovia().getId()), r.getAltitude(),
+                            r.getAeroviaId(), r.getAltitude(),
                             r.getSlot().getInicio()))
                     .toList());
             reservasVaga.saveAllAndFlush(vagas.stream()
                     .map(r -> new ReservaVagaEntity(r.getPlanoId(),
-                            aeroportos.getReferenceById(r.getAeroporto().getCodigo()), r.getNumeroVaga(),
+                            r.getAeroportoCodigo(), r.getNumeroVaga(),
                             r.getSlot().getInicio()))
                     .toList());
         } catch (DataIntegrityViolationException e) {

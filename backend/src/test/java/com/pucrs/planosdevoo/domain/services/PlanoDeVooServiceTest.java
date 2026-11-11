@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test;
 
 class PlanoDeVooServiceTest {
 
-    private static final Aeroporto POA = new Aeroporto("POA", "Porto Alegre", 41);
-    private static final Aeroporto FLN = new Aeroporto("FLN", "Florianópolis", 16);
-    private static final Aeroporto CWB = new Aeroporto("CWB", "Curitiba", 26);
+    private static final String POA = "POA";
+    private static final String FLN = "FLN";
+    private static final String CWB = "CWB";
     private static final Aerovia R1 = new Aerovia("R1", POA, FLN, 363);
     private static final Aerovia R4 = new Aerovia("R4", FLN, CWB, 245);
     private static final Piloto PILOTO = new Piloto(1L, "Ana Souza");
@@ -102,6 +102,16 @@ class PlanoDeVooServiceTest {
     }
 
     @Test
+    void validarAcusaVagaQueNaoExisteNoCadastro() {
+        PlanoDeVoo plano = PlanoDeVoo.reconstituir(1L, PILOTO, PASSAGEIROS, POA, FLN, em(10, 0),
+                SituacaoPlano.EM_EDICAO, List.of());
+        plano.adicionarTrecho(R1, 30_000, em(10, 0), new Pouso(99, 30));
+        planos.adicionar(plano);
+
+        assertTrue(servicoEm(VESPERA).validar(1L).contains("Trecho 1: a vaga 99 não existe em FLN"));
+    }
+
+    @Test
     void validarConsideraAsReservasAtuais() {
         planoValido(1L, em(10, 0));
         planoValido(2L, em(10, 0));
@@ -164,7 +174,7 @@ class PlanoDeVooServiceTest {
     private static MalhaAereaPort malhaAerea() {
         return new MalhaAereaPort() {
             public Optional<Aeroporto> buscarAeroporto(String codigo) {
-                return Stream.of(POA, FLN, CWB).filter(a -> a.getCodigo().equals(codigo)).findFirst();
+                return Stream.of(POA, FLN, CWB).filter(codigo::equals).map(c -> new Aeroporto(c, c, 16)).findFirst();
             }
             public Optional<Aerovia> buscarAerovia(String id) {
                 return Stream.of(R1, R4).filter(a -> a.getId().equals(id)).findFirst();

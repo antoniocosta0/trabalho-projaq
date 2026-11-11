@@ -2,8 +2,6 @@ package com.pucrs.planosdevoo.infra.adapters.out.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 @Embeddable
@@ -12,9 +10,17 @@ public class TrechoEmbeddable {
     @Column(nullable = false)
     private int ordem;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "aerovia_id")
-    private AeroviaEntity aerovia;
+    @Column(name = "aerovia_id", nullable = false)
+    private String aeroviaId;
+
+    @Column(name = "origem_codigo", nullable = false)
+    private String origem;
+
+    @Column(name = "destino_codigo", nullable = false)
+    private String destino;
+
+    @Column(name = "distancia_km", nullable = false)
+    private double distanciaKm;
 
     @Column(nullable = false)
     private int altitude;
@@ -30,10 +36,14 @@ public class TrechoEmbeddable {
 
     protected TrechoEmbeddable() { }
 
-    public TrechoEmbeddable(int ordem, AeroviaEntity aerovia, int altitude, LocalDateTime horarioEntrada,
-                               Integer numeroVaga, Integer permanenciaMinutos) {
+    public TrechoEmbeddable(int ordem, String aeroviaId, String origem, String destino, double distanciaKm,
+                            int altitude, LocalDateTime horarioEntrada, Integer numeroVaga,
+                            Integer permanenciaMinutos) {
         this.ordem = ordem;
-        this.aerovia = aerovia;
+        this.aeroviaId = aeroviaId;
+        this.origem = origem;
+        this.destino = destino;
+        this.distanciaKm = distanciaKm;
         this.altitude = altitude;
         this.horarioEntrada = horarioEntrada;
         this.numeroVaga = numeroVaga;
@@ -41,7 +51,10 @@ public class TrechoEmbeddable {
     }
 
     public int getOrdem() { return ordem; }
-    public AeroviaEntity getAerovia() { return aerovia; }
+    public String getAeroviaId() { return aeroviaId; }
+    public String getOrigem() { return origem; }
+    public String getDestino() { return destino; }
+    public double getDistanciaKm() { return distanciaKm; }
     public int getAltitude() { return altitude; }
     public LocalDateTime getHorarioEntrada() { return horarioEntrada; }
     public Integer getNumeroVaga() { return numeroVaga; }

@@ -11,12 +11,12 @@ public final class ReservaMapper {
     private ReservaMapper() { }
 
     public static ReservaAerovia paraDominio(ReservaAeroviaEntity e) {
-        return new ReservaAerovia(e.getPlanoId(), MalhaAereaMapper.paraDominio(e.getAerovia()), e.getAltitude(),
+        return new ReservaAerovia(e.getPlanoId(), e.getAeroviaId(), e.getAltitude(),
                 new Slot(e.getSlotInicio()));
     }
 
     public static ReservaVaga paraDominio(ReservaVagaEntity e) {
-        return new ReservaVaga(e.getPlanoId(), MalhaAereaMapper.paraDominio(e.getAeroporto()), e.getNumeroVaga(),
+        return new ReservaVaga(e.getPlanoId(), e.getAeroportoCodigo(), e.getNumeroVaga(),
                 new Slot(e.getSlotInicio()));
     }
 }

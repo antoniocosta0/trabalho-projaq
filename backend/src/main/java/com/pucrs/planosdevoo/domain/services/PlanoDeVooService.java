@@ -49,7 +49,7 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     @Override
     public PlanoDeVoo criar(PlanoCommand comando) {
         PlanoDeVoo plano = PlanoDeVoo.novo(buscarPiloto(comando.pilotoId()), buscarAeronave(comando.prefixoAeronave()),
-                buscarAeroporto(comando.codigoOrigem()), buscarAeroporto(comando.codigoDestino()), comando.partida());
+                buscarAeroporto(comando.codigoOrigem()).getCodigo(), buscarAeroporto(comando.codigoDestino()).getCodigo(), comando.partida());
         return planos.salvar(plano);
     }
 
@@ -57,7 +57,7 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     public PlanoDeVoo alterar(Long id, PlanoCommand comando) {
         PlanoDeVoo plano = buscar(id);
         plano.alterarDados(buscarPiloto(comando.pilotoId()), buscarAeronave(comando.prefixoAeronave()),
-                buscarAeroporto(comando.codigoOrigem()), buscarAeroporto(comando.codigoDestino()), comando.partida());
+                buscarAeroporto(comando.codigoOrigem()).getCodigo(), buscarAeroporto(comando.codigoDestino()).getCodigo(), comando.partida());
         return planos.salvar(plano);
     }
 
@@ -99,7 +99,7 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     public List<String> validar(Long planoId) {
         PlanoDeVoo plano = buscar(planoId);
         List<String> problemas = new ArrayList<>(plano.validar());
-        problemas.addAll(disponibilidade.conflitos(plano));
+        problemas.addAll(disponibilidade.verificarRecursos(plano));
         return problemas;
     }
 
@@ -108,7 +108,7 @@ public class PlanoDeVooService implements PlanoDeVooUseCase {
     public PlanoDeVoo aprovar(Long planoId) {
         return transacao.executar(() -> {
             PlanoDeVoo plano = buscar(planoId);
-            plano.aprovar(disponibilidade.conflitos(plano));
+            plano.aprovar(disponibilidade.verificarRecursos(plano));
             PlanoDeVoo aprovado = planos.salvar(plano);
             reservas.reservar(aprovado.reservasDeAerovia(), aprovado.reservasDeVaga());
             return aprovado;

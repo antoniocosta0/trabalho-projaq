@@ -68,7 +68,7 @@ public class Trecho {
 
     public List<ReservaAerovia> reservasDeAerovia(Long planoId) {
         return slotsOcupados().stream()
-                .map(slot -> new ReservaAerovia(planoId, aerovia, altitude, slot))
+                .map(slot -> new ReservaAerovia(planoId, aerovia.getId(), altitude, slot))
                 .toList();
     }
 

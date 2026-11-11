@@ -15,13 +15,13 @@ public class PlanoDeVoo {
     private final Long id;
     private Piloto piloto;
     private Aeronave aeronave;
-    private Aeroporto origem;
-    private Aeroporto destino;
+    private String origem;
+    private String destino;
     private LocalDateTime partida;
     private SituacaoPlano situacao;
     private final List<Trecho> trechos;
 
-    private PlanoDeVoo(Long id, Piloto piloto, Aeronave aeronave, Aeroporto origem, Aeroporto destino,
+    private PlanoDeVoo(Long id, Piloto piloto, Aeronave aeronave, String origem, String destino,
                        LocalDateTime partida, SituacaoPlano situacao, List<Trecho> trechos) {
         if (piloto == null || aeronave == null || origem == null || destino == null || partida == null) {
             throw new IllegalArgumentException("Piloto, aeronave, origem, destino e partida são obrigatórios");
@@ -36,19 +36,19 @@ public class PlanoDeVoo {
         this.trechos = new ArrayList<>(trechos);
     }
 
-    public static PlanoDeVoo novo(Piloto piloto, Aeronave aeronave, Aeroporto origem,
-                                  Aeroporto destino, LocalDateTime partida) {
+    public static PlanoDeVoo novo(Piloto piloto, Aeronave aeronave, String origem,
+                                  String destino, LocalDateTime partida) {
         return new PlanoDeVoo(null, piloto, aeronave, origem, destino, partida,
                 SituacaoPlano.EM_EDICAO, List.of());
     }
 
-    public static PlanoDeVoo reconstituir(Long id, Piloto piloto, Aeronave aeronave, Aeroporto origem,
-                                          Aeroporto destino, LocalDateTime partida, SituacaoPlano situacao,
+    public static PlanoDeVoo reconstituir(Long id, Piloto piloto, Aeronave aeronave, String origem,
+                                          String destino, LocalDateTime partida, SituacaoPlano situacao,
                                           List<Trecho> trechos) {
         return new PlanoDeVoo(id, piloto, aeronave, origem, destino, partida, situacao, trechos);
     }
 
-    public void alterarDados(Piloto piloto, Aeronave aeronave, Aeroporto origem, Aeroporto destino,
+    public void alterarDados(Piloto piloto, Aeronave aeronave, String origem, String destino,
                              LocalDateTime partida) {
         garantirEmEdicao("alterar o plano");
         this.piloto = piloto;
@@ -91,10 +91,10 @@ public class PlanoDeVoo {
         situacao = SituacaoPlano.ABANDONADO;
     }
 
-    public void aprovar(List<String> conflitosDeReserva) {
+    public void aprovar(List<String> problemasDosRecursos) {
         garantirEmEdicao("aprovar o plano");
         List<String> problemas = new ArrayList<>(validar());
-        problemas.addAll(conflitosDeReserva);
+        problemas.addAll(problemasDosRecursos);
         if (!problemas.isEmpty()) {
             throw new PlanoInvalidoException(problemas);
         }
@@ -129,7 +129,7 @@ public class PlanoDeVoo {
             return problemas;
         }
         verificarPercurso(problemas);
-        verificarPousos(problemas);
+        verificarPousoNoDestino(problemas);
         verificarHorarios(problemas);
         verificarMesmoDia(problemas);
         verificarAeronave(problemas);
@@ -139,35 +139,26 @@ public class PlanoDeVoo {
 
     private void verificarPercurso(List<String> problemas) {
         Trecho primeiro = trechos.get(0);
-        if (!mesmoAeroporto(primeiro.getAerovia().getOrigem(), origem)) {
-            problemas.add("Trecho 1 sai de " + primeiro.getAerovia().getOrigem().getCodigo()
-                    + ", mas o plano parte de " + origem.getCodigo());
+        if (!primeiro.getAerovia().getOrigem().equals(origem)) {
+            problemas.add("Trecho 1 sai de " + primeiro.getAerovia().getOrigem() + ", mas o plano parte de " + origem);
         }
         for (int i = 1; i < trechos.size(); i++) {
-            Aeroporto chegouEm = trechos.get(i - 1).getAerovia().getDestino();
-            Aeroporto saiDe = trechos.get(i).getAerovia().getOrigem();
-            if (!mesmoAeroporto(chegouEm, saiDe)) {
-                problemas.add("Trecho " + (i + 1) + " sai de " + saiDe.getCodigo()
-                        + ", mas o trecho " + i + " termina em " + chegouEm.getCodigo());
+            String chegouEm = trechos.get(i - 1).getAerovia().getDestino();
+            String saiDe = trechos.get(i).getAerovia().getOrigem();
+            if (!chegouEm.equals(saiDe)) {
+                problemas.add("Trecho " + (i + 1) + " sai de " + saiDe + ", mas o trecho " + i + " termina em " + chegouEm);
             }
         }
         Trecho ultimo = ultimoTrecho();
-        if (!mesmoAeroporto(ultimo.getAerovia().getDestino(), destino)) {
-            problemas.add("O último trecho termina em " + ultimo.getAerovia().getDestino().getCodigo()
-                    + ", mas o destino do plano é " + destino.getCodigo());
+        if (!ultimo.getAerovia().getDestino().equals(destino)) {
+            problemas.add("O último trecho termina em " + ultimo.getAerovia().getDestino()
+                    + ", mas o destino do plano é " + destino);
         }
     }
 
-    private void verificarPousos(List<String> problemas) {
+    private void verificarPousoNoDestino(List<String> problemas) {
         if (ultimoTrecho().getPouso() == null) {
             problemas.add("O voo precisa terminar com pouso no destino final");
-        }
-        for (Trecho t : trechos) {
-            Aeroporto aeroporto = t.getAerovia().getDestino();
-            if (t.getPouso() != null && !aeroporto.possuiVaga(t.getPouso().getNumeroVaga())) {
-                problemas.add("Trecho " + t.getOrdem() + ": a vaga " + t.getPouso().getNumeroVaga()
-                        + " não existe em " + aeroporto.getCodigo());
-            }
         }
     }
 
@@ -238,15 +229,11 @@ public class PlanoDeVoo {
         return trechos.get(trechos.size() - 1);
     }
 
-    private static boolean mesmoAeroporto(Aeroporto a, Aeroporto b) {
-        return a.getCodigo().equals(b.getCodigo());
-    }
-
     public Long getId() { return id; }
     public Piloto getPiloto() { return piloto; }
     public Aeronave getAeronave() { return aeronave; }
-    public Aeroporto getOrigem() { return origem; }
-    public Aeroporto getDestino() { return destino; }
+    public String getOrigem() { return origem; }
+    public String getDestino() { return destino; }
     public LocalDateTime getPartida() { return partida; }
     public SituacaoPlano getSituacao() { return situacao; }
     public List<Trecho> getTrechos() { return List.copyOf(trechos); }

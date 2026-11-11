@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReservaAeroviaJpaRepository extends JpaRepository<ReservaAeroviaEntity, Long> {
 
-    List<ReservaAeroviaEntity> findByAerovia_IdAndSlotInicioIn(String aeroviaId, Collection<LocalDateTime> slots);
+    List<ReservaAeroviaEntity> findByAeroviaIdAndSlotInicioIn(String aeroviaId, Collection<LocalDateTime> slots);
 
     @Modifying
     @Query("delete from ReservaAeroviaEntity r where r.planoId = :planoId")

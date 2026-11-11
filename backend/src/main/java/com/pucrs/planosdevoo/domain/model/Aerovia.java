@@ -5,20 +5,20 @@ import java.time.Duration;
 public class Aerovia {
 
     private final String id;
-    private final Aeroporto origem;
-    private final Aeroporto destino;
+    private final String origem;
+    private final String destino;
     private final double distanciaKm;
 
-    public Aerovia(String id, Aeroporto origem, Aeroporto destino, double distanciaKm) {
+    public Aerovia(String id, String origem, String destino, double distanciaKm) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Identificador da aerovia é obrigatório");
         }
         if (origem == null || destino == null) {
             throw new IllegalArgumentException("Aerovia precisa de origem e destino");
         }
-        if (origem.getCodigo().equals(destino.getCodigo())) {
+        if (origem.equals(destino)) {
             throw new IllegalArgumentException("Aerovia precisa ligar dois aeroportos diferentes: "
-                    + origem.getCodigo() + " foi informado como origem e destino");
+                    + origem + " foi informado como origem e destino");
         }
         if (distanciaKm <= 0) {
             throw new IllegalArgumentException("Distância da aerovia deve ser positiva");
@@ -36,7 +36,7 @@ public class Aerovia {
     }
 
     public String getId() { return id; }
-    public Aeroporto getOrigem() { return origem; }
-    public Aeroporto getDestino() { return destino; }
+    public String getOrigem() { return origem; }
+    public String getDestino() { return destino; }
     public double getDistanciaKm() { return distanciaKm; }
 }

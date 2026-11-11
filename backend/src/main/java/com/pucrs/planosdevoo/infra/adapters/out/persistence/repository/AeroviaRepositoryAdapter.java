@@ -32,8 +32,8 @@ public class AeroviaRepositoryAdapter implements AeroviaRepository {
     @Override
     public Aerovia salvar(Aerovia aerovia) {
         AeroviaEntity entidade = new AeroviaEntity(aerovia.getId(),
-                aeroportos.getReferenceById(aerovia.getOrigem().getCodigo()),
-                aeroportos.getReferenceById(aerovia.getDestino().getCodigo()), aerovia.getDistanciaKm());
+                aeroportos.getReferenceById(aerovia.getOrigem()),
+                aeroportos.getReferenceById(aerovia.getDestino()), aerovia.getDistanciaKm());
         jpa.save(entidade);
         return aerovia;
     }

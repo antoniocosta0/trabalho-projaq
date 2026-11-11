@@ -13,8 +13,6 @@ import com.pucrs.planosdevoo.domain.model.Slot;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoCommand;
 import com.pucrs.planosdevoo.domain.ports.in.PlanoDeVooUseCase;
 import com.pucrs.planosdevoo.domain.ports.in.TrechoCommand;
-import com.pucrs.planosdevoo.domain.ports.out.AeroportoRepository;
-import com.pucrs.planosdevoo.domain.ports.out.AeroviaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.PlanoDeVooRepository;
 import com.pucrs.planosdevoo.domain.ports.out.ReservaRepository;
 import com.pucrs.planosdevoo.domain.ports.out.TransacaoPort;
@@ -32,8 +30,6 @@ class AprovacaoAtomicaTest {
     @Autowired PlanoDeVooUseCase planoDeVoo;
     @Autowired PlanoDeVooRepository planos;
     @Autowired ReservaRepository reservas;
-    @Autowired AeroviaRepository aerovias;
-    @Autowired AeroportoRepository aeroportos;
     @Autowired TransacaoPort transacao;
 
     @Test
@@ -41,9 +37,9 @@ class AprovacaoAtomicaTest {
         planoDeVoo.aprovar(planoPoaFln(30_000, 3).getId());
         PlanoDeVoo disputa = planoPoaFln(31_000, 3);
         Slot slot = new Slot(PARTIDA);
-        ReservaAerovia altitudeLivre = new ReservaAerovia(disputa.getId(), aerovias.buscarPorId("R1").orElseThrow(),
+        ReservaAerovia altitudeLivre = new ReservaAerovia(disputa.getId(), "R1",
                 31_000, slot);
-        ReservaVaga vagaOcupada = new ReservaVaga(disputa.getId(), aeroportos.buscarPorCodigo("FLN").orElseThrow(),
+        ReservaVaga vagaOcupada = new ReservaVaga(disputa.getId(), "FLN",
                 3, slot);
 
         assertThrows(ConflitoDeReservaException.class, () -> transacao.executar(() -> {

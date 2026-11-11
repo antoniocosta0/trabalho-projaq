@@ -11,7 +11,7 @@ public record TrechoResponse(int ordem, String aerovia, String origem, String de
     public static TrechoResponse de(Trecho t) {
         boolean pousa = t.getPouso() != null;
         return new TrechoResponse(t.getOrdem(), t.getAerovia().getId(),
-                t.getAerovia().getOrigem().getCodigo(), t.getAerovia().getDestino().getCodigo(),
+                t.getAerovia().getOrigem(), t.getAerovia().getDestino(),
                 t.getAltitude(), t.getHorarioEntrada(), t.horarioChegada(),
                 pousa ? "POUSO" : "SOBREVOO",
                 pousa ? t.getPouso().getNumeroVaga() : null,

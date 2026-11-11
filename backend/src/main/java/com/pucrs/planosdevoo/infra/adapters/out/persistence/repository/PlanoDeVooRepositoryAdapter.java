@@ -1,5 +1,6 @@
 package com.pucrs.planosdevoo.infra.adapters.out.persistence.repository;
 
+import com.pucrs.planosdevoo.domain.model.Aerovia;
 import com.pucrs.planosdevoo.domain.model.PlanoDeVoo;
 import com.pucrs.planosdevoo.domain.model.Pouso;
 import com.pucrs.planosdevoo.domain.model.SituacaoPlano;
@@ -18,17 +19,12 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
     private final PlanoDeVooJpaRepository planos;
     private final PilotoJpaRepository pilotos;
     private final AeronaveJpaRepository aeronaves;
-    private final AeroportoJpaRepository aeroportos;
-    private final AeroviaJpaRepository aerovias;
 
     public PlanoDeVooRepositoryAdapter(PlanoDeVooJpaRepository planos, PilotoJpaRepository pilotos,
-                                   AeronaveJpaRepository aeronaves, AeroportoJpaRepository aeroportos,
-                                   AeroviaJpaRepository aerovias) {
+                                       AeronaveJpaRepository aeronaves) {
         this.planos = planos;
         this.pilotos = pilotos;
         this.aeronaves = aeronaves;
-        this.aeroportos = aeroportos;
-        this.aerovias = aerovias;
     }
 
     @Override
@@ -37,8 +33,8 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
                 plano.getId(),
                 pilotos.getReferenceById(plano.getPiloto().getId()),
                 aeronaves.getReferenceById(plano.getAeronave().getPrefixo()),
-                aeroportos.getReferenceById(plano.getOrigem().getCodigo()),
-                aeroportos.getReferenceById(plano.getDestino().getCodigo()),
+                plano.getOrigem(),
+                plano.getDestino(),
                 plano.getPartida(),
                 plano.getSituacao(),
                 plano.getTrechos().stream().map(this::trechoParaEntidade).toList());
@@ -51,8 +47,9 @@ public class PlanoDeVooRepositoryAdapter implements PlanoDeVooRepository {
 
     private TrechoEmbeddable trechoParaEntidade(Trecho t) {
         Pouso pouso = t.getPouso();
-        return new TrechoEmbeddable(t.getOrdem(), aerovias.getReferenceById(t.getAerovia().getId()),
-                t.getAltitude(), t.getHorarioEntrada(),
+        Aerovia aerovia = t.getAerovia();
+        return new TrechoEmbeddable(t.getOrdem(), aerovia.getId(), aerovia.getOrigem(), aerovia.getDestino(),
+                aerovia.getDistanciaKm(), t.getAltitude(), t.getHorarioEntrada(),
                 pouso == null ? null : pouso.getNumeroVaga(),
                 pouso == null ? null : pouso.getPermanenciaMinutos());
     }

@@ -72,8 +72,6 @@ class TrechoTest {
     }
 
     private static Aerovia aerovia(double distanciaKm) {
-        Aeroporto origem = new Aeroporto("POA", "Porto Alegre", 10);
-        Aeroporto destino = new Aeroporto("FLN", "Florianopolis", 8);
-        return new Aerovia("R1", origem, destino, distanciaKm);
+        return new Aerovia("R1", "POA", "FLN", distanciaKm);
     }
 }

@@ -51,22 +51,22 @@ WHEN NOT MATCHED THEN INSERT (id, piloto_id, aeronave_prefixo, origem_codigo, de
 
 MERGE INTO trecho t USING (VALUES
     -- 1001: R2 01:00-02:07, GRU ate 03:07; R7 03:07-03:35, CWB ate 05:05
-    (1001, 1, 'R2', 30000, TIMESTAMP '2026-10-19 01:00:00', 10, 60),
-    (1001, 2, 'R7', 30000, TIMESTAMP '2026-10-19 03:07:00', 5, 90),
+    (1001, 1, 'R2', 'POA', 'GRU', 865, 30000, TIMESTAMP '2026-10-19 01:00:00', 10, 60),
+    (1001, 2, 'R7', 'GRU', 'CWB', 360, 30000, TIMESTAMP '2026-10-19 03:07:00', 5, 90),
     -- 1002: R5 06:30-06:48, sobrevoo de FLN; R8 06:48-07:14, POA ate 07:59
-    (1002, 1, 'R5', 29000, TIMESTAMP '2026-10-19 06:30:00', NULL, NULL),
-    (1002, 2, 'R8', 29000, TIMESTAMP '2026-10-19 06:48:00', 12, 45),
+    (1002, 1, 'R5', 'CWB', 'FLN', 245, 29000, TIMESTAMP '2026-10-19 06:30:00', NULL, NULL),
+    (1002, 2, 'R8', 'FLN', 'POA', 363, 29000, TIMESTAMP '2026-10-19 06:48:00', 12, 45),
     -- 1003: R2 21:00-22:03, GRU ate 00:03 do dia 20
-    (1003, 1, 'R2', 31000, TIMESTAMP '2026-10-19 21:00:00', 20, 120),
+    (1003, 1, 'R2', 'POA', 'GRU', 865, 31000, TIMESTAMP '2026-10-19 21:00:00', 20, 120),
     -- 1004: R4 20:00-20:23, CWB ate 20:53; R6 20:53-21:26, GRU ate 23:26
-    (1004, 1, 'R4', 26000, TIMESTAMP '2026-10-19 20:00:00', 8, 30),
-    (1004, 2, 'R6', 26000, TIMESTAMP '2026-10-19 20:53:00', 21, 120),
+    (1004, 1, 'R4', 'FLN', 'CWB', 245, 26000, TIMESTAMP '2026-10-19 20:00:00', 8, 30),
+    (1004, 2, 'R6', 'CWB', 'GRU', 360, 26000, TIMESTAMP '2026-10-19 20:53:00', 21, 120),
     -- 1005: R1 08:00-08:26 em 17/10, FLN ate 09:26
-    (1005, 1, 'R1', 30000, TIMESTAMP '2026-10-17 08:00:00', 3, 60)
-) AS s (plano_id, ordem, aerovia_id, altitude, horario_entrada, numero_vaga, permanencia_minutos)
+    (1005, 1, 'R1', 'POA', 'FLN', 363, 30000, TIMESTAMP '2026-10-17 08:00:00', 3, 60)
+) AS s (plano_id, ordem, aerovia_id, origem_codigo, destino_codigo, distancia_km, altitude, horario_entrada, numero_vaga, permanencia_minutos)
 ON t.plano_id = s.plano_id AND t.ordem = s.ordem
-WHEN NOT MATCHED THEN INSERT (plano_id, ordem, aerovia_id, altitude, horario_entrada, numero_vaga, permanencia_minutos)
-    VALUES (s.plano_id, s.ordem, s.aerovia_id, s.altitude, s.horario_entrada, s.numero_vaga, s.permanencia_minutos);
+WHEN NOT MATCHED THEN INSERT (plano_id, ordem, aerovia_id, origem_codigo, destino_codigo, distancia_km, altitude, horario_entrada, numero_vaga, permanencia_minutos)
+    VALUES (s.plano_id, s.ordem, s.aerovia_id, s.origem_codigo, s.destino_codigo, s.distancia_km, s.altitude, s.horario_entrada, s.numero_vaga, s.permanencia_minutos);
 
 -- Só insere reserva de plano ainda APROVADO, para não recriar reserva já liberada.
 MERGE INTO reserva_aerovia t USING (SELECT v.* FROM (VALUES

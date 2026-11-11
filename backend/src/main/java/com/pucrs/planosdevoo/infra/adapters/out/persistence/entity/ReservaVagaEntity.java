@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -21,9 +19,8 @@ public class ReservaVagaEntity {
     @Column(name = "plano_id", nullable = false)
     private Long planoId;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "aeroporto_codigo")
-    private AeroportoEntity aeroporto;
+    @Column(name = "aeroporto_codigo", nullable = false)
+    private String aeroportoCodigo;
 
     @Column(name = "numero_vaga", nullable = false)
     private int numeroVaga;
@@ -33,15 +30,15 @@ public class ReservaVagaEntity {
 
     protected ReservaVagaEntity() { }
 
-    public ReservaVagaEntity(Long planoId, AeroportoEntity aeroporto, int numeroVaga, LocalDateTime slotInicio) {
+    public ReservaVagaEntity(Long planoId, String aeroportoCodigo, int numeroVaga, LocalDateTime slotInicio) {
         this.planoId = planoId;
-        this.aeroporto = aeroporto;
+        this.aeroportoCodigo = aeroportoCodigo;
         this.numeroVaga = numeroVaga;
         this.slotInicio = slotInicio;
     }
 
     public Long getPlanoId() { return planoId; }
-    public AeroportoEntity getAeroporto() { return aeroporto; }
+    public String getAeroportoCodigo() { return aeroportoCodigo; }
     public int getNumeroVaga() { return numeroVaga; }
     public LocalDateTime getSlotInicio() { return slotInicio; }
 }

@@ -55,12 +55,12 @@ public class DisponibilidadeService implements DisponibilidadeUseCase {
                 .toList();
     }
 
-    public List<String> conflitos(PlanoDeVoo plano) {
+    public List<String> verificarRecursos(PlanoDeVoo plano) {
         List<String> problemas = new ArrayList<>();
         Set<String> usadosPeloPlano = new HashSet<>();
         for (Trecho trecho : plano.getTrechos()) {
             verificarAltitude(trecho, usadosPeloPlano, problemas);
-            if (trecho.getPouso() != null) {
+            if (trecho.getPouso() != null && vagaExiste(trecho, problemas)) {
                 verificarVaga(trecho, usadosPeloPlano, problemas);
             }
         }
@@ -77,8 +77,20 @@ public class DisponibilidadeService implements DisponibilidadeUseCase {
         verificarSlots(trecho, recurso, trecho.slotsOcupados(), reservados, usadosPeloPlano, problemas);
     }
 
+    private boolean vagaExiste(Trecho trecho, List<String> problemas) {
+        String codigo = trecho.getAerovia().getDestino();
+        int vaga = trecho.getPouso().getNumeroVaga();
+        Aeroporto aeroporto = malhaAerea.buscarAeroporto(codigo)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Aeroporto " + codigo + " não encontrado"));
+        if (!aeroporto.possuiVaga(vaga)) {
+            problemas.add("Trecho " + trecho.getOrdem() + ": a vaga " + vaga + " não existe em " + codigo);
+            return false;
+        }
+        return true;
+    }
+
     private void verificarVaga(Trecho trecho, Set<String> usadosPeloPlano, List<String> problemas) {
-        String codigo = trecho.getAerovia().getDestino().getCodigo();
+        String codigo = trecho.getAerovia().getDestino();
         int vaga = trecho.getPouso().getNumeroVaga();
         Set<Slot> reservados = reservas.buscarReservasVaga(codigo, trecho.slotsDaVaga()).stream()
                 .filter(r -> r.getNumeroVaga() == vaga)

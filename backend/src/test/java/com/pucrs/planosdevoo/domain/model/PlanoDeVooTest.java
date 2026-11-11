@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Test;
 
 class PlanoDeVooTest {
 
-    private static final Aeroporto POA = new Aeroporto("POA", "Porto Alegre", 41);
-    private static final Aeroporto FLN = new Aeroporto("FLN", "Florianópolis", 16);
-    private static final Aeroporto CWB = new Aeroporto("CWB", "Curitiba", 26);
-    private static final Aeroporto GRU = new Aeroporto("GRU", "Guarulhos", 115);
+    private static final String POA = "POA";
+    private static final String FLN = "FLN";
+    private static final String CWB = "CWB";
+    private static final String GRU = "GRU";
 
     private static final Aerovia R1 = new Aerovia("R1", POA, FLN, 363);
     private static final Aerovia R2 = new Aerovia("R2", POA, GRU, 865);
@@ -31,7 +31,7 @@ class PlanoDeVooTest {
         return LocalDateTime.of(2026, 10, 19, hora, minuto);
     }
 
-    private static PlanoDeVoo plano(Aeronave aeronave, Aeroporto destino, LocalDateTime partida) {
+    private static PlanoDeVoo plano(Aeronave aeronave, String destino, LocalDateTime partida) {
         return PlanoDeVoo.novo(PILOTO, aeronave, POA, destino, partida);
     }
 
@@ -172,13 +172,6 @@ class PlanoDeVooTest {
         assertTemProblemaCom(p.validar(), "terminar com pouso");
     }
 
-    @Test
-    void vagaQueNaoExisteNoAeroporto() {
-        PlanoDeVoo p = plano(PASSAGEIROS, FLN, em(10, 0));
-        p.adicionarTrecho(R1, 30_000, em(10, 0), new Pouso(99, 30));
-
-        assertTemProblemaCom(p.validar(), "a vaga 99 não existe em FLN");
-    }
 
     @Test
     void primeiraEntradaDiferenteDaPartida() {

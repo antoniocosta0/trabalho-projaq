@@ -35,13 +35,11 @@ public class PlanoDeVooEntity {
     @JoinColumn(name = "aeronave_prefixo")
     private AeronaveEntity aeronave;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "origem_codigo")
-    private AeroportoEntity origem;
+    @Column(name = "origem_codigo", nullable = false)
+    private String origem;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "destino_codigo")
-    private AeroportoEntity destino;
+    @Column(name = "destino_codigo", nullable = false)
+    private String destino;
 
     @Column(nullable = false)
     private LocalDateTime partida;
@@ -57,8 +55,8 @@ public class PlanoDeVooEntity {
 
     protected PlanoDeVooEntity() { }
 
-    public PlanoDeVooEntity(Long id, PilotoEntity piloto, AeronaveEntity aeronave, AeroportoEntity origem,
-                            AeroportoEntity destino, LocalDateTime partida, SituacaoPlano situacao,
+    public PlanoDeVooEntity(Long id, PilotoEntity piloto, AeronaveEntity aeronave, String origem,
+                            String destino, LocalDateTime partida, SituacaoPlano situacao,
                             List<TrechoEmbeddable> trechos) {
         this.id = id;
         this.piloto = piloto;
@@ -73,8 +71,8 @@ public class PlanoDeVooEntity {
     public Long getId() { return id; }
     public PilotoEntity getPiloto() { return piloto; }
     public AeronaveEntity getAeronave() { return aeronave; }
-    public AeroportoEntity getOrigem() { return origem; }
-    public AeroportoEntity getDestino() { return destino; }
+    public String getOrigem() { return origem; }
+    public String getDestino() { return destino; }
     public LocalDateTime getPartida() { return partida; }
     public SituacaoPlano getSituacao() { return situacao; }
     public List<TrechoEmbeddable> getTrechos() { return trechos; }
