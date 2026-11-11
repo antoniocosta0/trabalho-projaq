@@ -37,6 +37,20 @@ Para ensaiar a apresentação em outro dia, fixe o relógio:
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--app.relogio.instante-fixo=2026-10-19T10:00:00
 ```
 
+## Executar com Docker
+
+Requer Docker com Compose v2. O build da imagem roda os testes. Decisão em
+[ADR 0009](docs/arquitetura/decisoes/0009-implantacao-em-conteineres.md).
+
+```sh
+docker compose up -d --build --wait --wait-timeout 300
+docker compose ps
+docker compose down       # mantém o volume com o banco
+docker compose down -v    # apaga o volume; a próxima subida recarrega o seed
+```
+
+Para fixar o relógio, copie `.env.example` para `.env` e preencha `APP_RELOGIO_INSTANTE_FIXO`.
+
 ## Banco e carga inicial
 
 H2 em arquivo (`backend/data/`), então o estado sobrevive à reinicialização. Na subida, o

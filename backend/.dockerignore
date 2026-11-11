@@ -1,0 +1,15 @@
+# Contexto do build: so o que o Dockerfile copia (mvnw, .mvn, pom.xml, src).
+# O resto atrasa o envio ao builder e pode vazar estado local para a imagem.
+target/
+data/
+*.db
+*.mv.db
+*.trace.db
+*.lock.db
+*.log
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Dockerfile
+.dockerignore
