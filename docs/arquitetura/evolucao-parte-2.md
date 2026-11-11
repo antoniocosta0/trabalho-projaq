@@ -47,3 +47,25 @@ Não existe ponto de saída para avisar outra aplicação de que uma aprovação
 - Consulta da rede aérea: buscar um aeroporto (código, nome, vagas) e uma aerovia (id, origem, destino, distância) por identificador.
 - Comunicação da aprovação: identificação do plano aprovado e o instante da aprovação, gravados junto com a aprovação.
 - Propriedade do plano: o plano não tem dono, e a mensagem de aprovação exige o criador.
+
+### O que mudou e por quê
+
+| Mudança | Por quê | Mudança futura concentrada aqui |
+|---|---|---|
+| `MalhaAereaPort` (`domain/ports/out`) com `MalhaAereaLocalAdapter` | planos e disponibilidade deixam de usar os repositórios da malha | etapa 3 troca só o adaptador por um cliente HTTP |
+| plano guarda códigos de aeroporto; trecho guarda cópia da aerovia; sem FKs para a malha | ler um plano não depende mais das tabelas `aeroporto` e `aerovia` | etapa 3 apaga essas tabelas sem tocar nos planos |
+| a existência da vaga passou do `PlanoDeVoo` para `DisponibilidadeService.verificarRecursos`, via porta | a vaga cadastrada pertence ao cadastro; a ocupação, à gestão | o mesmo código passa a consultar o cadastro por HTTP |
+| `AprovacaoPublisherPort` e tabela `outbox_evento`, gravada na transação da aprovação | toda aprovação efetivada passa a ter a intenção de envio registrada | etapa 4 acrescenta só o publicador e o RabbitMQ |
+| cabeçalho `X-Usuario` e coluna `criador` | propriedade dos planos e criador na mensagem | o gateway apenas repassa o cabeçalho |
+
+Decisões: ADRs 0010, 0011 e 0012. O `MalhaAereaService` e suas rotas continuam no monólito até a
+etapa 3; é o bloco que será extraído inteiro.
+
+### Evidências
+
+- `./mvnw test` no `backend/`: regras da parte 1, propriedade (`PlanoDeVooServiceTest`) e outbox
+  só em aprovação efetivada (validar e aprovação recusada não gravam).
+- `docs/api/requests.http` executado do início ao fim num banco limpo, com os mesmos resultados
+  da parte 1 e os novos 401 e 403.
+- O schema mudou: para usar um banco criado antes desta etapa, apague `backend/data/`
+  (ou `docker compose down -v`).

@@ -15,13 +15,16 @@ class Aeroporto {
 
 class Aerovia {
   id
+  origem (código)
+  destino (código)
   distanciaKm
   --
   duracao(velocidade) : Duration
 }
 
 note right of Aerovia
-  Orientada e imutável após o cadastro.
+  Orientada e imutável. O trecho guarda uma
+  cópia; o cadastro mestre fica na malha.
 end note
 
 class Piloto {
@@ -58,15 +61,19 @@ class AeronaveFactory {
 
 class PlanoDeVoo <<raiz de agregado>> {
   id
+  criador
+  origem (código)
+  destino (código)
   partida
   situacao
   --
+  pertenceA(usuario) : boolean
   alterarDados(piloto, aeronave, origem, destino, partida)
   adicionarTrecho(aerovia, altitude, entrada, pouso)
   alterarTrecho(ordem, ...)
   removerTrecho(ordem)
   validar() : List<String>
-  aprovar(conflitos)
+  aprovar(problemasDosRecursos)
   cancelar(agora)
   abandonar()
   reservasDeAerovia() : List<ReservaAerovia>
@@ -105,11 +112,13 @@ end note
 
 class ReservaAerovia {
   planoId
+  aeroviaId
   altitude
 }
 
 class ReservaVaga {
   planoId
+  aeroportoCodigo
   numeroVaga
 }
 
@@ -120,8 +129,8 @@ enum SituacaoPlano {
   ABANDONADO
 }
 
-Aerovia "*" --> "1" Aeroporto : origem
-Aerovia "*" --> "1" Aeroporto : destino
+Aerovia "*" ..> "1" Aeroporto : origem
+Aerovia "*" ..> "1" Aeroporto : destino
 
 Aeronave <|-- AeronaveParticular
 Aeronave <|-- AeronavePassageiros
@@ -130,8 +139,8 @@ AeronaveFactory ..> Aeronave : cria
 
 PlanoDeVoo "*" --> "1" Piloto
 PlanoDeVoo "*" --> "1" Aeronave
-PlanoDeVoo "*" --> "1" Aeroporto : origem
-PlanoDeVoo "*" --> "1" Aeroporto : destino
+PlanoDeVoo "*" ..> "1" Aeroporto : origem
+PlanoDeVoo "*" ..> "1" Aeroporto : destino
 PlanoDeVoo --> SituacaoPlano
 PlanoDeVoo "1" *-- "0..*" Trecho : percurso
 Trecho "*" --> "1" Aerovia
@@ -139,9 +148,14 @@ Trecho "1" *-- "0..1" Pouso
 
 PlanoDeVoo "1" -- "0..*" ReservaAerovia
 PlanoDeVoo "1" -- "0..*" ReservaVaga
-ReservaAerovia "*" --> "1" Aerovia
+ReservaAerovia "*" ..> "1" Aerovia
 ReservaAerovia "*" --> "1" Slot
-ReservaVaga "*" --> "1" Aeroporto
+ReservaVaga "*" ..> "1" Aeroporto
 ReservaVaga "*" --> "1" Slot
+
+note as referencias
+  Setas tracejadas: referência por código,
+  sem chave estrangeira (etapa 1 da parte 2).
+end note
 
 @enduml

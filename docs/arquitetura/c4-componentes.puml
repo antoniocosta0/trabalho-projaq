@@ -11,8 +11,8 @@ Container_Boundary(api, "Backend (Spring Boot)") {
   Component(portas_in, "Portas de entrada", "Interfaces Java", "MalhaAereaUseCase, FrotaUseCase, DisponibilidadeUseCase, PlanoDeVooUseCase e os commands")
   Component(servicos, "Serviços", "Java puro", "MalhaAereaService, FrotaService, DisponibilidadeService, PlanoDeVooService")
   Component(modelo, "Modelo de domínio", "Java puro", "PlanoDeVoo, Trecho, Pouso, Slot, Aerovia, Aeroporto, Aeronave e categorias, reservas")
-  Component(portas_out, "Portas de saída", "Interfaces Java", "AeroportoRepository, AeroviaRepository, PilotoRepository, AeronaveRepository, PlanoDeVooRepository, ReservaRepository, TransacaoPort")
-  Component(persistencia, "Adaptadores de persistência", "Spring Data JPA", "RepositoryAdapters, JpaRepositories, entidades JPA, mappers e TransacaoSpringAdapter")
+  Component(portas_out, "Portas de saída", "Interfaces Java", "MalhaAereaPort, AprovacaoPublisherPort, AeroportoRepository, AeroviaRepository, PilotoRepository, AeronaveRepository, PlanoDeVooRepository, ReservaRepository, TransacaoPort")
+  Component(persistencia, "Adaptadores de persistência", "Spring Data JPA", "RepositoryAdapters, MalhaAereaLocalAdapter, AprovacaoOutboxAdapter (tabela outbox_evento), JpaRepositories, entidades JPA, mappers e TransacaoSpringAdapter")
   Component(config, "Configuração", "Spring @Configuration", "ServiceConfig cria os serviços; OpenApiConfig")
 }
 

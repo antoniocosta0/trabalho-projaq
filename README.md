@@ -51,6 +51,12 @@ docker compose down -v    # apaga o volume; a próxima subida recarrega o seed
 
 Para fixar o relógio, copie `.env.example` para `.env` e preencha `APP_RELOGIO_INSTANTE_FIXO`.
 
+## Usuário
+
+As rotas `/planos` exigem o cabeçalho `X-Usuario` (401 sem ele). Cada usuário só vê e altera os
+próprios planos (403). Na carga inicial, os planos 1001 a 1005 pertencem a `carla`, `ana`, `bruno`,
+`diego` e `bruno`.
+
 ## Banco e carga inicial
 
 H2 em arquivo (`backend/data/`), então o estado sobrevive à reinicialização. Na subida, o
@@ -94,6 +100,7 @@ Problem Detail (RFC 7807), com `problemas` quando há mais de um.
 - Casos de uso: [`docs/dominio/casos-de-uso.md`](docs/dominio/casos-de-uso.md)
 - C4 (contexto, contêineres, componentes): [`docs/arquitetura/`](docs/arquitetura/)
 - Decisões: [`docs/arquitetura/decisoes/`](docs/arquitetura/decisoes/)
+- Evolução da parte 2, por etapa: [`docs/arquitetura/evolucao-parte-2.md`](docs/arquitetura/evolucao-parte-2.md)
 
 ![Modelo de domínio](docs/dominio/modelo-dominio.png)
 ![C4 contexto](docs/arquitetura/c4-contexto.png)
