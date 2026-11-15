@@ -2,25 +2,27 @@
 
 Ator único: **Usuário**. O enunciado não distingue perfis.
 
-| UC | Caso de uso | Serviço | Endpoint |
+| UC | Caso de uso | Serviço (aplicação) | Endpoint pelo gateway |
 |---|---|---|---|
-| UC01 | Consultar aeroportos | `MalhaAereaService` | `GET /aeroportos` |
-| UC02 | Consultar aerovias | `MalhaAereaService` | `GET /aerovias` |
-| UC03 | Consultar pilotos | `FrotaService` | `GET /pilotos` |
-| UC04 | Consultar aeronaves | `FrotaService` | `GET /aeronaves` |
-| UC05 | Criar plano | `PlanoDeVooService` | `POST /planos` |
-| UC06 | Editar plano e percurso | `PlanoDeVooService` | `PUT /planos/{id}`, `POST/PUT/DELETE /planos/{id}/trechos` |
-| UC07 | Consultar altitudes disponíveis | `DisponibilidadeService` | `GET /aerovias/{id}/altitudes-disponiveis` |
-| UC08 | Consultar vagas disponíveis | `DisponibilidadeService` | `GET /aeroportos/{codigo}/vagas-disponiveis` |
-| UC09 | Validar plano | `PlanoDeVooService` | `POST /planos/{id}/validacao` |
-| UC10 | Aprovar plano | `PlanoDeVooService` | `POST /planos/{id}/aprovacao` |
-| UC11 | Abandonar plano | `PlanoDeVooService` | `POST /planos/{id}/abandono` |
-| UC12 | Cancelar plano | `PlanoDeVooService` | `POST /planos/{id}/cancelamento` |
-| UC13 | Consultar plano | `PlanoDeVooService` | `GET /planos/{id}` |
-| UC14 | Consultar planos por situação | `PlanoDeVooService` | `GET /planos?situacao=` |
+| UC01 | Consultar aeroportos | `MalhaAereaService` (cadastro) | `GET /cadastro/aeroportos` |
+| UC02 | Consultar aerovias | `MalhaAereaService` (cadastro) | `GET /cadastro/aerovias` |
+| UC03 | Consultar pilotos | `FrotaService` (gestão) | `GET /gestao/pilotos` |
+| UC04 | Consultar aeronaves | `FrotaService` (gestão) | `GET /gestao/aeronaves` |
+| UC05 | Criar plano | `PlanoDeVooService` (gestão) | `POST /gestao/planos` |
+| UC06 | Editar plano e percurso | `PlanoDeVooService` (gestão) | `PUT /gestao/planos/{id}`, `POST/PUT/DELETE /gestao/planos/{id}/trechos` |
+| UC07 | Consultar altitudes disponíveis | `DisponibilidadeService` (gestão) | `GET /gestao/aerovias/{id}/altitudes-disponiveis` |
+| UC08 | Consultar vagas disponíveis | `DisponibilidadeService` (gestão) | `GET /gestao/aeroportos/{codigo}/vagas-disponiveis` |
+| UC09 | Validar plano | `PlanoDeVooService` (gestão) | `POST /gestao/planos/{id}/validacao` |
+| UC10 | Aprovar plano | `PlanoDeVooService` (gestão) | `POST /gestao/planos/{id}/aprovacao` |
+| UC11 | Abandonar plano | `PlanoDeVooService` (gestão) | `POST /gestao/planos/{id}/abandono` |
+| UC12 | Cancelar plano | `PlanoDeVooService` (gestão) | `POST /gestao/planos/{id}/cancelamento` |
+| UC13 | Consultar plano | `PlanoDeVooService` (gestão) | `GET /gestao/planos/{id}` |
+| UC14 | Consultar planos por situação | `PlanoDeVooService` (gestão) | `GET /gestao/planos?situacao=` |
 
-Os cadastros de aeroporto, aerovia, piloto e aeronave (`POST` nas mesmas rotas de consulta)
-existem porque o §2 e o §8.1 pedem, mas não têm regra de negócio além de recusar duplicatas.
+Os cadastros de aeroporto e aerovia (`POST /cadastro/...`) e de piloto e aeronave
+(`POST /gestao/...`) existem porque o §2 e o §8.1 pedem, mas não têm regra de negócio além de
+recusar duplicatas. Na parte 2, as rotas `/gestao/planos` exigem o cabeçalho `X-Usuario` e cada
+aprovação efetivada é registrada no serviço `registro` (`GET /registro/aprovacoes/{planoId}`).
 
 ## Regras por caso de uso
 
