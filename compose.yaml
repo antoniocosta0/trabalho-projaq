@@ -13,6 +13,21 @@ x-limites: &limites
       memory: 512M
 
 services:
+  rabbitmq:
+    image: rabbitmq:4.3.7-management
+    hostname: rabbitmq
+    ports:
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - planos-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      <<: *saude
+    deploy: *limites
+    restart: unless-stopped
+
   eureka:
     build: ./eureka
     image: pas/eureka:${TAG:-p2}
@@ -67,6 +82,7 @@ services:
     image: pas/planos-de-voo:${TAG:-p2}
     environment:
       EUREKA_URL: http://eureka:8761/eureka
+      RABBITMQ_HOST: rabbitmq
       APP_RELOGIO_ZONA: ${APP_RELOGIO_ZONA:-America/Sao_Paulo}
       APP_RELOGIO_INSTANTE_FIXO: ${APP_RELOGIO_INSTANTE_FIXO:-}
     volumes:
@@ -82,6 +98,27 @@ services:
     deploy: *limites
     restart: unless-stopped
 
+  registro:
+    build: ./registro
+    image: pas/registro:${TAG:-p2}
+    environment:
+      EUREKA_URL: http://eureka:8761/eureka
+      RABBITMQ_HOST: rabbitmq
+    volumes:
+      - registro-data:/app/data
+    networks:
+      - planos-net
+    depends_on:
+      eureka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/actuator/health"]
+      <<: *saude
+    deploy: *limites
+    restart: unless-stopped
+
 networks:
   planos-net:
     driver: bridge
@@ -89,3 +126,5 @@ networks:
 volumes:
   planos-data:
   cadastro-data:
+  registro-data:
+  rabbitmq-data:
