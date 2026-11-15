@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(MalhaAereaEmMemoriaConfig.class)
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:seed;DB_CLOSE_DELAY=-1",
-        "eureka.client.enabled=false"})
+        "eureka.client.enabled=false", "app.outbox.publicar=false"})
 class SeedTest {
 
     private static final LocalDate DATA_DE_REFERENCIA = LocalDate.of(2026, 10, 19);

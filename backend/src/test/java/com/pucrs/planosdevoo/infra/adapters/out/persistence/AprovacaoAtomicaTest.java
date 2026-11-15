@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(MalhaAereaEmMemoriaConfig.class)
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:atomicidade;DB_CLOSE_DELAY=-1",
-        "eureka.client.enabled=false"})
+        "eureka.client.enabled=false", "app.outbox.publicar=false"})
 class AprovacaoAtomicaTest {
 
     private static final LocalDateTime PARTIDA = LocalDateTime.of(2031, 3, 12, 10, 0);

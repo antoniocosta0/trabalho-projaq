@@ -67,5 +67,7 @@ CREATE TABLE IF NOT EXISTS outbox_evento (
     evento_id     VARCHAR(36) PRIMARY KEY,
     plano_id      BIGINT      NOT NULL UNIQUE,
     aprovado_em   TIMESTAMP   NOT NULL,
-    publicado_em  TIMESTAMP
+    publicado_em  TIMESTAMP,
+    tentativas    INT          NOT NULL DEFAULT 0,
+    ultimo_erro   VARCHAR(500)
 );

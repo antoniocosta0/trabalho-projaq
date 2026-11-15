@@ -23,6 +23,12 @@ public class OutboxEventoEntity {
     @Column(name = "publicado_em")
     private LocalDateTime publicadoEm;
 
+    @Column(nullable = false)
+    private int tentativas;
+
+    @Column(name = "ultimo_erro")
+    private String ultimoErro;
+
     protected OutboxEventoEntity() { }
 
     public OutboxEventoEntity(String eventoId, Long planoId, LocalDateTime aprovadoEm) {
@@ -31,8 +37,21 @@ public class OutboxEventoEntity {
         this.aprovadoEm = aprovadoEm;
     }
 
+    public void marcarPublicado(LocalDateTime instante) {
+        publicadoEm = instante;
+        tentativas++;
+        ultimoErro = null;
+    }
+
+    public void registrarFalha(String erro) {
+        tentativas++;
+        ultimoErro = erro == null ? null : erro.substring(0, Math.min(erro.length(), 500));
+    }
+
     public String getEventoId() { return eventoId; }
     public Long getPlanoId() { return planoId; }
     public LocalDateTime getAprovadoEm() { return aprovadoEm; }
     public LocalDateTime getPublicadoEm() { return publicadoEm; }
+    public int getTentativas() { return tentativas; }
+    public String getUltimoErro() { return ultimoErro; }
 }
