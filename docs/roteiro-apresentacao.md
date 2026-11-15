@@ -1,11 +1,14 @@
 # Roteiro da apresentação
 
+Parte 1 abaixo. As demonstrações da parte 2 estão na tabela do fim de
+[`arquitetura/evolucao-parte-2.md`](arquitetura/evolucao-parte-2.md).
+
 Cada demonstração aponta para o bloco de [`api/requests.http`](api/requests.http).
 Banco limpo e blocos na ordem. Para ensaiar em qualquer data com o resultado de 19/10:
 
 ```sh
-cd backend && rm -rf ./data && ./mvnw spring-boot:run \
-  -Dspring-boot.run.arguments=--app.relogio.instante-fixo=2026-10-19T10:00:00
+docker compose down -v
+APP_RELOGIO_INSTANTE_FIXO=2026-10-19T10:00:00 docker compose up -d --build --wait
 ```
 
 | # | Demonstração | Bloco | Resultado |

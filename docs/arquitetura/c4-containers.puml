@@ -7,12 +7,15 @@ Person(usuario, "Usuário", "Monta, valida, aprova e gerencia planos de voo")
 System_Ext(cliente, "Cliente HTTP", "curl, REST Client, Swagger UI")
 
 System_Boundary(sistema, "Sistema de Gestão de Planos de Voo") {
-  Container(gateway, "API Gateway", "Spring Cloud Gateway", "Único ponto de entrada (porta 8080). /gestao/** e /cadastro/** vão para os serviços, sem o prefixo")
+  Container(gateway, "API Gateway", "Spring Cloud Gateway", "Único ponto de entrada (porta 8080). /gestao/**, /cadastro/** e /registro/** vão para os serviços, sem o prefixo")
   Container(eureka, "Eureka", "Spring Cloud Netflix Eureka", "Catálogo das instâncias em execução (painel na porta 8761)")
   Container(api, "Gestão de planos", "Java 25, Spring Boot 4.1.1", "Planos, reservas, disponibilidade, pilotos e aeronaves")
   Container(cadastro, "Cadastro da rede aérea", "Java 25, Spring Boot 4.1.1", "Aeroportos, vagas e aerovias")
   ContainerDb(banco, "Banco da gestão", "H2 em arquivo", "Planos, trechos, reservas, outbox, pilotos e aeronaves")
   ContainerDb(bancoCadastro, "Banco do cadastro", "H2 em arquivo", "Aeroportos, vagas e aerovias")
+  Container(registro, "Registro de aprovações", "Java 25, Spring Boot 4.1.1", "Guarda a cópia de cada aprovação recebida e a expõe para consulta")
+  ContainerDb(bancoRegistro, "Banco do registro", "H2 em arquivo", "Aprovações recebidas")
+  ContainerQueue(rabbit, "RabbitMQ", "RabbitMQ 4.3", "Exchange planos.aprovacoes, fila registro.aprovacoes e DLQ")
 }
 
 Rel(usuario, cliente, "Usa")
@@ -25,5 +28,10 @@ Rel(gateway, cadastro, "Encaminha", "HTTP, lb://cadastro")
 Rel(api, cadastro, "Consulta aeroportos e aerovias", "HTTP/JSON síncrono, lb://cadastro")
 Rel(cadastro, eureka, "Registra-se", "HTTP")
 Rel(cadastro, bancoCadastro, "Lê e grava", "JDBC")
+Rel(api, rabbit, "Publica aprovações (outbox + confirmação)", "AMQP")
+Rel(rabbit, registro, "Entrega aprovações", "AMQP, fila durável")
+Rel(gateway, registro, "Encaminha", "HTTP, lb://registro")
+Rel(registro, eureka, "Registra-se", "HTTP")
+Rel(registro, bancoRegistro, "Lê e grava", "JDBC")
 
 @enduml

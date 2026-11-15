@@ -6,6 +6,7 @@ title Nível 3 - Componentes do Backend (hexagonal)
 System_Ext(cliente, "Cliente HTTP", "curl, Swagger UI, REST Client")
 ContainerDb(banco, "Banco da gestão", "H2 em arquivo", "Frota, planos, reservas e outbox")
 Container_Ext(cadastro, "Cadastro da rede aérea", "Spring Boot", "Aeroportos, vagas e aerovias")
+ContainerQueue(rabbit, "RabbitMQ", "AMQP", "planos.aprovacoes → registro.aprovacoes")
 
 Container_Boundary(api, "Gestão de planos (Spring Boot)") {
   Component(rest, "Adaptadores REST", "Spring Web MVC", "FrotaController, DisponibilidadeController, PlanoDeVooController, DTOs e RestExceptionHandler")
@@ -15,7 +16,8 @@ Container_Boundary(api, "Gestão de planos (Spring Boot)") {
   Component(portas_out, "Portas de saída", "Interfaces Java", "MalhaAereaPort, AprovacaoPublisherPort, PilotoRepository, AeronaveRepository, PlanoDeVooRepository, ReservaRepository, TransacaoPort")
   Component(persistencia, "Adaptadores de persistência", "Spring Data JPA", "RepositoryAdapters, AprovacaoOutboxAdapter (tabela outbox_evento), JpaRepositories, entidades JPA, mappers e TransacaoSpringAdapter")
   Component(http, "Adaptador HTTP do cadastro", "RestClient + Spring Cloud LoadBalancer", "MalhaAereaHttpAdapter: 404 vira vazio, demais falhas viram 503; tempos limite 2 s / 3 s")
-  Component(config, "Configuração", "Spring @Configuration", "ServiceConfig cria os serviços; OpenApiConfig")
+  Component(mensageria, "Publicador de aprovações", "Spring AMQP, @Scheduled", "AprovacaoRabbitPublisher lê o outbox e marca publicado só após a confirmação; AprovacaoMensagem é o contrato v1")
+  Component(config, "Configuração", "Spring @Configuration", "ServiceConfig, CadastroClientConfig, RabbitConfig (topologia), OpenApiConfig")
 }
 
 Rel(cliente, rest, "Requisições", "HTTP/JSON")
@@ -27,6 +29,8 @@ Rel_U(persistencia, portas_out, "Implementa")
 Rel(persistencia, banco, "Lê e grava", "JDBC")
 Rel_U(http, portas_out, "Implementa")
 Rel(http, cadastro, "GET /aeroportos/{codigo}/vagas, GET /aerovias/{id}", "HTTP/JSON")
+Rel(mensageria, banco, "Lê pendentes e marca publicados", "JDBC")
+Rel(mensageria, rabbit, "Publica", "AMQP, publisher confirms")
 Rel(config, servicos, "Instancia")
 
 @enduml

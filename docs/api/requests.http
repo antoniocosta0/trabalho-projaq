@@ -7,6 +7,7 @@
 
 @host = http://localhost:8080/gestao
 @cadastro = http://localhost:8080/cadastro
+@registro = http://localhost:8080/registro
 
 ### ── 1. Malha aérea e frota ──────────────────────────────────────
 
@@ -470,3 +471,18 @@ Content-Type: application/json
 
 { "prefixo": "PR-ZZ2", "categoria": "CARGA", "velocidadeCruzeiroKmh": 900,
   "autonomiaKm": 3000, "companhiaAerea": "Sul Cargas" }
+
+### ── 9. Registro das aprovações (mensagens assíncronas) ───────────
+### A publicação roda a cada 5 s: uma aprovação recém-feita pode levar alguns segundos para aparecer.
+
+### 9.1 Aprovações registradas: 1001 a 1005 da carga, 1 e 11 deste roteiro
+GET {{registro}}/aprovacoes
+
+### 9.2 Cópia da aprovação do plano 1, mesmo cancelado
+GET {{registro}}/aprovacoes/1
+
+### 9.3 Plano só validado não tem registro: 404
+GET {{registro}}/aprovacoes/2
+
+### 9.4 Aprovação recusada não tem registro: 404
+GET {{registro}}/aprovacoes/7

@@ -1,0 +1,21 @@
+@startuml
+title Modelo de Domínio - Registro de aprovações
+hide circle
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class RegistroAprovacao {
+  eventoId
+  planoId
+  aprovadoEm
+  recebidoEm
+  conteudo (mensagem como recebida)
+}
+
+note right of RegistroAprovacao
+  Um registro por evento e por plano.
+  A consulta não depende da gestão nem do cadastro.
+end note
+
+@enduml

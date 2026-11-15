@@ -135,3 +135,39 @@ Decisão: ADR 0014. Contrato: `docs/api/cadastro.md`.
 - Cadastro fora: `docker compose stop cadastro`. Consultar um plano continua funcionando; validar
   e aprovar respondem 503 e o plano continua em edição. `docker compose start cadastro` → volta.
 - Novos recursos: cadastrar SDU e R9 (seção 8) e aprovar um plano por eles, sem alterar a gestão.
+
+## Etapa 4 — Registro assíncrono das aprovações
+
+### O que mudou
+
+| Mudança | Onde |
+|---|---|
+| publicador do outbox com confirmação do broker; colunas `tentativas` e `ultimo_erro` | `backend/.../infra/adapters/out/messaging`, `outbox_evento` |
+| contrato da mensagem (versão 1) | `AprovacaoMensagem`, `docs/api/mensagens.md` |
+| serviço novo: consumidor idempotente, banco próprio e consulta REST | `registro/` |
+| RabbitMQ, `registro` e rota `/registro/**` | `compose.yaml`, `gateway/` |
+
+Decisão: ADR 0015 (e ADR 0011 para o outbox).
+
+### Consistência eventual
+
+A aprovação continua atômica no banco da gestão: situação, reservas e linha do outbox na mesma
+transação. A publicação acontece depois, fora dela. Se o broker, a gestão ou o registro estiverem
+fora, o registro fica atrasado e se completa quando eles voltam; nada é perdido nem duplicado.
+
+### Como demonstrar (§7 da parte 2)
+
+Com `APP_RELOGIO_INSTANTE_FIXO=2026-10-19T10:00:00 docker compose up -d --build --wait`:
+
+| # | Demonstração | Como |
+|---|---|---|
+| 5 | aprovação chega ao registro | aprovar um plano; `GET /registro/aprovacoes/{id}` |
+| 6 | validar e aprovação recusada não registram | `requests.http` 2.5 e 4.2; `GET /registro/aprovacoes/2` e `/7` dão 404 |
+| 7 | consumidor parado | `docker compose stop registro`; aprovar; a mensagem espera na fila (painel em `:15672`); `docker compose start registro` → registrado |
+| 8 | broker ou produtor fora | `docker compose stop rabbitmq`; aprovar (200); o log mostra "não publicada (tentativa N)"; `docker compose stop planos`; `start rabbitmq`; `start planos` → publicada e registrada |
+| 9 | reenvio sem duplicar | publicar de novo, pelo painel, o JSON de `GET /registro/aprovacoes/1001` na exchange `planos.aprovacoes` com a chave `plano.aprovado`; o log diz "já registrada, ignorada" e a contagem não muda |
+| 10 | cancelamento preserva o histórico | `requests.http` 5.1; `GET /registro/aprovacoes/1` continua igual |
+| 11 | dados após reinício | `docker compose restart`; planos, cadastro, registros e outbox iguais; nada é reenviado |
+
+Os planos aprovados da carga inicial (1001 a 1005) chegam ao registro pela fila na primeira
+subida, com `eventoId` fixo; reinícios não os duplicam.

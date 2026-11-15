@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [backend, cadastro, registro, gateway, eureka]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -17,10 +20,11 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Testes
-        working-directory: backend
-        run: ./mvnw -B clean test
+        working-directory: ${{ matrix.app }}
+        run: ./mvnw -B clean verify
       - name: Domínio sem dependência de infraestrutura
+        if: matrix.app == 'backend' || matrix.app == 'cadastro' || matrix.app == 'registro'
         run: |
-          if grep -rn "org.springframework\|jakarta.persistence\|infra\." backend/src/main/java/com/pucrs/planosdevoo/domain/; then
+          if grep -rn "org.springframework\|jakarta.persistence\|infra\." ${{ matrix.app }}/src/main/java/com/pucrs/*/domain/; then
             exit 1
           fi
